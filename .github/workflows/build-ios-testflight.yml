@@ -1,0 +1,152 @@
+name: Build SleepRise iOS and TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_to_testflight:
+        description: "Build tamamlandığında TestFlight'a yükle"
+        required: true
+        default: true
+        type: boolean
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    # İş akışını, gerekli Apple ve GitHub ayarları tamamlanana kadar güvenli biçimde devre dışı tutar.
+    if: vars.IOS_CI_ENABLED == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    env:
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      PROFILE_BASE64: ${{ secrets.APPSTORE_PROVISIONING_PROFILE_BASE64 }}
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: pnpm kur
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: JavaScript bağımlılıklarını yükle
+        run: pnpm install --frozen-lockfile
+
+      - name: Web varlıklarını iOS projesine eşitle
+        run: npx cap sync ios
+
+      - name: iOS bağımlılıklarını CocoaPods ile kur
+        working-directory: ios/App
+        run: pod install --repo-update
+
+      - name: iOS dağıtım sertifikasını anahtarlığa aktar
+        uses: apple-actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: ${{ secrets.APPSTORE_CERTIFICATES_FILE_BASE64 }}
+          p12-password: ${{ secrets.APPSTORE_CERTIFICATES_PASSWORD }}
+
+      - name: App Store provisioning profile kur
+        id: profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          PROFILE_TMP="$RUNNER_TEMP/SleepRise.mobileprovision"
+          if ! printf '%s' "$PROFILE_BASE64" | base64 --decode > "$PROFILE_TMP"; then
+            printf '%s' "$PROFILE_BASE64" | base64 -D > "$PROFILE_TMP"
+          fi
+          security cms -D -i "$PROFILE_TMP" > "$RUNNER_TEMP/profile.plist"
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")
+          cp "$PROFILE_TMP" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+          echo "name=$PROFILE_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: IPA dışa aktarma ayarlarını oluştur
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>$APPLE_TEAM_ID</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$IOS_BUNDLE_ID</key>
+              <string>${{ steps.profile.outputs.name }}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Xcode arşivini oluştur
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$RUNNER_TEMP/SleepRise.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            PRODUCT_BUNDLE_IDENTIFIER="$IOS_BUNDLE_ID" \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="${{ steps.profile.outputs.name }}" \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            clean archive
+
+      - name: IPA oluştur
+        shell: bash
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/SleepRise.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: IPA dosyasını bul
+        id: ipa
+        shell: bash
+        run: |
+          set -euo pipefail
+          IPA_PATH=$(find "$RUNNER_TEMP/export" -maxdepth 1 -name '*.ipa' -print -quit)
+          test -n "$IPA_PATH"
+          echo "path=$IPA_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: IPA çıktısını sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: sleeprise-ios-${{ github.run_number }}
+          path: ${{ steps.ipa.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: TestFlight'a yükle
+        if: ${{ (github.event_name == 'push' && vars.IOS_AUTO_UPLOAD == 'true') || (github.event_name == 'workflow_dispatch' && inputs.upload_to_testflight) }}
+        uses: apple-actions/upload-testflight-build@v5
+        with:
+          app-path: ${{ steps.ipa.outputs.path }}
+          issuer-id: ${{ vars.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ vars.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          release-notes: "SleepRise iOS build #${{ github.run_number }}"
+          uses-non-exempt-encryption: ${{ vars.IOS_USES_NON_EXEMPT_ENCRYPTION || 'false' }}
+          wait-for-processing: 'false'
+          backend: AppStoreAPI

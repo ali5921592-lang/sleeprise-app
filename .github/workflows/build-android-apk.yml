@@ -1,0 +1,56 @@
+name: Build Sleepify Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: pnpm kur
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Java kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: JavaScript bağımlılıklarını yükle
+        run: pnpm install --frozen-lockfile
+
+      - name: Web varlıklarını Android projesine eşitle
+        run: npx cap sync android
+
+      - name: Debug APK derle
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: APK çıktısını yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sleepify-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14

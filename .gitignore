@@ -1,0 +1,22 @@
+node_modules/
+.DS_Store
+.env
+.env.*
+
+# Capacitor tarafından www/ klasöründen yeniden üretilen native web çıktıları
+android/app/src/main/assets/public/
+ios/App/App/public/
+android/app/src/main/assets/capacitor.config.json
+ios/App/App/capacitor.config.json
+
+# Yerel derleme çıktıları
+android/.gradle/
+android/build/
+android/app/build/
+ios/App/Pods/
+ios/App/build/
+*.ipa
+*.xcarchive
+*.p12
+*.mobileprovision
+AuthKey_*.p8

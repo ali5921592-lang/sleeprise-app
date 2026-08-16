@@ -1,0 +1,24 @@
+{
+  "name": "sleepify-apk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SleepRise HTML uygulamasını Android ve iOS için paketleyen Capacitor projesi.",
+  "scripts": {
+    "sync": "npx cap sync",
+    "sync:android": "npx cap sync android",
+    "sync:ios": "npx cap sync ios",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios",
+    "build:android": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "typescript": "^7.0.2"
+  }
+}
