@@ -10,5 +10,17 @@
   "android": {
     "allowMixedContent": false,
     "captureInput": true
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#00B899",
+      "sound": "alarm_default.wav",
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "banner",
+        "list"
+      ]
+    }
   }
 }
