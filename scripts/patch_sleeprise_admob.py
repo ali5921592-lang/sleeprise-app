@@ -213,7 +213,7 @@ def upsert_android():
 
 def upsert_main_activity():
     java = MAIN_ACTIVITY_PATH.read_text()
-    bridge = '''\n    private final class SleepRiseBuildBridge {\n        @JavascriptInterface\n        public boolean isDebug() { return BuildConfig.DEBUG; }\n    }\n'''
+    bridge = '''\n    private final class SleepRiseBuildBridge {\n        @JavascriptInterface\n        public boolean isDebug() { return (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0; }\n    }\n'''
     if 'class SleepRiseBuildBridge' not in java:
         java = java.replace('\n    private void handleWebMediaRequest', bridge + '\n    private void handleWebMediaRequest')
     if 'addJavascriptInterface(new SleepRiseBuildBridge()' not in java:
