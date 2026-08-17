@@ -1,0 +1,73 @@
+name: Build SleepRise Android release AAB
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-release-aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: pnpm kur
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Java kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Android upload keystore’unu hazırla
+        env:
+          SLEEPRISE_UPLOAD_KEYSTORE_B64: ${{ secrets.SLEEPRISE_UPLOAD_KEYSTORE_B64 }}
+        run: |
+          test -n "$SLEEPRISE_UPLOAD_KEYSTORE_B64"
+          printf '%s' "$SLEEPRISE_UPLOAD_KEYSTORE_B64" | base64 --decode > "$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"
+          test -s "$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"
+
+      - name: JavaScript bağımlılıklarını yükle
+        run: pnpm install --frozen-lockfile
+
+      - name: Web varlıklarını Android projesine eşitle
+        run: npx cap sync android
+
+      - name: İmzalı release AAB derle
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/android/sleeprise-upload-key.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.SLEEPRISE_ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+          chmod +x android/gradlew
+          cd android
+          ./gradlew bundleRelease --no-daemon
+
+      - name: İmzalı AAB artefaktını yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sleeprise-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Keystore dosyasını temizle
+        if: always()
+        run: rm -f "$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"

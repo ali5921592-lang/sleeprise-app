@@ -1419,7 +1419,8 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
-</body>
+\n
+\n</body>
 </html>
 <script id="sleeprise-features-v42">
 (function(){
@@ -1775,7 +1776,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const nativeIds=()=>{try{return JSON.parse(localStorage.getItem('sleeprise_v49_native_ids')||'[]')}catch(e){return[]}};
   const saveNativeIds=x=>{try{localStorage.setItem('sleeprise_v49_native_ids',JSON.stringify(x))}catch(e){}};
   function alarmOccurrences(a,limit=14){const out=[],now=new Date();for(let day=0;day<32&&out.length<limit;day++){const d=new Date(now);d.setDate(now.getDate()+day);d.setHours(a.h,a.m,0,0);if(d<=now)continue;if(!a.days?.length||a.days.includes(d.getDay()))out.push(d)}return out}
-  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}const active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:base,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,a.days?.length?14:1)){const id=300000+(seq++);ids.push(id);notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_'+base,sound:'default',ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
+  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}const active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_v53_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:base,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,a.days?.length?14:1)){const id=300000+(seq++);ids.push(id);notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_v53_'+base,sound:base,ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
   function hookNativeScheduling(){
     const oldRefresh=window.refresh;if(typeof oldRefresh==='function'&&!oldRefresh.__v49){const wrapped=function(){const r=oldRefresh.apply(this,arguments);setTimeout(syncNativeAlarms,120);return r};wrapped.__v49=true;window.refresh=wrapped}
     setTimeout(syncNativeAlarms,1400);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(syncNativeAlarms,300)});
@@ -1855,5 +1856,108 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   document.addEventListener('click',e=>{const target=e.target.closest('#langGrid [data-l],#langMenu [data-l]');if(target)setTimeout(refresh,40)},true);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
+\n
+\n
+\n
+\n
+
+<script id="sleeprise-v53-language-onboarding">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV53LocaleReady)return;
+  window.__SleepRiseV53LocaleReady=true;
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const LANG_META={
+    tr:{name:'Türkçe',loc:'tr-TR',dir:'ltr',title:'Dilini seç',sub:'SleepRise uygulamasını kullanmak istediğin dili seç.',go:'Devam et'},
+    en:{name:'English',loc:'en-US',dir:'ltr',title:'Choose your language',sub:'Choose the language you want to use in SleepRise.',go:'Continue'},
+    es:{name:'Español',loc:'es-ES',dir:'ltr',title:'Elige tu idioma',sub:'Elige el idioma que quieres usar en SleepRise.',go:'Continuar'},
+    de:{name:'Deutsch',loc:'de-DE',dir:'ltr',title:'Sprache auswählen',sub:'Wähle die Sprache, die du in SleepRise verwenden möchtest.',go:'Weiter'},
+    fr:{name:'Français',loc:'fr-FR',dir:'ltr',title:'Choisissez votre langue',sub:'Choisissez la langue que vous souhaitez utiliser dans SleepRise.',go:'Continuer'},
+    pt:{name:'Português',loc:'pt-BR',dir:'ltr',title:'Escolha seu idioma',sub:'Escolha o idioma que você deseja usar no SleepRise.',go:'Continuar'},
+    ar:{name:'العربية',loc:'ar-SA',dir:'rtl',title:'اختر لغتك',sub:'اختر اللغة التي تريد استخدامها في SleepRise.',go:'متابعة'},
+    zh:{name:'简体中文',loc:'zh-CN',dir:'ltr',title:'选择语言',sub:'选择你希望在 SleepRise 中使用的语言。',go:'继续'},
+    ja:{name:'日本語',loc:'ja-JP',dir:'ltr',title:'言語を選択',sub:'SleepRiseで使用する言語を選択してください。',go:'続ける'}
+  };
+  const codes=Object.keys(LANG_META);
+  const current=()=>{try{if(typeof lang!=='undefined'&&lang)return lang}catch(e){}return (navigator.language||'en').slice(0,2).toLowerCase() in LANG_META?(navigator.language||'en').slice(0,2).toLowerCase():'en'};
+  const data=()=>{try{return typeof DATA!=='undefined'?DATA:null}catch(e){return null}};
+  const maps=()=>{try{return typeof I18N!=='undefined'?I18N:null}catch(e){return null}};
+  const mergeAll=()=>{
+    const d=data(),i=maps(); if(!d||!i)return false;
+    codes.forEach(code=>{
+      i[code]=i[code]||{};
+      Object.assign(i[code],d.base?.[code]||{},d.extra?.I18N_EXT?.[code]||{},d.extra?.I18N_OB?.[code]||{},d.extra?.I18N_TD?.[code]||{},d.extra?.I18N_TOUR?.[code]||{});
+      Object.values(d.legacy?.full||{}).forEach(pack=>{if(pack?.[code])Object.assign(i[code],pack[code])});
+      if(typeof I18N_EXT!=='undefined'&&I18N_EXT[code])Object.assign(i[code],I18N_EXT[code]);
+      if(typeof I18N_OB!=='undefined'&&I18N_OB[code])Object.assign(i[code],I18N_OB[code]);
+      if(typeof I18N_TD!=='undefined'&&I18N_TD[code])Object.assign(i[code],I18N_TD[code]);
+      if(typeof I18N_TOUR!=='undefined'&&I18N_TOUR[code])Object.assign(i[code],I18N_TOUR[code]);
+    });
+    return true;
+  };
+  const code=()=>{const c=current();return codes.includes(c)?c:'en'};
+  const localeMap=()=>{const i=maps(),c=code();return i?.[c]||{}};
+  const msg=(key,fallback)=>{const d=data(),m=d?.messages?.[code()];return m?.[key]??localeMap()[key]??fallback??key};
+  const tx=(key,fallback)=>localeMap()[key]??fallback??key;
+  const setLang=(c)=>{
+    if(!codes.includes(c))c='en';
+    try{lang=c}catch(e){}
+    try{if(typeof save==='function')save();else localStorage.setItem('sf_lang',JSON.stringify(c))}catch(e){}
+    document.documentElement.lang=LANG_META[c].loc;
+    document.documentElement.dir=LANG_META[c].dir;
+    mergeAll();
+    try{if(typeof applyI18n==='function')applyI18n()}catch(e){}
+    try{if(typeof renderLangMenu==='function')renderLangMenu()}catch(e){}
+    try{if(typeof renderLangModal==='function')renderLangModal()}catch(e){}
+    try{if(typeof renderTones==='function')renderTones()}catch(e){}
+    syncGenerated();
+  };
+  const toneName=(id)=>{
+    const d=data(),c=code(),t=d?.tones?.[c];
+    return t?.[id]||localeMap()['tone_'+id]||tx('tone_'+id,id);
+  };
+  const soundName=(id)=>{
+    const c=code(),m=localeMap();
+    return m['snd_'+id]||m['tone_'+id]||({fire:'snd_fire',rain:'snd_rain',wind:'snd_wind',wave:'snd_wave',forest:'snd_forest',white:'snd_white'}[id]&&m[({fire:'snd_fire',rain:'snd_rain',wind:'snd_wind',wave:'snd_wave',forest:'snd_forest',white:'snd_white'}[id])])||id;
+  };
+  const ATM_KEYS={fire:'snd_fire',fireplace:'snd_fire',fireplaceCrackle:'snd_fire',rain:'snd_rain',rainWindow:'snd_rain',wind:'snd_wind',waves:'snd_wave',wave:'snd_wave',ocean:'snd_wave',forest:'snd_forest'};
+  const setText=(el,value)=>{if(el&&value!=null&&String(value).trim())el.textContent=value};
+  const syncGenerated=()=>{
+    mergeAll();
+    const m=data()?.messages?.[code()]||{};
+    const set=(sel,key)=>setText($(sel),m[key]||tx(key));
+    set('#v49-settings .v49-settings-head b','settings');set('#v49-settings .v49-settings-head small','settingsDesc');
+    [['v49SleepAmbient','sleepAmbient','sleepAmbientDesc'],['v49WakeAmbient','wakeAmbient','wakeAmbientDesc'],['v49VoiceGuide','voiceGuide','voiceGuideDesc']].forEach(([id,k,dk])=>{const el=$('#'+id);const row=el?.closest('.v49-setting-row');const s=row?.querySelectorAll('span b,span small')||[];setText(s[0],m[k]||tx(k));setText(s[1],m[dk]||tx(dk));});
+    set('#v49ExactAlarm','exactAlarm');set('#v49MixerOff','mixerOff');set('#v49AtmosphereOff','atmosphereOff');set('#v49WakeCard .v49-wake-kicker','dailyMotivation');set('#v49WakeCard .v49-wake-sub','scheduleAlarm');set('#v49WakeAddAlarm','addAlarm');
+    $$('[data-v42-relax-play]').forEach(btn=>{const row=btn.closest('[data-v42-relax-row]')||btn.closest('.snd');const playing=row?.classList.contains('is-playing');setText(btn,playing?(tx('stop')||m.stop||'Stop'):(tx('start')||m.start||'Start'));});
+    $$('[data-snd]').forEach(card=>{const id=card.dataset.snd;if(!id||card.dataset.custom==='true')return;const label=card.querySelector('.snd-name,.tone-name,.alarm-tone-name');if(label)setText(label,soundName(id));});
+    $$('[data-tone]').forEach(el=>setText(el,toneName(el.dataset.tone)));
+    $$('[data-atm]').forEach(card=>{const id=card.dataset.atm;const key=ATM_KEYS[id]||('atm_'+id);const label=card.querySelector('.atm-name,.atmosphere-name,.v42-atm-name,.name,b,strong');if(label)setText(label,localeMap()[key]||localeMap()['snd_'+id]||label.textContent);});
+    const literal={
+      'BAŞLAT':'start','BAŞLATMAK':'start','DURDUR':'stop','DUR':'stop','Tüm sesleri kapat':'mixerOff','Atmosferi kapat':'atmosphereOff','Alarm ekle':'addAlarm','Günün motivasyonu':'dailyMotivation','Uyanışını bugünden planla.':'scheduleAlarm','Ses ayarları':'settings','Uyku arka planı':'sleepAmbient','Uyanış arka planı':'wakeAmbient','Sesli nefes rehberi':'voiceGuide','Android kesin alarm iznini kontrol et':'exactAlarm','Kesin alarm izni açık.':'exactAlarmOpen','Alarm cihazda kaydedildi':'nativeAlarm','Uyku arka plan sesleri kapatıldı':'sleepAmbientOff','Tüm rahatlama sesleri kapatıldı':'allRelaxOff','Atmosfer kapatıldı':'atmosphereClosed','Radyo için ekrana dokun.':'radioTap','Şömine sesini başlatmak için ekrana dokun.':'fireTap'
+    };
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(n=>{const v=n.nodeValue.trim();const k=literal[v];if(k&&code()!=='tr'){const val=m[k]||tx(k);if(val)n.nodeValue=n.nodeValue.replace(v,val);}});
+  };
+  const addStyles=()=>{if($('#sr53LocaleStyle'))return;const s=document.createElement('style');s.id='sr53LocaleStyle';s.textContent=`#sr53LanguageGate{position:fixed;inset:0;z-index:60000;display:grid;place-items:center;padding:22px;background:linear-gradient(145deg,#07132d,#162c60 55%,#0b8e8a);font-family:Inter,system-ui,sans-serif;color:#f7fbff}#sr53LanguageGate[hidden]{display:none}.sr53-panel{width:min(470px,100%);padding:26px 22px;border-radius:28px;background:rgba(6,17,43,.93);box-shadow:0 24px 80px rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.15)}.sr53-brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}.sr53-brand img{width:44px;height:44px;border-radius:13px;object-fit:cover}.sr53-brand b{font-size:21px;letter-spacing:-.03em}.sr53-panel h1{margin:0 0 8px;font-size:27px;line-height:1.08}.sr53-panel p{margin:0 0 18px;color:#b8c7e4;font-size:14px;line-height:1.5}.sr53-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sr53-grid button{min-height:62px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.06);color:#edf6ff;text-align:center;padding:8px 5px;font:700 12px Inter,system-ui;transition:transform .16s ease,background .16s ease,border-color .16s ease}.sr53-grid button:active{transform:scale(.97)}.sr53-grid button.on{background:linear-gradient(135deg,#41d7c2,#4b7dff);border-color:rgba(255,255,255,.55);box-shadow:0 8px 20px rgba(60,190,220,.25)}.sr53-grid button span{display:block;font-size:20px;margin-bottom:4px}.sr53-go{width:100%;margin-top:18px;border:0;border-radius:15px;padding:14px 16px;background:#f6c453;color:#13244b;font:800 14px Inter,system-ui}.sr53-go:active{transform:scale(.98)}`;document.head.appendChild(s)};
+  const gateText=(c)=>LANG_META[c]||LANG_META.en;
+  const showGate=()=>{
+    if($('#sr53LanguageGate'))return;
+    addStyles();const c0=code();const gate=document.createElement('div');gate.id='sr53LanguageGate';gate.setAttribute('role','dialog');gate.setAttribute('aria-modal','true');gate.innerHTML=`<div class="sr53-panel" dir="${LANG_META[c0].dir}"><div class="sr53-brand"><img src="icon-192.png" alt="SleepRise"><b>SleepRise</b></div><h1 id="sr53GateTitle"></h1><p id="sr53GateSub"></p><div class="sr53-grid" id="sr53GateGrid"></div><button class="sr53-go" id="sr53GateGo" type="button"></button></div>`;document.body.appendChild(gate);
+    const render=()=>{const c=code(),t=gateText(c);gate.querySelector('.sr53-panel').dir=t.dir;setText($('#sr53GateTitle'),t.title);setText($('#sr53GateSub'),t.sub);setText($('#sr53GateGo'),t.go);$('#sr53GateGrid').innerHTML=codes.map(x=>`<button type="button" data-sr53-lang="${x}" class="${x===c?'on':''}"><span>${({tr:'🇹🇷',en:'🇬🇧',es:'🇪🇸',de:'🇩🇪',fr:'🇫🇷',pt:'🇧🇷',ar:'🇸🇦',zh:'🇨🇳',ja:'🇯🇵'})[x]}</span>${LANG_META[x].name}</button>`).join('');};
+    render();$('#sr53GateGrid').addEventListener('click',e=>{const b=e.target.closest('[data-sr53-lang]');if(!b)return;setLang(b.dataset.sr53Lang);render();});
+    $('#sr53GateGo').addEventListener('click',()=>{const c=code();try{localStorage.setItem('sleeprise_v53_language_confirmed',c)}catch(e){};gate.remove();try{$('#langModal')?.classList.remove('on')}catch(e){};setLang(c);const done=(()=>{try{return typeof DB!=='undefined'&&DB.get('onbDone',false)}catch(e){return false}})();try{if(!done&&typeof obShow==='function')obShow()}catch(e){try{if(!done)$('#onb')?.classList.add('on')}catch(_){} }});
+  };
+  const boot=()=>{
+    let ready=false;for(let i=0;i<50;i++){if(mergeAll()){ready=true;break}}
+    try{if(typeof applyI18n==='function')applyI18n()}catch(e){}
+    try{if(typeof renderTones==='function')renderTones()}catch(e){}
+    syncGenerated();
+    const fresh=!localStorage.getItem('sleeprise_v53_language_confirmed');const onboardingDone=(()=>{try{return typeof DB!=='undefined'&&DB.get('onbDone',false)}catch(e){return false}})();
+    if(fresh){try{$('#onb')?.classList.remove('on');$('#langModal')?.classList.remove('on')}catch(e){};showGate();}
+    let last=code();setInterval(()=>{const c=code();if(c!==last){last=c;mergeAll();try{if(typeof applyI18n==='function')applyI18n()}catch(e){};try{if(typeof renderTones==='function')renderTones()}catch(e){};syncGenerated();}},350);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,80),{once:true});else setTimeout(boot,80);
 })();
 </script>

@@ -20,3 +20,6 @@ ios/App/build/
 *.p12
 *.mobileprovision
 AuthKey_*.p8
+*.jks
+*.keystore
+android/sleeprise-upload-key.jks
