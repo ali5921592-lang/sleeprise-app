@@ -1439,6 +1439,16 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
 
 
 
+
+
+
+
+
+
+
+
+
+
 <!-- sleeprise-v55-locale-complete -->
 <script id="sleeprise-v55-locale-complete">
 (function(){
@@ -1568,6 +1578,166 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   const run=()=>{try{const saved=JSON.parse(localStorage.getItem('sr_locale_v55')||'null');if(C.includes(saved)&&typeof lang!=='undefined')lang=saved}catch(e){}refresh();setTimeout(refresh,25);setInterval(refresh,160);document.addEventListener('click',e=>{const card=e.target?.closest?.('#langGrid .langcard');if(card?.dataset?.l&&C.includes(card.dataset.l)){localStorage.setItem('sr_locale_v55',JSON.stringify(card.dataset.l));localStorage.setItem('sf_lang',JSON.stringify(card.dataset.l));try{if(typeof lang!=='undefined')lang=card.dataset.l}catch(e){}setTimeout(refresh,60)}if(e.target?.closest?.('#sr53GateGrid button,[data-lang],#btnLang'))setTimeout(refresh,60)},true)};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(run,220),{once:true});else setTimeout(run,220);
 })();
+
+/* v55 onboarding locale completion */
+(function(){
+  'use strict';
+  if(window.__sr55OnbLocale)return;
+  window.__sr55OnbLocale=true;
+  const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
+  const T={
+    tr:{title:'SleepRise’a hoş geldin',sub:'Dursun, uyku ve uyanış ritmini küçük adımlarla kurmana yardım edecek.',luma:'Merhaba, ben Luma. Geceyi sakin, sabahı net kılmak için buradayım.',helloSleep:'Uyku zamanı yaklaşıyor',helloWake:'Günaydın! Kahven hazır.',captionSleep:'Uyku ritmini birlikte kuralım',captionWake:'Birlikte dinç uyanalım',skip:'Atla',next:'Devam et',aria:'Luma, SleepRise ateşböceği maskotu'},
+    en:{title:'Welcome to SleepRise',sub:'Dursun will help you build a calmer sleep and wake rhythm, one small step at a time.',luma:'Hi, I’m Luma. I’m here to make nights calmer and mornings clearer.',helloSleep:'Bedtime is getting closer',helloWake:'Good morning! Your coffee is ready.',captionSleep:'Let’s build your sleep rhythm together',captionWake:'Let’s wake up refreshed together',skip:'Skip',next:'Continue',aria:'Luma, SleepRise firefly mascot'},
+    es:{title:'Te damos la bienvenida a SleepRise',sub:'Dursun te ayudará a crear un ritmo de sueño y despertar más tranquilo, paso a paso.',luma:'Hola, soy Luma. Estoy aquí para hacer tus noches más tranquilas y tus mañanas más claras.',helloSleep:'Se acerca la hora de dormir',helloWake:'¡Buenos días! Tu café está listo.',captionSleep:'Construyamos juntos tu ritmo de sueño',captionWake:'Despertemos con energía juntos',skip:'Omitir',next:'Continuar',aria:'Luma, mascota luciérnaga de SleepRise'},
+    de:{title:'Willkommen bei SleepRise',sub:'Dursun hilft dir Schritt für Schritt, einen ruhigeren Schlaf- und Wachrhythmus aufzubauen.',luma:'Hallo, ich bin Luma. Ich mache deine Nächte ruhiger und deine Morgen klarer.',helloSleep:'Die Schlafenszeit rückt näher',helloWake:'Guten Morgen! Dein Kaffee ist fertig.',captionSleep:'Lass uns gemeinsam deinen Schlafrhythmus aufbauen',captionWake:'Lass uns gemeinsam erholt aufwachen',skip:'Überspringen',next:'Weiter',aria:'Luma, das Glühwürmchen-Maskottchen von SleepRise'},
+    fr:{title:'Bienvenue sur SleepRise',sub:'Dursun t’aide à construire un rythme de sommeil et de réveil plus serein, étape par étape.',luma:'Bonjour, je suis Luma. Je suis là pour apaiser tes nuits et éclaircir tes matins.',helloSleep:'L’heure du coucher approche',helloWake:'Bonjour ! Ton café est prêt.',captionSleep:'Construisons ensemble ton rythme de sommeil',captionWake:'Réveillons-nous ensemble en pleine forme',skip:'Passer',next:'Continuer',aria:'Luma, la mascotte luciole de SleepRise'},
+    pt:{title:'Boas-vindas ao SleepRise',sub:'Dursun vai ajudar você a criar um ritmo de sono e despertar mais tranquilo, passo a passo.',luma:'Olá, eu sou a Luma. Estou aqui para deixar suas noites mais calmas e suas manhãs mais claras.',helloSleep:'A hora de dormir está chegando',helloWake:'Bom dia! Seu café está pronto.',captionSleep:'Vamos construir seu ritmo de sono juntos',captionWake:'Vamos acordar renovados juntos',skip:'Pular',next:'Continuar',aria:'Luma, mascote vaga-lume do SleepRise'},
+    ar:{title:'مرحبًا بك في SleepRise',sub:'سيساعدك دورسون على بناء إيقاع أكثر هدوءًا للنوم والاستيقاظ، خطوة صغيرة في كل مرة.',luma:'مرحبًا، أنا لوما. أنا هنا لأجعل لياليك أهدأ وصباحك أوضح.',helloSleep:'اقترب موعد النوم',helloWake:'صباح الخير! قهوتك جاهزة.',captionSleep:'لنبنِ إيقاع نومك معًا',captionWake:'لنستيقظ بنشاط معًا',skip:'تخطّي',next:'متابعة',aria:'لوما، تميمة اليراعة في SleepRise'},
+    zh:{title:'欢迎使用 SleepRise',sub:'Dursun 会陪你一步一步建立更平稳的睡眠与起床节奏。',luma:'你好，我是 Luma。我会让夜晚更安静，让清晨更清晰。',helloSleep:'快到睡觉时间了',helloWake:'早上好！你的咖啡准备好了。',captionSleep:'一起建立你的睡眠节奏',captionWake:'一起精神饱满地醒来',skip:'跳过',next:'继续',aria:'Luma，SleepRise 萤火虫吉祥物'},
+    ja:{title:'SleepRiseへようこそ',sub:'Dursunと一緒に、小さな一歩から穏やかな睡眠と目覚めのリズムを整えましょう。',luma:'こんにちは、Lumaです。夜を穏やかに、朝をすっきり過ごせるようにお手伝いします。',helloSleep:'そろそろ就寝時間です',helloWake:'おはようございます！コーヒーの準備ができました。',captionSleep:'一緒に睡眠リズムを整えましょう',captionWake:'一緒にすっきり目覚めましょう',skip:'スキップ',next:'続ける',aria:'Luma、SleepRiseのホタルマスコット'}
+  };
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return T[v]?v:'tr'}catch(e){return'tr'}};
+  function render(){const o=q('#onb');if(!o)return;const c=code(),t=T[c]||T.en,step=typeof obStep!=='undefined'?Number(obStep):0;
+    const title=q('#onbTitle',o),sub=q('#onbSub',o),note=q('.v35-onb-note',o),hello=q('#v33OnbDursun .hello',o),cap=q('#v33OnbDursun .caption',o),skip=q('#onbSkip',o),next=q('#onbNext',o);
+    if(step===0){if(title)title.textContent=t.title;if(sub)sub.textContent=t.sub}
+    if(note)note.textContent=t.luma;
+    if(hello)hello.textContent=step===5||step===6?t.helloWake:t.helloSleep;
+    if(cap)cap.textContent=step===5||step===6?t.captionWake:t.captionSleep;
+    if(skip)skip.textContent=t.skip;if(next)next.textContent=t.next;
+    qa('#onb [aria-label]').forEach(e=>{if(/Luma|Sleepify|SleepRise|Dursun|ateşböceği|firefly|luciole|luciérnaga|Glühwürmchen|vaga-lume|يراعة|萤火虫|ホタル/i.test(e.getAttribute('aria-label')||''))e.setAttribute('aria-label',t.aria)});
+  }
+  const start=()=>{render();const o=q('#onb');if(o&&!o.dataset.sr55OnbObserver){o.dataset.sr55OnbObserver='1';o.addEventListener('click',()=>setTimeout(render,0),true)}};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+  setInterval(render,160);
+})();
+/* /v55 onboarding locale completion */
+
+/* v55 runtime QA readability and safe text defaults */
+(function(){
+  'use strict';
+  if(window.__sr55QaStyle)return;
+  window.__sr55QaStyle=true;
+  const s=document.createElement('style');s.id='sr55QaReadability';s.textContent=`.v49-settings,.sr44-relax-library,.sr44-cinema-library,.sr44-tone-card,.sr44-relax-card,.sr44-video-card{word-break:normal;overflow-wrap:anywhere}.v49-settings small,.v49-setting-row small,.sr44-section-head p,.sr44-relax-card small,.sr44-video-card small,.sr44-tone-card small{line-height:1.45}.sr53-panel h1,.sr53-panel p,.sr53-go,.sr53-grid button{line-height:1.35;overflow-wrap:anywhere}.onb .card2 h2,.onb .card2 p,.onb .card2 button{overflow-wrap:anywhere}.onb .card2 p{line-height:1.5}.onb .card2 button{min-height:44px}`;document.head.appendChild(s);
+})();
+/* /v55 runtime QA readability and safe text defaults */
+
+/* v55 alarm simulation helpers: deterministic, non-invasive QA surface */
+(function(){
+  'use strict';
+  if(window.__sr55AlarmQA)return;
+  window.__sr55AlarmQA=true;
+  window.SleepRiseAlarmQA={
+    occurrences(a,limit){try{const out=[],now=new Date(),max=limit||14;for(let i=0;i<32&&out.length<max;i++){const d=new Date(now);d.setDate(now.getDate()+i);d.setHours(Number(a.h)||0,Number(a.m)||0,0,0);if(d<=now)continue;const days=Array.isArray(a.days)?a.days.map(Number):[];if(!days.length||days.includes(d.getDay()))out.push(d.toISOString())}return out}catch(e){return[]}},
+    async sync(){try{return typeof syncNativeAlarms==='function'?await syncNativeAlarms():{ok:false,reason:'unavailable'}}catch(e){return{ok:false,reason:String(e)}}},
+    fire(id){try{const a=typeof alarms!=='undefined'&&alarms.find(x=>String(x.id)===String(id));if(a&&typeof fire==='function'){fire(a);return true}return false}catch(e){return false}},
+    list(){try{return typeof alarms!=='undefined'?alarms.map(a=>({id:a.id,h:a.h,m:a.m,days:a.days||[],on:!!a.on,tone:a.tone,task:a.task||a.challenge||'none'})):[] }catch(e){return[]}}
+  };
+})();
+/* /v55 alarm simulation helpers */
+
+/* v55 v42 setup onboarding locale completion */
+(function(){
+  'use strict';
+  if(window.__sr55V42OnbLocale)return;
+  window.__sr55V42OnbLocale=true;
+  const q=s=>document.querySelector(s);
+  const T={
+    tr:{dir:'ltr',kicker:'SLEEP RISE · KISA KURULUM',title:'Sana uygun bir başlangıç hazırlayalım',sub:'Yaş aralığın ve seçtiğin özellikler, uygulamada göreceğin önerileri düzenler. İstersen daha sonra değiştirebilirsin.',age:'Yaş aralığın',gender:'Cinsiyet',feature:'İlk bakışta sana göstereceklerimiz',featureDesc:'Uyku planı, alarm sesleri, radyo ile uyanma ve rahatlama modları.',ageNote:'Uyku hedeflerini günlük rutinine göre sade tutacağız.',ages:['18 yaş altı','18–24','25–34','35–44','45+'],genders:['Kadın','Erkek','Belirtmek istemiyorum'],save:'BAŞLA',skip:'ŞİMDİ DEĞİL'},
+    en:{dir:'ltr',kicker:'SLEEP RISE · QUICK SETUP',title:'Let’s prepare a start that fits you',sub:'Your age range and chosen features help tailor the recommendations you see. You can change them later.',age:'Age range',gender:'Gender',feature:'What we’ll show you first',featureDesc:'Sleep planning, alarm sounds, radio wake-up and relaxation modes.',ageNote:'We’ll keep your sleep goals simple and aligned with your daily routine.',ages:['Under 18','18–24','25–34','35–44','45+'],genders:['Female','Male','Prefer not to say'],save:'GET STARTED',skip:'NOT NOW'},
+    es:{dir:'ltr',kicker:'SLEEP RISE · CONFIGURACIÓN RÁPIDA',title:'Preparemos un comienzo a tu medida',sub:'Tu edad y las funciones que elijas adaptan las recomendaciones que verás. Puedes cambiarlo más tarde.',age:'Edad',gender:'Género',feature:'Lo que te mostraremos primero',featureDesc:'Plan de sueño, sonidos de alarma, despertar con radio y modos de relajación.',ageNote:'Mantendremos tus objetivos de sueño sencillos y adaptados a tu rutina diaria.',ages:['Menos de 18','18–24','25–34','35–44','45+'],genders:['Mujer','Hombre','Prefiero no decirlo'],save:'EMPEZAR',skip:'AHORA NO'},
+    de:{dir:'ltr',kicker:'SLEEP RISE · SCHNELLE EINRICHTUNG',title:'Bereiten wir einen passenden Start vor',sub:'Dein Alter und die ausgewählten Funktionen passen die Empfehlungen an. Du kannst dies später ändern.',age:'Altersgruppe',gender:'Geschlecht',feature:'Das zeigen wir dir zuerst',featureDesc:'Schlafplanung, Wecktöne, Aufwachen mit Radio und Entspannungsmodi.',ageNote:'Wir halten deine Schlafziele einfach und passend zu deinem Alltag.',ages:['Unter 18','18–24','25–34','35–44','45+'],genders:['Weiblich','Männlich','Keine Angabe'],save:'STARTEN',skip:'JETZT NICHT'},
+    fr:{dir:'ltr',kicker:'SLEEP RISE · CONFIGURATION RAPIDE',title:'Préparons un début qui vous ressemble',sub:'Votre âge et les fonctions choisies personnalisent les recommandations affichées. Vous pourrez modifier ces choix plus tard.',age:'Tranche d’âge',gender:'Genre',feature:'Ce que nous vous montrerons d’abord',featureDesc:'Plan de sommeil, sons d’alarme, réveil par radio et modes de relaxation.',ageNote:'Nous garderons vos objectifs de sommeil simples et adaptés à votre quotidien.',ages:['Moins de 18 ans','18–24','25–34','35–44','45+'],genders:['Femme','Homme','Je préfère ne pas répondre'],save:'COMMENCER',skip:'PAS MAINTENANT'},
+    pt:{dir:'ltr',kicker:'SLEEP RISE · CONFIGURAÇÃO RÁPIDA',title:'Vamos preparar um começo sob medida',sub:'Sua idade e os recursos escolhidos ajustam as recomendações exibidas. Você pode alterar isso depois.',age:'Faixa etária',gender:'Gênero',feature:'O que mostraremos primeiro',featureDesc:'Plano de sono, sons de alarme, despertar com rádio e modos de relaxamento.',ageNote:'Manteremos suas metas de sono simples e alinhadas à sua rotina diária.',ages:['Menos de 18','18–24','25–34','35–44','45+'],genders:['Feminino','Masculino','Prefiro não informar'],save:'COMEÇAR',skip:'AGORA NÃO'},
+    ar:{dir:'rtl',kicker:'SLEEP RISE · إعداد سريع',title:'لنجهّز بداية تناسبك',sub:'يساعد عمرك والميزات التي تختارها في تخصيص التوصيات التي ستراها. يمكنك تغييرها لاحقًا.',age:'الفئة العمرية',gender:'الجنس',feature:'ما سنعرضه لك أولًا',featureDesc:'خطة النوم، أصوات المنبه، الاستيقاظ على الراديو وأوضاع الاسترخاء.',ageNote:'سنبقي أهداف نومك بسيطة ومتوافقة مع روتينك اليومي.',ages:['أقل من 18','18–24','25–34','35–44','45+'],genders:['أنثى','ذكر','أفضل عدم الإجابة'],save:'ابدأ',skip:'ليس الآن'},
+    zh:{dir:'ltr',kicker:'SLEEP RISE · 快速设置',title:'为你准备合适的开始方式',sub:'你的年龄和所选功能会帮助我们调整推荐内容。之后也可以随时修改。',age:'年龄范围',gender:'性别',feature:'我们会先为你展示',featureDesc:'睡眠计划、闹钟声音、广播唤醒和放松模式。',ageNote:'我们会根据你的日常作息，让睡眠目标保持简单。',ages:['18岁以下','18–24','25–34','35–44','45+'],genders:['女性','男性','不愿透露'],save:'开始',skip:'暂时不要'},
+    ja:{dir:'ltr',kicker:'SLEEP RISE · クイック設定',title:'あなたに合ったスタートを準備しましょう',sub:'年齢と選択した機能に合わせて、おすすめを調整します。あとで変更することもできます。',age:'年齢層',gender:'性別',feature:'最初にご案内する内容',featureDesc:'睡眠プラン、アラーム音、ラジオ起床、リラックスモード。',ageNote:'毎日の生活リズムに合わせて、睡眠目標をシンプルに整えます。',ages:['18歳未満','18–24','25–34','35–44','45歳以上'],genders:['女性','男性','回答しない'],save:'始める',skip:'今はしない'}
+  };
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return T[v]?v:'tr'}catch(e){return'tr'}};
+  function render(){const o=q('#v42Onboarding');if(!o)return;const t=T[code()]||T.en;o.dir=t.dir;o.querySelector('.v42-kicker')&&(o.querySelector('.v42-kicker').textContent=t.kicker);o.querySelector('h2')&&(o.querySelector('h2').textContent=t.title);o.querySelector('.v42-onboard>p')&&(o.querySelector('.v42-onboard>p').textContent=t.sub);const ageLabel=o.querySelector('select[data-v42-age]')?.parentElement;if(ageLabel&&ageLabel.childNodes[0])ageLabel.childNodes[0].textContent=t.age+' ';o.querySelector('legend')&&(o.querySelector('legend').textContent=t.gender);const opts=o.querySelectorAll('select[data-v42-age] option');opts.forEach((x,i)=>{if(t.ages[i])x.textContent=t.ages[i]});const gl=o.querySelectorAll('input[name="v42gender"]');gl.forEach((x,i)=>{const label=x.parentElement;if(label&&t.genders[i]){const txt=[...label.childNodes].find(n=>n.nodeType===3);if(txt)txt.textContent=' '+t.genders[i]}});const b=o.querySelector('.v42-onboard-features b');if(b)b.textContent=t.feature;const spans=o.querySelectorAll('.v42-onboard-features span');if(spans[0])spans[0].textContent=t.featureDesc;if(spans[1])spans[1].textContent=t.ageNote;const save=o.querySelector('[data-v42-onboard-save]');if(save)save.textContent=t.save;const skip=o.querySelector('[data-v42-onboard-skip]');if(skip)skip.textContent=t.skip}
+  render();setInterval(render,180);
+})();
+/* /v55 v42 setup onboarding locale completion */
+
+/* v55 legacy text leak cleanup */
+(function(){
+  'use strict';
+  if(window.__sr55LeakCleanup)return;
+  window.__sr55LeakCleanup=true;
+  const M={
+    tr:{'Dokun ve başla':'Dokun ve başla','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.','Smart wake':'Akıllı uyanış','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Alarmdan önceki zaman aralığında, hafif uykudaki hareketlerine göre seni uyandırır.','The screen brightens slowly 15 minutes before the alarm.':'Alarmdan 15 dakika önce ekran yavaşça aydınlanır.','How did you wake up?':'Nasıl uyandın?','Off':'Kapalı','Good night':'İyi geceler','Night rhythm active':'Gece ritmi etkin'},
+    en:{'Dokun ve başla':'Touch to begin','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'If you enable radio while setting an alarm, the saved HTTPS stream starts at alarm time. Some stations may not work because of stream and operating-system limits.','Smart wake':'Smart wake','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Wakes you based on movement during the pre-alarm window, while you are in light sleep.','The screen brightens slowly 15 minutes before the alarm.':'The screen slowly brightens 15 minutes before the alarm.','How did you wake up?':'How did you wake up?','Off':'Off','Good night':'Good night','Night rhythm active':'Night rhythm active'},
+    es:{'Dokun ve başla':'Toca para empezar','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'Si activas la radio al configurar una alarma, la emisión HTTPS guardada comenzará a la hora de la alarma. Algunas emisoras pueden no funcionar por las limitaciones del formato y del sistema.','Smart wake':'Despertar inteligente','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Te despierta según tus movimientos durante el intervalo previo a la alarma, mientras duermes ligeramente.','The screen brightens slowly 15 minutes before the alarm.':'La pantalla se ilumina poco a poco 15 minutos antes de la alarma.','How did you wake up?':'¿Cómo te despertaste?','Off':'Desactivado','Good night':'Buenas noches','Night rhythm active':'Ritmo nocturno activo'},
+    de:{'Dokun ve başla':'Zum Starten tippen','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'Wenn du beim Einstellen eines Alarms Radio aktivierst, startet der gespeicherte HTTPS-Stream zur Weckzeit. Einige Sender funktionieren wegen Format- oder Systembeschränkungen möglicherweise nicht.','Smart wake':'Intelligentes Aufwachen','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Weckt dich anhand deiner Bewegungen im Voralarmfenster während des leichten Schlafs.','The screen brightens slowly 15 minutes before the alarm.':'Der Bildschirm wird 15 Minuten vor dem Alarm langsam heller.','How did you wake up?':'Wie bist du aufgewacht?','Off':'Aus','Good night':'Gute Nacht','Night rhythm active':'Nachtrhythmus aktiv'},
+    fr:{'Dokun ve başla':'Touchez pour commencer','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'Si vous activez la radio lors du réglage d’une alarme, le flux HTTPS enregistré démarrera à l’heure prévue. Certaines stations peuvent ne pas fonctionner selon le format et le système.','Smart wake':'Réveil intelligent','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Vous réveille pendant le sommeil léger selon vos mouvements dans la fenêtre précédant l’alarme.','The screen brightens slowly 15 minutes before the alarm.':'L’écran s’éclaire progressivement 15 minutes avant l’alarme.','How did you wake up ?':'Comment vous êtes-vous réveillé ?','How did you wake up?':'Comment vous êtes-vous réveillé ?','Off':'Désactivé','Good night':'Bonne nuit','Night rhythm active':'Rythme nocturne actif'},
+    pt:{'Dokun ve başla':'Toque para começar','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'Se você ativar o rádio ao configurar um alarme, a transmissão HTTPS salva começará no horário do alarme. Algumas estações podem não funcionar por limitações do formato e do sistema.','Smart wake':'Despertar inteligente','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'Desperta você conforme seus movimentos durante a janela anterior ao alarme, no sono leve.','The screen brightens slowly 15 minutes before the alarm.':'A tela fica mais clara gradualmente 15 minutos antes do alarme.','How did you wake up?':'Como você acordou?','Off':'Desativado','Good night':'Boa noite','Night rhythm active':'Ritmo noturno ativo'},
+    ar:{'Dokun ve başla':'اضغط للبدء','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'عند تفعيل الراديو أثناء إعداد المنبه، سيبدأ البث المحفوظ عبر HTTPS في وقت المنبه. قد لا تعمل بعض المحطات بسبب قيود الصيغة ونظام التشغيل.','Smart wake':'استيقاظ ذكي','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'يوقظك بناءً على حركتك خلال الفترة السابقة للمنبه أثناء النوم الخفيف.','The screen brightens slowly 15 minutes before the alarm.':'تزداد إضاءة الشاشة تدريجيًا قبل المنبه بـ15 دقيقة.','How did you wake up?':'كيف استيقظت؟','Off':'متوقف','Good night':'تصبح على خير','Night rhythm active':'إيقاع الليل مفعّل'},
+    zh:{'Dokun ve başla':'点击开始','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'设置闹钟时开启广播后，保存的 HTTPS 音频流会在闹钟时间启动。受格式和系统限制，部分电台可能无法播放。','Smart wake':'智能唤醒','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'在闹钟前的时间段根据浅睡眠中的动作唤醒你。','The screen brightens slowly 15 minutes before the alarm.':'闹钟前 15 分钟，屏幕会逐渐变亮。','How did you wake up?':'你醒来时感觉如何？','Off':'关闭','Good night':'晚安','Night rhythm active':'夜间节奏已启用'},
+    ja:{'Dokun ve başla':'タップして開始','Alarm kurarken radyo seçimini açarsan kayıtlı HTTPS yayın alarm saatinde başlatılır. Yayın biçimi ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.':'アラーム設定でラジオを有効にすると、保存したHTTPS配信がアラーム時刻に始まります。形式やOSの制限により再生できない局もあります。','Smart wake':'スマート起床','Wakes you on movement inside the window before the alarm — that is, during light sleep.':'アラーム前の時間帯に、浅い眠りでの動きを検知して起こします。','The screen brightens slowly 15 minutes before the alarm.':'アラームの15分前から画面がゆっくり明るくなります。','How did you wake up?':'目覚めたときの気分は？','Off':'オフ','Good night':'おやすみなさい','Night rhythm active':'夜のリズムが有効'}
+  };
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return M[v]?v:'tr'}catch(e){return'tr'}};
+  function render(){const map=M[code()]||M.en;document.querySelectorAll('.app *').forEach(e=>{if(e.children.length===0){const v=e.textContent.trim();if(map[v]&&v!==map[v])e.textContent=map[v]}})}
+  render();setInterval(render,220);
+})();
+/* /v55 legacy text leak cleanup */
+
+/* v55 cross-locale alias stabilizer */
+(function(){
+  'use strict';
+  if(window.__sr55AliasStabilizer)return;
+  window.__sr55AliasStabilizer=true;
+  const L={
+    tr:{baby:'Bebekleri rahatlatabilecek sesler. Cihazı bebekten uzak tutun ve sesi düşük tutun.',mix:'Sesleri ve seviyeleri ayrı ayrı ayarla',need:'Önce birkaç sesi etkinleştir',add:'Alarm ekle',sleep:'Uyku zamanı yaklaşıyor',morning:'Günaydın!'},
+    en:{baby:'Sounds that may soothe babies. Keep the device away from the baby and the volume low.',mix:'Adjust sounds and levels separately',need:'Turn on a few sounds first',add:'Add alarm',sleep:'Bedtime is getting closer',morning:'Good morning!'},
+    es:{baby:'Sonidos que pueden calmar a los bebés. Mantén el dispositivo alejado del bebé y el volumen bajo.',mix:'Ajusta los sonidos y niveles por separado',need:'Activa primero algunos sonidos',add:'Añadir alarma',sleep:'Se acerca la hora de dormir',morning:'¡Buenos días!'},
+    de:{baby:'Geräusche, die Babys beruhigen können. Halte das Gerät vom Baby fern und die Lautstärke niedrig.',mix:'Sounds und Pegel einzeln anpassen',need:'Aktiviere zuerst einige Sounds',add:'Alarm hinzufügen',sleep:'Die Schlafenszeit rückt näher',morning:'Guten Morgen!'},
+    fr:{baby:'Des sons qui peuvent apaiser les bébés. Gardez l’appareil loin du bébé et le volume bas.',mix:'Ajuster les sons et les niveaux séparément',need:'Activez d’abord quelques sons',add:'Ajouter une alarme',sleep:'L’heure du coucher approche',morning:'Bonjour !'},
+    pt:{baby:'Sons que podem acalmar os bebês. Mantenha o aparelho longe do bebê e o volume baixo.',mix:'Ajuste os sons e os níveis separadamente',need:'Ative alguns sons primeiro',add:'Adicionar alarme',sleep:'A hora de dormir está chegando',morning:'Bom dia!'},
+    ar:{baby:'أصوات قد تساعد على تهدئة الأطفال. أبقِ الجهاز بعيدًا عن الطفل وخفّض مستوى الصوت.',mix:'اضبط الأصوات والمستويات كلٌّ على حدة',need:'فعّل بعض الأصوات أولًا',add:'إضافة منبه',sleep:'اقترب موعد النوم',morning:'صباح الخير!'},
+    zh:{baby:'可能安抚宝宝的声音。请让设备远离宝宝，并将音量调低。',mix:'分别调整声音和音量',need:'请先开启几种声音',add:'添加闹钟',sleep:'快到睡觉时间了',morning:'早上好！'},
+    ja:{baby:'赤ちゃんを落ち着かせる音。端末を赤ちゃんから離し、音量を小さくしてください。',mix:'音と音量を個別に調整',need:'まずいくつかの音をオンにしてください',add:'アラームを追加',sleep:'そろそろ就寝時間です',morning:'おはようございます！'}
+  };
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return L[v]?v:'tr'}catch(e){return'tr'}};
+  const aliases=[['baby'],['mix'],['need'],['add'],['sleep'],['morning']];
+  function render(){const c=code(),t=L[c]||L.en;const variants=Object.values(L).flatMap(x=>aliases.map(([k])=>x[k]));variants.push('Sounds, die Babys beruhigen können. Halte das Gerät vom Baby fern und die Lautstärke niedrig.');document.querySelectorAll('body *').forEach(e=>{if(e.children.length)return;const v=e.textContent.trim();if(v==='Sounds, die Babys beruhigen können. Halte das Gerät vom Baby fern und die Lautstärke niedrig.'){e.textContent=t.baby;return}for(const [k] of aliases){if(variants.includes(v)&&v!==t[k]){e.textContent=t[k];break}}})}
+  render();setInterval(render,220);
+})();
+/* /v55 cross-locale alias stabilizer */
+
+/* v55 final dynamic locale lock */
+(function(){
+  'use strict';
+  if(window.__sr55DynamicLock)return;
+  window.__sr55DynamicLock=true;
+  const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
+  const D={
+    tr:{lumaSleep:'Luma geceyi aydınlatıyor',lumaWake:'Luma gün ışığını getirdi',lumaCard:'Luma yanında',lumaCardText:'Parlak ekranı azalt, ritmini Luma’ya bırak.',dursunCard:'Dursun yanında',dursunText:'Uyku modunda sakinleşmene, uyanış modunda güne başlamana yardım eder.',radio:'Radyo ile uyan',radioDesc:'İstediğin kanalı ekle veya rastgele istasyon seç',random:'RASTGELE İSTASYON',preview:'ÖNİZLE',save:'KAYDET',stop:'DURDUR',name:'Kanal adı',url:'https://... radyo stream URL',empty:'Henüz radyo kanalı eklenmedi.',disclaimer:'Alarm ayarında radyoyu etkinleştirirsen kayıtlı HTTPS yayın alarm saatinde başlar. Format ve işletim sistemi kısıtları nedeniyle bazı istasyonlar çalışmayabilir.'},
+    en:{lumaSleep:'Luma lights up the night',lumaWake:'Luma brings the daylight',lumaCard:'Luma is with you',lumaCardText:'Dim the bright screen and let Luma guide your rhythm.',dursunCard:'Dursun is with you',dursunText:'Dursun helps you settle in Sleep mode and start the day in Wake mode.',radio:'Wake up with radio',radioDesc:'Add a channel or choose a random station',random:'RANDOM STATION',preview:'PREVIEW',save:'SAVE',stop:'STOP',name:'Channel name',url:'https://... radio stream URL',empty:'No radio channel added yet.',disclaimer:'Enable radio in the alarm settings to start the saved HTTPS stream at alarm time. Some stations may not work because of format or operating-system limits.'},
+    es:{lumaSleep:'Luma ilumina la noche',lumaWake:'Luma trae la luz del día',lumaCard:'Luma está contigo',lumaCardText:'Reduce la luz de la pantalla y deja que Luma guíe tu ritmo.',dursunCard:'Dursun está contigo',dursunText:'Dursun te ayuda a relajarte en modo Sueño y a empezar el día en modo Despertar.',radio:'Despertar con radio',radioDesc:'Añade una emisora o elige una estación al azar',random:'EMISORA ALEATORIA',preview:'VISTA PREVIA',save:'GUARDAR',stop:'DETENER',name:'Nombre de la emisora',url:'https://... URL de emisión de radio',empty:'Todavía no se ha añadido ninguna emisora.',disclaimer:'Activa la radio en los ajustes de la alarma para iniciar la emisión HTTPS guardada a la hora de la alarma. Algunas emisoras pueden no funcionar por las limitaciones del formato o del sistema.'},
+    de:{lumaSleep:'Luma erhellt die Nacht',lumaWake:'Luma bringt das Tageslicht',lumaCard:'Luma ist bei dir',lumaCardText:'Dimme den hellen Bildschirm und lass Luma deinen Rhythmus begleiten.',dursunCard:'Dursun ist bei dir',dursunText:'Dursun hilft dir im Schlafmodus zur Ruhe zu kommen und im Wachmodus in den Tag zu starten.',radio:'Mit Radio aufwachen',radioDesc:'Füge einen Sender hinzu oder wähle einen zufälligen Sender',random:'ZUFÄLLIGER SENDER',preview:'VORSCHAU',save:'SPEICHERN',stop:'STOPP',name:'Sendername',url:'https://... Radio-Stream-URL',empty:'Noch kein Radiosender hinzugefügt.',disclaimer:'Aktiviere Radio in den Alarmeinstellungen, damit der gespeicherte HTTPS-Stream zur Weckzeit startet. Einige Sender funktionieren wegen Format- oder Systembeschränkungen möglicherweise nicht.'},
+    fr:{lumaSleep:'Luma illumine la nuit',lumaWake:'Luma apporte la lumière du jour',lumaCard:'Luma est avec vous',lumaCardText:'Réduisez la lumière de l’écran et laissez Luma guider votre rythme.',dursunCard:'Dursun est avec vous',dursunText:'Dursun vous aide à vous apaiser en mode Sommeil et à commencer la journée en mode Réveil.',radio:'Se réveiller avec la radio',radioDesc:'Ajoutez une station ou choisissez-en une au hasard',random:'STATION ALÉATOIRE',preview:'APERÇU',save:'ENREGISTRER',stop:'ARRÊTER',name:'Nom de la station',url:'https://... URL du flux radio',empty:'Aucune station radio ajoutée pour le moment.',disclaimer:'Activez la radio dans les réglages de l’alarme pour lancer le flux HTTPS enregistré à l’heure prévue. Certaines stations peuvent ne pas fonctionner selon le format et le système.'},
+    pt:{lumaSleep:'Luma ilumina a noite',lumaWake:'Luma traz a luz do dia',lumaCard:'Luma está com você',lumaCardText:'Reduza o brilho da tela e deixe a Luma guiar seu ritmo.',dursunCard:'Dursun está com você',dursunText:'Dursun ajuda você a relaxar no modo Sono e começar o dia no modo Despertar.',radio:'Acordar com rádio',radioDesc:'Adicione uma estação ou escolha uma estação aleatória',random:'ESTAÇÃO ALEATÓRIA',preview:'PRÉVIA',save:'SALVAR',stop:'PARAR',name:'Nome da estação',url:'https://... URL do streaming de rádio',empty:'Nenhuma estação de rádio adicionada ainda.',disclaimer:'Ative o rádio nas configurações do alarme para iniciar a transmissão HTTPS salva no horário do alarme. Algumas estações podem não funcionar por limitações do formato e do sistema.'},
+    ar:{lumaSleep:'لوما تضيء الليل',lumaWake:'لوما تجلب ضوء النهار',lumaCard:'لوما معك',lumaCardText:'خفّف سطوع الشاشة ودع لوما ترشد إيقاعك.',dursunCard:'دورسون معك',dursunText:'يساعدك دورسون على الاسترخاء في وضع النوم وبدء يومك في وضع الاستيقاظ.',radio:'الاستيقاظ على الراديو',radioDesc:'أضف محطة أو اختر محطة عشوائية',random:'محطة عشوائية',preview:'معاينة',save:'حفظ',stop:'إيقاف',name:'اسم المحطة',url:'https://... رابط بث الراديو',empty:'لم تتم إضافة محطة راديو بعد.',disclaimer:'فعّل الراديو في إعدادات المنبه لبدء بث HTTPS المحفوظ في وقت المنبه. قد لا تعمل بعض المحطات بسبب قيود الصيغة ونظام التشغيل.'},
+    zh:{lumaSleep:'Luma 点亮夜晚',lumaWake:'Luma 带来晨光',lumaCard:'Luma 与你同在',lumaCardText:'调暗屏幕亮度，让 Luma 陪你调整节奏。',dursunCard:'Dursun 与你同在',dursunText:'Dursun 帮你在睡眠模式下放松，并在起床模式下开启新一天。',radio:'用广播唤醒',radioDesc:'添加电台或随机选择一个电台',random:'随机电台',preview:'预览',save:'保存',stop:'停止',name:'电台名称',url:'https://... 广播流 URL',empty:'尚未添加广播电台。',disclaimer:'在闹钟设置中开启广播，保存的 HTTPS 音频流会在闹钟时间启动。受格式和系统限制，部分电台可能无法播放。'},
+    ja:{lumaSleep:'Lumaが夜を照らします',lumaWake:'Lumaが朝の光を届けます',lumaCard:'Lumaがそばにいます',lumaCardText:'画面を暗くして、Lumaと一緒にリズムを整えましょう。',dursunCard:'Dursunがそばにいます',dursunText:'Dursunが睡眠モードで落ち着き、起床モードで一日を始めるのを助けます。',radio:'ラジオで起床',radioDesc:'放送局を追加するか、ランダムな局を選択',random:'ランダムな放送局',preview:'プレビュー',save:'保存',stop:'停止',name:'放送局名',url:'https://... ラジオ配信URL',empty:'ラジオ局はまだ追加されていません。',disclaimer:'アラーム設定でラジオを有効にすると、保存したHTTPS配信がアラーム時刻に始まります。形式やOSの制限により再生できない局もあります。'}
+  };
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return D[v]?v:'tr'}catch(e){return'tr'}};
+  function render(){const t=D[code()]||D.en;const wake=(()=>{try{return typeof mode!=='undefined'&&mode==='wake'}catch(e){return false}})();const set=(s,v)=>qa(s).forEach(e=>{if(e.children.length===0)e.textContent=v});set('.v35-luma-label',wake?t.lumaWake:t.lumaSleep);set('#v35LumaCard b',t.lumaCard);set('#v35LumaCard p',t.lumaCardText);set('#v33DursunCard .hello',wake?t.dursunCard:t.dursunCard);set('#v33DursunCard b',t.dursunCard);set('#v33DursunCard p',t.dursunText);set('.dursun-home .hello',wake?t.lumaWake:t.lumaSleep);const r=q('.v42-radio');if(r){set('.v42-radio .v42-block-head b',t.radio);set('.v42-radio .v42-block-head small',t.radioDesc);set('[data-v42-radio-random]',t.random);set('[data-v42-radio-preview]',t.preview);set('[data-v42-radio-save]',t.save);set('[data-v42-radio-stop]',t.stop);set('[data-v42-radio-current]',t.empty);set('.v42-disclaimer',t.disclaimer);const n=r.querySelector('[data-v42-radio-name]');if(n)n.placeholder=t.name;const u=r.querySelector('[data-v42-radio-url]');if(u)u.placeholder=t.url}}
+  render();setInterval(render,220);
+})();
+/* /v55 final dynamic locale lock */
+
+/* v55 barcode camera fallback */
+(function(){
+  'use strict';
+  if(window.__sr55BarcodeFallback)return;
+  window.__sr55BarcodeFallback=true;
+  const MSG={tr:'Kamera kullanılamıyor. Kayıtlı barkodu elle yazıp Enter’a basın.',en:'Camera is unavailable. Enter the saved barcode manually and press Enter.',es:'La cámara no está disponible. Escribe manualmente el código guardado y pulsa Enter.',de:'Die Kamera ist nicht verfügbar. Gib den gespeicherten Barcode manuell ein und drücke Enter.',fr:'La caméra est indisponible. Saisissez manuellement le code enregistré et appuyez sur Entrée.',pt:'A câmera não está disponível. Digite o código salvo manualmente e pressione Enter.',ar:'الكاميرا غير متاحة. أدخل الرمز المحفوظ يدويًا واضغط على Enter.',zh:'摄像头不可用。请手动输入已保存的条码并按 Enter。',ja:'カメラを利用できません。保存したバーコードを手入力してEnterを押してください。'};
+  const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return MSG[v]?v:'tr'}catch(e){return'tr'}};
+  let announced=false;
+  function render(){const box=document.querySelector('#taskBarcode');if(!box||!box.classList.contains('on')){announced=false;return}const video=document.querySelector('#bcVideo'),input=document.querySelector('#bcManual');if(video&&(!video.srcObject||video.readyState<2)){const hint=document.querySelector('#bcHint');if(hint){hint.textContent=MSG[code()];hint.dataset.sr55Fallback='1'}if(input){input.disabled=false;input.setAttribute('aria-label',MSG[code()]);if(!announced){announced=true;try{input.focus()}catch(e){}}}}}
+  render();setInterval(render,500);
+})();
+/* /v55 barcode camera fallback */
 </script>
 <!-- /sleeprise-v55-locale-complete -->
 </body>
