@@ -46,6 +46,7 @@ public class MainActivity extends BridgeActivity {
             }
         });
         webView.addJavascriptInterface(new SleepRiseTtsBridge(), "SleepRiseTTS");
+        webView.addJavascriptInterface(new SleepRiseBuildBridge(), "SleepRiseBuild");
 
         webView.setWebChromeClient(new BridgeWebChromeClient(getBridge()) {
             @Override
@@ -82,6 +83,11 @@ public class MainActivity extends BridgeActivity {
                 if (sleepRiseTts != null) sleepRiseTts.stop();
             });
         }
+    }
+
+    private final class SleepRiseBuildBridge {
+        @JavascriptInterface
+        public boolean isDebug() { return BuildConfig.DEBUG; }
     }
 
     private void handleWebMediaRequest(PermissionRequest request) {

@@ -11,7 +11,9 @@ install! 'cocoapods', :disable_input_output_paths => true
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/.pnpm/@capacitor+ios@7.6.8_@capacitor+core@7.6.8/node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/.pnpm/@capacitor+ios@7.6.8_@capacitor+core@7.6.8/node_modules/@capacitor/ios'
+  pod 'CapacitorCommunityAdmob', :path => '../../node_modules/.pnpm/@capacitor-community+admob@7.2.0/node_modules/@capacitor-community/admob'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/.pnpm/@capacitor+local-notifications@7.0.7_@capacitor+core@7.6.8/node_modules/@capacitor/local-notifications'
+  pod 'CapgoNativePurchases', :path => '../../node_modules/.pnpm/@capgo+native-purchases@7.19.3_@capacitor+core@7.6.8/node_modules/@capgo/native-purchases'
 end
 
 target 'App' do
