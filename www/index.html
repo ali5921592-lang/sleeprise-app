@@ -1454,6 +1454,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
 
 
 
+
 <!-- sleeprise-v55-locale-complete -->
 <script id="sleeprise-v55-locale-complete">
 (function(){
@@ -1785,6 +1786,14 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   addStyle();render();setInterval(()=>{if(document.querySelector('#p-stats.on'))render()},900);document.addEventListener('click',e=>{if(e.target.closest('#p-stats [data-sr56-start]')){document.querySelector('.tab[data-p="sleep"]')?.click()}});
 })();
 /* /v56 professional sleep analytics dashboard */
+
+/* v56 body whitespace hygiene */
+(function(){
+  const clean=()=>{try{[...document.body.childNodes].forEach(n=>{if(n.nodeType===3&&/^(?:\s|\\n)+$/.test(n.nodeValue||''))n.remove()})}catch(e){}};
+  clean();
+  setInterval(clean,1200);
+})();
+/* /v56 body whitespace hygiene */
 </script>
 <!-- /sleeprise-v55-locale-complete -->
 </body>
