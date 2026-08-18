@@ -2233,7 +2233,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     ja:{callHead:'安全に関する注意',call:'この機能は個人用の予定通話を補助するものです。緊急サービス、実在の人物、公式機関になりすます目的では使用できません。',health:'睡眠データはウェルネス目的の推定であり、医療機器や診断ツールではありません。'}
   };
   const code=()=>{const c=(document.documentElement.lang||'en').slice(0,2);return copy[c]?c:'en'};
-  function add(parent,kind,text,head){if(!parent)return;let n=parent.querySelector('.sr-v65-safety[data-kind="'+kind+'"]');if(!n){n=document.createElement('div');n.className='sr-v65-safety';n.dataset.kind=kind;parent.appendChild(n)}n.innerHTML='<b>'+head+'</b><span>'+text+'</span>.'}
+  function add(parent,kind,text,head){if(!parent)return;let n=parent.querySelector('.sr-v65-safety[data-kind="'+kind+'"]');if(!n){n=document.createElement('div');n.className='sr-v65-safety';n.dataset.kind=kind;parent.appendChild(n)}n.innerHTML='<b>'+head+'</b><span>'+text+'</span>'}
   function apply(){const x=copy[code()];const call=document.querySelector('#p-call');if(call){const note=call.querySelector('.sr-v65-safety[data-kind="call"]');add(note?.parentElement||call,'call',x.call,x.callHead)}const sleep=document.querySelector('#p-sleep');if(sleep)add(sleep,'health',x.health,'SleepRise')}
   apply();setTimeout(apply,600);setInterval(apply,1800);
 })();
