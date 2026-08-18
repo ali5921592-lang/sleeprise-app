@@ -2210,6 +2210,35 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
 })();
 </script>
 <!-- SLEEPRISE_V64_REVIEW_END -->
+<!-- SLEEPRISE_V65_STORE_RISK_START -->
+<style id="sleeprise-v65-store-risk-style">
+  .sr-v65-safety{margin:10px 0 16px;padding:11px 13px;border-radius:14px;background:rgba(255,159,28,.10);border:1px solid rgba(255,159,28,.26);color:inherit;font-size:11px;line-height:1.45}
+  .sr-v65-safety b{display:block;margin-bottom:3px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a96500}
+  .app.nightmode .sr-v65-safety{background:rgba(255,209,139,.10);border-color:rgba(255,209,139,.25)}.app.nightmode .sr-v65-safety b{color:#ffd18b}
+</style>
+<script id="sleeprise-v65-store-risk">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV65StoreRisk)return;
+  window.__SleepRiseV65StoreRisk=true;
+  const copy={
+    tr:{callHead:'Kişisel güvenlik notu',call:'Bu özellik yalnızca kişisel bir planlı arama yardımcısıdır; acil servisleri, gerçek kişileri veya resmi kurumları taklit etmek için kullanılamaz.',health:'Uyku içgörüleri wellness amaçlı tahminlerdir; tıbbi cihaz veya teşhis aracı değildir.'},
+    en:{callHead:'Personal safety note',call:'This feature is a personal scheduled-call aid only; it must not be used to impersonate emergency services, real people, or official organizations.',health:'Sleep insights are wellness estimates, not a medical device or diagnostic tool.'},
+    es:{callHead:'Nota de seguridad',call:'Esta función solo ayuda con una llamada personal programada; no debe usarse para imitar servicios de emergencia, personas reales u organismos oficiales.',health:'Los datos del sueño son estimaciones de bienestar, no un dispositivo médico ni una herramienta de diagnóstico.'},
+    de:{callHead:'Hinweis zur Sicherheit',call:'Diese Funktion ist nur eine persönliche geplante Anrufhilfe und darf nicht dazu dienen, Notdienste, echte Personen oder Behörden zu imitieren.',health:'Schlafdaten sind Wellness-Schätzungen und kein Medizinprodukt oder Diagnosewerkzeug.'},
+    fr:{callHead:'Note de sécurité',call:'Cette fonction aide uniquement à planifier un appel personnel ; elle ne doit pas servir à imiter les services d’urgence, de vraies personnes ou des organismes officiels.',health:'Les données de sommeil sont des estimations de bien-être, pas un dispositif médical ni un outil de diagnostic.'},
+    pt:{callHead:'Nota de segurança',call:'Este recurso é apenas um auxílio para uma chamada pessoal agendada; não deve ser usado para imitar serviços de emergência, pessoas reais ou órgãos oficiais.',health:'Os dados do sono são estimativas de bem-estar, não um dispositivo médico nem uma ferramenta de diagnóstico.'},
+    ar:{callHead:'تنبيه للسلامة الشخصية',call:'هذه الميزة للمساعدة في جدولة مكالمة شخصية فقط؛ ولا يجوز استخدامها لانتحال خدمات الطوارئ أو الأشخاص الحقيقيين أو الجهات الرسمية.',health:'بيانات النوم تقديرات للعافية وليست جهازاً طبياً أو أداة للتشخيص.'},
+    zh:{callHead:'个人安全提示',call:'此功能仅用于个人计划通话辅助，不得用于冒充急救服务、真实人物或官方机构。',health:'睡眠数据仅为健康生活方式估算，不是医疗设备或诊断工具。'},
+    ja:{callHead:'安全に関する注意',call:'この機能は個人用の予定通話を補助するものです。緊急サービス、実在の人物、公式機関になりすます目的では使用できません。',health:'睡眠データはウェルネス目的の推定であり、医療機器や診断ツールではありません。'}
+  };
+  const code=()=>{const c=(document.documentElement.lang||'en').slice(0,2);return copy[c]?c:'en'};
+  function add(parent,kind,text,head){if(!parent)return;let n=parent.querySelector('.sr-v65-safety[data-kind="'+kind+'"]');if(!n){n=document.createElement('div');n.className='sr-v65-safety';n.dataset.kind=kind;parent.appendChild(n)}n.innerHTML='<b>'+head+'</b><span>'+text+'</span>.'}
+  function apply(){const x=copy[code()];const call=document.querySelector('#p-call');if(call){const note=call.querySelector('.sr-v65-safety[data-kind="call"]');add(note?.parentElement||call,'call',x.call,x.callHead)}const sleep=document.querySelector('#p-sleep');if(sleep)add(sleep,'health',x.health,'SleepRise')}
+  apply();setTimeout(apply,600);setInterval(apply,1800);
+})();
+</script>
+<!-- SLEEPRISE_V65_STORE_RISK_END -->
 </body>
 </html>
 <script id="sleeprise-features-v42">
