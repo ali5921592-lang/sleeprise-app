@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -32,6 +33,7 @@ public class MainActivity extends BridgeActivity {
     private static final int REQUEST_MEDIA = 4107;
     private PermissionRequest pendingMediaRequest;
     private TextToSpeech sleepRiseTts;
+    private boolean alarmActive = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class MainActivity extends BridgeActivity {
         });
         webView.addJavascriptInterface(new SleepRiseTtsBridge(), "SleepRiseTTS");
         webView.addJavascriptInterface(new SleepRiseBuildBridge(), "SleepRiseBuild");
+        webView.addJavascriptInterface(new SleepRiseNativeBridge(), "SleepRiseNative");
 
         webView.setWebChromeClient(new BridgeWebChromeClient(getBridge()) {
             @Override
@@ -147,6 +150,21 @@ public class MainActivity extends BridgeActivity {
         }
         if (granted.isEmpty()) request.deny();
         else request.grant(granted.toArray(new String[0]));
+    }
+
+    private final class SleepRiseNativeBridge {
+        @JavascriptInterface
+        public void setAlarmActive(boolean active) { alarmActive = active; }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && alarmActive) {
+            WebView webView = getBridge().getWebView();
+            webView.evaluateJavascript("window.SleepRiseVolumeSnooze && window.SleepRiseVolumeSnooze()", null);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
