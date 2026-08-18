@@ -158,7 +158,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    public void onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && alarmActive) {
             WebView webView = getBridge().getWebView();
             webView.evaluateJavascript("window.SleepRiseVolumeSnooze && window.SleepRiseVolumeSnooze()", null);
