@@ -63,9 +63,17 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          PROFILE_B64="$RUNNER_TEMP/profile.b64"
           PROFILE_TMP="$RUNNER_TEMP/SleepRise.mobileprovision"
-          if ! printf '%s' "$PROFILE_BASE64" | base64 --decode > "$PROFILE_TMP"; then
-            printf '%s' "$PROFILE_BASE64" | base64 -D > "$PROFILE_TMP"
+          # GitHub secret değerini boşluk ve satır sonlarından arındırarak decode et.
+          printf '%s' "$PROFILE_BASE64" | tr -d '[:space:]' > "$PROFILE_B64"
+          if ! base64 --decode "$PROFILE_B64" > "$PROFILE_TMP" 2>/dev/null; then
+            base64 -D "$PROFILE_B64" > "$PROFILE_TMP"
+          fi
+          # Secret aktarımını küçültmek için gzip’lenmiş profile’ları da destekle.
+          if [ "$(od -An -t x1 -N 2 "$PROFILE_TMP" | tr -d ' [:space:]')" = "1f8b" ]; then
+            gzip -dc "$PROFILE_TMP" > "$RUNNER_TEMP/SleepRise.decoded.mobileprovision"
+            mv "$RUNNER_TEMP/SleepRise.decoded.mobileprovision" "$PROFILE_TMP"
           fi
           security cms -D -i "$PROFILE_TMP" > "$RUNNER_TEMP/profile.plist"
           PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")
