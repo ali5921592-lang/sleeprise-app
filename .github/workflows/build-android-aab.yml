@@ -49,6 +49,7 @@ jobs:
             echo "ANDROID_KEY_PASSWORD=$EXISTING_KEY_PASSWORD" >> "$GITHUB_ENV"
           else
             echo "::warning::Existing Android signing secret is missing or invalid; generating a new upload keystore for this build."
+            rm -f "$KEYSTORE"
             STORE_PASSWORD="$(openssl rand -hex 24)"
             KEY_ALIAS="sleeprise-upload"
             KEY_PASSWORD="$STORE_PASSWORD"
