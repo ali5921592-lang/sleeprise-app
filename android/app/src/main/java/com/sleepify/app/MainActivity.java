@@ -158,13 +158,24 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public void onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && alarmActive) {
             WebView webView = getBridge().getWebView();
             webView.evaluateJavascript("window.SleepRiseVolumeSnooze && window.SleepRiseVolumeSnooze()", null);
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        if (alarmActive) {
+            WebView webView = getBridge().getWebView();
+            webView.evaluateJavascript("window.SleepRisePolicyBlock && window.SleepRisePolicyBlock()", null);
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override

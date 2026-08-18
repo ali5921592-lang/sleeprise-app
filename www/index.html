@@ -1819,6 +1819,73 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
 /* /v57 alarm policy bridge and translations */
 </script>
 <!-- /sleeprise-v55-locale-complete -->
+<!-- SLEEPRISE_V58_START -->
+<script id="sleeprise-v58-upgrades">
+/* v58 competitor-strength alarm upgrades */
+(function(){
+  const profileText={
+    tr:{label:'Görev profili',hint:'Birden fazla görevi sırayla tamamlamadan alarm kapanmaz.',gentle:'Hafif · Matematik',standard:'Standart · Matematik + Adım',heavy:'Ağır uyuyan · Hafıza + Adım',bathroom:'Banyo görevi · Matematik + Barkod',strict:'Katı mod: görev tamamlanmadan otomatik susturma kapalı'},
+    en:{label:'Task profile',hint:'The alarm stays on until every task is completed in order.',gentle:'Gentle · Math',standard:'Standard · Math + Steps',heavy:'Heavy sleeper · Memory + Steps',bathroom:'Bathroom · Math + Barcode',strict:'Strict mode: auto-silence disabled until tasks are complete'},
+    es:{label:'Perfil de tareas',hint:'La alarma permanece activa hasta completar todas las tareas.',gentle:'Suave · Matemáticas',standard:'Estándar · Matemáticas + Pasos',heavy:'Sueño profundo · Memoria + Pasos',bathroom:'Baño · Matemáticas + Código de barras',strict:'Modo estricto: silencio automático desactivado'},
+    de:{label:'Aufgabenprofil',hint:'Der Alarm bleibt aktiv, bis alle Aufgaben nacheinander erledigt sind.',gentle:'Sanft · Mathematik',standard:'Standard · Mathematik + Schritte',heavy:'Tiefschläfer · Gedächtnis + Schritte',bathroom:'Bad · Mathematik + Barcode',strict:'Strikter Modus: automatische Stummschaltung deaktiviert'},
+    fr:{label:'Profil de tâches',hint:'L’alarme reste active jusqu’à la fin de toutes les tâches.',gentle:'Doux · Maths',standard:'Standard · Maths + Pas',heavy:'Gros dormeur · Mémoire + Pas',bathroom:'Salle de bain · Maths + Code-barres',strict:'Mode strict : silence automatique désactivé'},
+    pt:{label:'Perfil de tarefas',hint:'O alarme continua até todas as tarefas serem concluídas.',gentle:'Suave · Matemática',standard:'Padrão · Matemática + Passos',heavy:'Sono pesado · Memória + Passos',bathroom:'Banheiro · Matemática + Código de barras',strict:'Modo rigoroso: silêncio automático desativado'},
+    ar:{label:'ملف المهام',hint:'يستمر المنبه حتى إكمال كل المهام بالترتيب.',gentle:'هادئ · رياضيات',standard:'قياسي · رياضيات وخطوات',heavy:'نوم عميق · ذاكرة وخطوات',bathroom:'الحمام · رياضيات وباركود',strict:'الوضع الصارم: الإيقاف التلقائي معطل'},
+    zh:{label:'任务模式',hint:'完成所有任务后闹钟才会停止。',gentle:'轻度 · 数学',standard:'标准 · 数学 + 步数',heavy:'深度睡眠 · 记忆 + 步数',bathroom:'浴室 · 数学 + 条形码',strict:'严格模式：完成任务前不会自动静音'},
+    ja:{label:'タスクプロファイル',hint:'すべてのタスクを順番に完了するまでアラームは止まりません。',gentle:'やさしい · 数学',standard:'標準 · 数学 + 歩数',heavy:'深い眠り · 記憶 + 歩数',bathroom:'洗面所 · 数学 + バーコード',strict:'厳格モード：タスク完了前の自動消音を無効化'}
+  };
+  const langKey=()=>{try{return typeof lang!=='undefined'&&profileText[lang]?lang:'en'}catch(e){return'en'}};
+  const tasksFor=p=>p==='standard'?['math','steps']:p==='heavy'?['memory','steps']:p==='bathroom'?['math','barcode']:['math'];
+  window.SleepRisePolicyBlock=()=>{try{if(document.querySelector('#ring.on')){if(typeof toast==='function')toast((typeof t==='function'&&t('taskRequired'))||profileText[langKey()].hint);return true}return false}catch(e){return false}};
+  const installUi=()=>{
+    try{
+      const host=document.querySelector('#fTask')?.parentElement;
+      if(!host||document.querySelector('#srTaskProfileWrap'))return;
+      const x=profileText[langKey()];
+      host.insertAdjacentHTML('afterend',`<div class="field" id="srTaskProfileWrap"><label id="srTaskProfileLabel">${x.label}</label><select id="srTaskProfile"><option value="gentle">${x.gentle}</option><option value="standard">${x.standard}</option><option value="heavy">${x.heavy}</option><option value="bathroom">${x.bathroom}</option></select><p class="note" id="srTaskProfileHint">${x.hint}</p></div>`);
+      const st=document.createElement('style');st.id='srTaskProfileStyle';st.textContent='#srTaskProfile{width:100%;border:1px solid var(--hair);border-radius:12px;background:var(--panel,#132a4f);color:inherit;padding:11px 12px;font:inherit}#srTaskProfileHint{margin-top:7px}#fAuto{opacity:.45;pointer-events:none}';document.head.appendChild(st);
+    }catch(e){}
+  };
+  const refreshUi=()=>{try{installUi();const x=profileText[langKey()];if(!x)return;const s=document.querySelector('#srTaskProfile'),l=document.querySelector('#srTaskProfileLabel'),h=document.querySelector('#srTaskProfileHint');if(l)l.textContent=x.label;if(h)h.textContent=x.hint;if(s){const v=s.value||'gentle';s.innerHTML=`<option value="gentle">${x.gentle}</option><option value="standard">${x.standard}</option><option value="heavy">${x.heavy}</option><option value="bathroom">${x.bathroom}</option>`;s.value=v}}catch(e){}};
+  const strict=()=>{try{const x=profileText[langKey()];if(typeof I18N!=='undefined'&&I18N[langKey()]){I18N[langKey()].autoSil=x.strict;I18N[langKey()].autoSilD=x.hint;I18N[langKey()].autoSilMsg=x.hint}if(Array.isArray(alarms))alarms.forEach(a=>{if(a.auto)a.auto=false});if(typeof draft!=='undefined'&&draft)draft.auto=false;document.querySelectorAll('[data-i18n="autoSil"]').forEach(n=>n.textContent=x.strict);document.querySelectorAll('[data-i18n="autoSilD"]').forEach(n=>n.textContent=x.hint);const a=document.querySelector('#fAuto');if(a){a.classList.remove('on');a.setAttribute('aria-disabled','true');a.title=x.strict}}catch(e){}};
+  const upgrade=()=>{
+    try{
+      if(window.__sr58Upgrade)return true;
+      if(typeof fire!=='function'||typeof finishDismiss!=='function')return false;
+      const coreFire=fire;
+      fire=function(e){
+        const p=e&&e.taskProfile;
+        const ts=e&&Array.isArray(e.tasks)&&e.tasks.length?e.tasks.slice():tasksFor(p||'gentle');
+        const clean=ts.filter(t=>['math','memory','typing','steps','shake','barcode','call','none'].includes(t)).map(t=>t==='barcode'&&!e.barcode?'steps':t);
+        const normalized={...e,tasks:clean.length?clean:['math'],task:(clean[0]||e.task||'math'),auto:false};
+        coreFire(normalized);
+        try{if(ringing){ringing.tasks=normalized.tasks.slice();ringing.__srTaskIndex=0;ringing.__srTaskComplete=false}}catch(x){}
+      };
+      const coreFinish=finishDismiss;
+      finishDismiss=function(){
+        try{
+          if(ringing&&Array.isArray(ringing.tasks)&&ringing.tasks.length&&!ringing.__srTaskComplete&&taskValidated){
+            const i=Number(ringing.__srTaskIndex||0);
+            if(i+1<ringing.tasks.length){
+              ringing.__srTaskIndex=i+1;taskValidated=false;toast((profileText[langKey()]||profileText.en).hint);startTask(ringing.tasks[i+1]);return;
+            }
+            ringing.__srTaskComplete=true;
+          }
+        }catch(e){}
+        return coreFinish.apply(this,arguments);
+      };
+      const bindSheet=()=>{try{const b=document.querySelector('#sheetSave');if(!b||b.__sr58Bound)return;const old=b.onclick;b.onclick=function(ev){try{const s=document.querySelector('#srTaskProfile');const p=s?.value||'gentle';if(typeof draft!=='undefined'&&draft){draft.taskProfile=p;draft.tasks=tasksFor(p);draft.task=draft.tasks[0];draft.auto=false}}catch(x){}return old?old.call(this,ev):undefined};b.__sr58Bound=true}catch(e){}};
+      const oldSync=typeof syncSheet==='function'?syncSheet:null;
+      if(oldSync&&!window.__sr58SyncWrapped){window.__sr58SyncWrapped=true;window.SleepRiseCoreSyncSheet=oldSync;syncSheet=function(){try{if(typeof draft!=='undefined'&&draft){draft.auto=false;const s=document.querySelector('#srTaskProfile');if(s&&draft.taskProfile)s.value=draft.taskProfile}}catch(e){}const r=oldSync.apply(this,arguments);try{const s=document.querySelector('#srTaskProfile');if(s&&typeof draft!=='undefined'&&draft)s.value=draft.taskProfile||'gentle'}catch(e){}return r}}
+      const s=document.querySelector('#srTaskProfile');if(s&&!s.__sr58Change){s.addEventListener('change',()=>{try{if(typeof draft!=='undefined'&&draft){draft.taskProfile=s.value;draft.tasks=tasksFor(s.value);draft.task=draft.tasks[0];draft.auto=false;if(typeof syncSheet==='function')syncSheet()}}catch(e){}});s.__sr58Change=true}
+      bindSheet();window.__sr58Upgrade=true;return true;
+    }catch(e){return false}
+  };
+  refreshUi();strict();upgrade();setInterval(()=>{refreshUi();strict();upgrade()},800);
+})();
+/* /v58 competitor-strength alarm upgrades */
+</script>
+<!-- SLEEPRISE_V58_END -->
 </body>
 </html>
 <script id="sleeprise-features-v42">
