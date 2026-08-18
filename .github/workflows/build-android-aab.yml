@@ -70,6 +70,11 @@ jobs:
       - name: JavaScript bağımlılıklarını yükle
         run: pnpm install --frozen-lockfile
 
+      - name: İlk Play yüklemesi için ağır video varlıklarını geçici çıkar
+        run: |
+          mv www/videos "$RUNNER_TEMP/sleeprise-videos"
+          mkdir -p www/videos
+
       - name: Web varlıklarını Android projesine eşitle
         run: npx cap sync android
 
@@ -102,6 +107,12 @@ jobs:
             android/signing.env
           if-no-files-found: error
           retention-days: 14
+
+      - name: Web video varlıklarını geri yükle
+        if: always()
+        run: |
+          rm -rf www/videos
+          if [ -d "$RUNNER_TEMP/sleeprise-videos" ]; then mv "$RUNNER_TEMP/sleeprise-videos" www/videos; fi
 
       - name: Keystore dosyasını temizle
         if: always()
