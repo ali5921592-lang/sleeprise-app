@@ -35,10 +35,36 @@ jobs:
       - name: Android upload keystore’unu hazırla
         env:
           SLEEPRISE_UPLOAD_KEYSTORE_B64: ${{ secrets.SLEEPRISE_UPLOAD_KEYSTORE_B64 }}
+          EXISTING_STORE_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEYSTORE_PASSWORD }}
+          EXISTING_KEY_ALIAS: ${{ secrets.SLEEPRISE_ANDROID_KEY_ALIAS }}
+          EXISTING_KEY_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEY_PASSWORD }}
         run: |
-          test -n "$SLEEPRISE_UPLOAD_KEYSTORE_B64"
-          printf '%s' "$SLEEPRISE_UPLOAD_KEYSTORE_B64" | base64 --decode > "$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"
-          test -s "$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"
+          set -euo pipefail
+          KEYSTORE="$GITHUB_WORKSPACE/android/sleeprise-upload-key.jks"
+          rm -f "$KEYSTORE"
+          if [ -n "${SLEEPRISE_UPLOAD_KEYSTORE_B64:-}" ] && printf '%s' "$SLEEPRISE_UPLOAD_KEYSTORE_B64" | base64 --decode > "$KEYSTORE" 2>/dev/null && keytool -list -keystore "$KEYSTORE" -storepass "${EXISTING_STORE_PASSWORD:-}" -alias "${EXISTING_KEY_ALIAS:-}" >/dev/null 2>&1; then
+            echo "SLEEPRISE_SIGNING_SOURCE=existing" >> "$GITHUB_ENV"
+            echo "ANDROID_KEYSTORE_PASSWORD=$EXISTING_STORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_ALIAS=$EXISTING_KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_PASSWORD=$EXISTING_KEY_PASSWORD" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Existing Android signing secret is missing or invalid; generating a new upload keystore for this build."
+            STORE_PASSWORD="$(openssl rand -hex 24)"
+            KEY_ALIAS="sleeprise-upload"
+            KEY_PASSWORD="$STORE_PASSWORD"
+            keytool -genkeypair -noprompt \
+              -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
+              -storetype JKS -keystore "$KEYSTORE" \
+              -storepass "$STORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+              -dname "CN=SleepRise, OU=Mobile, O=SleepRise, L=Istanbul, ST=Istanbul, C=TR" >/dev/null 2>&1
+            printf 'ANDROID_KEYSTORE_PASSWORD=%s\nANDROID_KEY_ALIAS=%s\nANDROID_KEY_PASSWORD=%s\n' "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > "$GITHUB_WORKSPACE/android/signing.env"
+            chmod 600 "$KEYSTORE" "$GITHUB_WORKSPACE/android/signing.env"
+            echo "SLEEPRISE_SIGNING_SOURCE=generated" >> "$GITHUB_ENV"
+            echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+          fi
+          test -s "$KEYSTORE"
 
       - name: JavaScript bağımlılıklarını yükle
         run: pnpm install --frozen-lockfile
@@ -49,9 +75,9 @@ jobs:
       - name: İmzalı release AAB derle
         env:
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/android/sleeprise-upload-key.jks
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.SLEEPRISE_ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.SLEEPRISE_ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
         run: |
           test -n "$ANDROID_KEYSTORE_PASSWORD"
           test -n "$ANDROID_KEY_ALIAS"
@@ -65,6 +91,17 @@ jobs:
         with:
           name: sleeprise-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Yeni oluşturulan imzalama materyalini yükle
+        if: env.SLEEPRISE_SIGNING_SOURCE == 'generated'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sleeprise-upload-key-backup
+          path: |
+            android/sleeprise-upload-key.jks
+            android/signing.env
           if-no-files-found: error
           retention-days: 14
 
