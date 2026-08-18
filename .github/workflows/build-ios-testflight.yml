@@ -97,6 +97,11 @@ jobs:
             <string>Apple Distribution</string>
             <key>teamID</key>
             <string>$APPLE_TEAM_ID</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$IOS_BUNDLE_ID</key>
+              <string>${{ steps.profile.outputs.name }}</string>
+            </dict>
           </dict>
           </plist>
           EOF
