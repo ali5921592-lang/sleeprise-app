@@ -67,8 +67,8 @@ jobs:
           PROFILE_TMP="$RUNNER_TEMP/SleepRise.mobileprovision"
           # GitHub secret değerini boşluk ve satır sonlarından arındırarak decode et.
           printf '%s' "$PROFILE_BASE64" | tr -d '[:space:]' > "$PROFILE_B64"
-          if ! base64 --decode "$PROFILE_B64" > "$PROFILE_TMP" 2>/dev/null; then
-            base64 -D "$PROFILE_B64" > "$PROFILE_TMP"
+          if ! base64 --decode -i "$PROFILE_B64" -o "$PROFILE_TMP" 2>/dev/null; then
+            base64 -D -i "$PROFILE_B64" -o "$PROFILE_TMP"
           fi
           # Secret aktarımını küçültmek için gzip’lenmiş profile’ları da destekle.
           if [ "$(od -An -t x1 -N 2 "$PROFILE_TMP" | tr -d ' [:space:]')" = "1f8b" ]; then
