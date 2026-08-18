@@ -75,9 +75,6 @@ jobs:
       - name: İmzalı release AAB derle
         env:
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/android/sleeprise-upload-key.jks
-          ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
         run: |
           test -n "$ANDROID_KEYSTORE_PASSWORD"
           test -n "$ANDROID_KEY_ALIAS"
