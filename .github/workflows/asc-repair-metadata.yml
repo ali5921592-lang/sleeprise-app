@@ -11,13 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Download repair script from this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github.raw+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/scripts/asc_repair_metadata.py?ref=${GITHUB_SHA}" \
+            -o /tmp/asc_repair_metadata.py
 
       - name: Install API client dependencies
         run: python -m pip install --disable-pip-version-check --no-input PyJWT cryptography requests
@@ -30,4 +37,4 @@ jobs:
           ASC_APP_ID: '6802760553'
           ASC_BUILD_NUMBER: '41'
           ASC_APPLY: 'true'
-        run: python scripts/asc_repair_metadata.py
+        run: python /tmp/asc_repair_metadata.py
