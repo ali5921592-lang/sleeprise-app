@@ -27,11 +27,11 @@ APPLY = os.environ.get("ASC_APPLY", "false").lower() == "true"
 SUBSCRIPTIONS = {
     "6803000242": {
         "name": "SleepRise Pro Monthly",
-        "description": "Unlock ad-free sleep sounds, unlimited analysis and Pro wake-up missions, month by month.",
+        "description": "Ad-free sleep sounds and unlimited Pro missions.",
     },
     "6803006192": {
         "name": "SleepRise Pro Yearly",
-        "description": "Unlock ad-free sleep sounds, unlimited analysis and Pro wake-up missions for a full year.",
+        "description": "Ad-free sleep sounds and Pro missions for a year.",
     },
 }
 
@@ -102,7 +102,7 @@ def get_version(token: str) -> str:
 def find_build(token: str) -> str:
     resp = request(
         "GET",
-        f"/builds?filter[app]={APP_ID}&filter[versionString]=1.0&sort=-uploadedDate&limit=200",
+        f"/builds?filter[app]={APP_ID}&sort=-uploadedDate&limit=200",
         token,
     )
     if resp.status_code != 200:
