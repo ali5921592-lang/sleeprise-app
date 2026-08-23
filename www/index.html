@@ -183,7 +183,32 @@ nav{height:76px!important;left:11px!important;right:11px!important;bottom:10px!i
 #atmCv.sr47-hidden-canvas{opacity:0!important;visibility:hidden!important;}
 @media(max-width:480px){.v32-atm-card{min-height:148px!important}.sr47-license-tag{font-size:7px;padding:4px 6px}}
 </style>
-<script src="vendor/zxing-browser.min.js"></script><style id="sleeprise-locale-gate">html.sr-locale-pending .app,html.sr-locale-switching .app{visibility:hidden!important;opacity:0!important;pointer-events:none!important}html.sr-locale-pending .splash{visibility:visible!important;opacity:1!important}</style><script>document.documentElement.classList.add('sr-locale-pending');</script></head>
+<script src="vendor/zxing-browser.min.js"></script><style id="sleeprise-locale-gate">html.sr-locale-pending .app,html.sr-locale-switching .app{visibility:hidden!important;opacity:0!important;pointer-events:none!important}html.sr-locale-pending .splash{visibility:visible!important;opacity:1!important}</style><script>document.documentElement.classList.add('sr-locale-pending');</script><style id="sleeprise-visual-assets-v70">
+:root{--sr70-night:#071631;--sr70-indigo:#342f82;--sr70-mint:#7fe4d3;--sr70-gold:#ffd27c;--sr70-sun:#ffb46b}
+#p-today.v70-visual-shell,#p-stats.v70-analysis-shell,#p-relax.v70-relax-shell{position:relative;isolation:isolate}
+#p-today.v70-visual-shell::before{content:"";position:absolute;inset:0 0 auto 0;height:238px;z-index:-1;border-radius:0 0 28px 28px;background-image:linear-gradient(180deg,rgba(7,18,48,.12) 0%,rgba(7,18,48,.62) 72%,rgba(7,18,48,.96) 100%),url("images/sleep-night-bg.png");background-position:center top;background-size:cover;opacity:.98;animation:v70NightDrift 26s ease-in-out infinite alternate;pointer-events:none}
+#p-today.v70-visual-shell.v70-mode-wake::before{background-image:linear-gradient(180deg,rgba(255,193,137,.06) 0%,rgba(255,190,141,.24) 55%,rgba(255,255,255,.94) 100%),url("images/wake-sunrise-bg.png");animation:v70MorningDrift 28s ease-in-out infinite alternate}
+#p-today.v70-visual-shell .tdhead{padding-top:14px}
+#p-today.v70-visual-shell .tdhead h1,#p-today.v70-visual-shell .tdhead p{position:relative;color:#fff;text-shadow:0 2px 15px rgba(0,0,0,.45)}
+#p-today.v70-visual-shell.v70-mode-wake .tdhead h1,#p-today.v70-visual-shell.v70-mode-wake .tdhead p{color:#182a4b;text-shadow:0 2px 15px rgba(255,255,255,.58)}
+#p-today.v70-visual-shell .hero{background:rgba(10,22,55,.55);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#p-today.v70-visual-shell.v70-mode-wake .hero{background:rgba(255,255,255,.58);border-color:rgba(255,255,255,.58)}
+#p-stats.v70-analysis-shell::before{content:"";position:absolute;inset:0 0 auto 0;height:214px;z-index:-1;border-radius:0 0 28px 28px;background-image:linear-gradient(180deg,rgba(8,19,53,.10),rgba(8,19,53,.76) 82%,rgba(255,255,255,.98)),url("images/sleep-analysis-illustration.png");background-size:cover;background-position:center top;opacity:.92;animation:v70AnalysisGlow 12s ease-in-out infinite alternate;pointer-events:none}
+#p-stats.v70-analysis-shell .anhead h2,#p-stats.v70-analysis-shell .anhead p{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.42)}
+#p-relax.v70-relax-shell::before{content:"";position:absolute;inset:0 0 auto 0;height:182px;z-index:-1;border-radius:0 0 26px 26px;background-image:linear-gradient(180deg,rgba(7,21,48,.08),rgba(7,21,48,.70) 80%,rgba(255,255,255,.98)),url("images/relax-ambient-cover.png");background-size:cover;background-position:center;opacity:.78;animation:v70RelaxDrift 30s ease-in-out infinite alternate;pointer-events:none}
+#p-relax.v70-relax-shell .breathe-wrap{position:relative}
+#p-relax.v70-relax-shell .breathe.v70-breath-enhanced::after{content:"";position:absolute;inset:12%;border:1px solid rgba(127,228,211,.42);border-radius:50%;box-shadow:0 0 34px rgba(127,228,211,.22),inset 0 0 28px rgba(127,228,211,.10);animation:v70BreathHalo 7s ease-in-out infinite;pointer-events:none}
+.v70-onb-art{display:block;width:104px;height:126px;margin:0 auto 4px;object-fit:contain;filter:drop-shadow(0 13px 24px rgba(0,0,0,.25));animation:v70CompanionFloat 4.8s ease-in-out infinite;position:relative;z-index:1}
+@keyframes v70NightDrift{0%{background-position:50% 0;background-size:cover}100%{background-position:54% 3px;background-size:calc(100% + 10px) calc(100% + 7px)}}
+@keyframes v70MorningDrift{0%{background-position:50% 0;background-size:cover}100%{background-position:46% 2px;background-size:calc(100% + 8px) calc(100% + 6px)}}
+@keyframes v70RelaxDrift{0%{background-position:50% 50%}100%{background-position:53% 47%}}
+@keyframes v70AnalysisGlow{0%{filter:saturate(.96) brightness(.98)}100%{filter:saturate(1.08) brightness(1.06)}}
+@keyframes v70BreathHalo{0%,100%{transform:scale(.92);opacity:.34}50%{transform:scale(1.05);opacity:.78}}
+@keyframes v70CompanionFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+@media(max-width:420px){#p-today.v70-visual-shell::before{height:224px}#p-stats.v70-analysis-shell::before{height:192px}#p-relax.v70-relax-shell::before{height:168px}.v70-onb-art{width:88px;height:108px}}
+@media(prefers-reduced-motion:reduce){#p-today.v70-visual-shell::before,#p-stats.v70-analysis-shell::before,#p-relax.v70-relax-shell::before,#p-relax.v70-relax-shell .breathe.v70-breath-enhanced::after,.v70-onb-art{animation:none!important}}
+</style>
+</head>
 <body>
 <div class="splash" id="splash">
 <div class="in">
@@ -2257,6 +2282,25 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   setTimeout(()=>{if(!ready)bootstrap()},8000);
 })();
 </script>
+<script id="sleeprise-visual-assets-v70-js">
+(function(){'use strict';
+  const q=s=>document.querySelector(s);
+  function mode(){return q('#modeSw button.on')?.dataset.mode||(document.querySelector('.app')?.classList.contains('nightmode')?'sleep':'wake')}
+  function apply(){
+    const today=q('#p-today'),stats=q('#p-stats'),relax=q('#p-relax');
+    if(today){today.classList.add('v70-visual-shell');today.classList.toggle('v70-mode-wake',mode()==='wake')}
+    if(stats)stats.classList.add('v70-analysis-shell');
+    if(relax){relax.classList.add('v70-relax-shell');q('#breathe')?.classList.add('v70-breath-enhanced')}
+    const onb=q('#onb'),body=q('#onbBody');
+    if(onb&&body){let img=onb.querySelector('.v70-onb-art');if(!img){img=document.createElement('img');img.className='v70-onb-art';img.src='images/onboarding-moon-companion.png';img.alt='';img.setAttribute('aria-hidden','true')}if(img.parentElement!==body)body.insertBefore(img,body.firstChild)}
+  }
+  apply();
+  const root=q('#modeSw');if(root)new MutationObserver(apply).observe(root,{subtree:true,attributes:true,attributeFilter:['class','aria-pressed']});
+  const app=document.querySelector('.app');if(app)new MutationObserver(apply).observe(app,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('click',e=>{if(e.target.closest('#modeSw,[data-mode]'))setTimeout(apply,30)},{passive:true});
+  window.SleepRiseVisualAssetsV70={refresh:apply};
+})();
+</script>
 </body>
 </html>
 <script id="sleeprise-features-v42">
@@ -3384,3 +3428,25 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- SLEEPRISE_V69_LOCALE_POLISH_END -->
+<script id="sleeprise-visual-luma-locale-v70">
+(function(){'use strict';
+  const q=s=>document.querySelector(s), lang=()=>{try{for(const k of ['sr_locale_v55','sf_lang']){const raw=localStorage.getItem(k);if(!raw)continue;let v=raw;try{v=JSON.parse(raw)}catch(e){}v=String(v).replace(/^['"]|['"]$/g,'');if(TEXT[v])return v}}catch(e){}return 'tr'};
+  const TEXT={
+    tr:{sleep:'Luma geceyi aydınlatıyor',wake:'Luma gün ışığını getirdi',card:'Luma yanında',cardText:'Parlak ekranı azalt, ritmini Luma’ya bırak.',onb:'Merhaba, ben Luma. Geceyi sakin, sabahı net kılmak için buradayım.',title:'SleepRise’a hoş geldin',sub:'Birlikte daha sakin geceler ve daha aydınlık sabahlar için uyku ritmini adım adım oluşturalım.'},
+    en:{sleep:'Luma lights the night',wake:'Luma brings daylight',card:'Luma is with you',cardText:'Dim the screen and let Luma guide your rhythm.',onb:'Hi, I’m Luma. I’m here to make nights calm and mornings clear.',title:'Welcome to SleepRise',sub:'Let’s build a calmer sleep and wake rhythm together, one step at a time.'},
+    es:{sleep:'Luma ilumina la noche',wake:'Luma trae la luz del día',card:'Luma está contigo',cardText:'Reduce la luz de la pantalla y deja que Luma guíe tu ritmo.',onb:'Hola, soy Luma. Estoy aquí para calmar tus noches y aclarar tus mañanas.',title:'Te damos la bienvenida a SleepRise',sub:'Construyamos juntos un ritmo de sueño y despertar más tranquilo, paso a paso.'},
+    de:{sleep:'Luma erhellt die Nacht',wake:'Luma bringt das Tageslicht',card:'Luma begleitet dich',cardText:'Dimme den Bildschirm und lass Luma deinen Rhythmus begleiten.',onb:'Hallo, ich bin Luma. Ich begleite dich zu ruhigen Nächten und klaren Morgen.',title:'Willkommen bei SleepRise',sub:'Gemeinsam entwickeln wir Schritt für Schritt einen ruhigeren Schlaf- und Wachrhythmus.'},
+    fr:{sleep:'Luma éclaire la nuit',wake:'Luma apporte la lumière du jour',card:'Luma est à vos côtés',cardText:'Réduisez la lumière de l’écran et laissez Luma guider votre rythme.',onb:'Bonjour, je suis Luma. Je suis là pour apaiser vos nuits et éclairer vos matins.',title:'Bienvenue sur SleepRise',sub:'Construisons ensemble un rythme de sommeil et de réveil plus serein, étape par étape.'},
+    pt:{sleep:'Luma ilumina a noite',wake:'Luma traz a luz do dia',card:'Luma está com você',cardText:'Reduza o brilho da tela e deixe Luma guiar seu ritmo.',onb:'Olá, eu sou Luma. Estou aqui para tornar suas noites tranquilas e suas manhãs mais claras.',title:'Boas-vindas ao SleepRise',sub:'Vamos criar juntos um ritmo de sono e despertar mais tranquilo, passo a passo.'},
+    ar:{sleep:'لوما تنير الليل',wake:'لوما تجلب ضوء النهار',card:'لوما معك',cardText:'خفّف سطوع الشاشة ودع لوما ترشد إيقاعك.',onb:'مرحبًا، أنا لوما. أنا هنا لأجعل لياليك أهدأ وصباحاتك أوضح.',title:'مرحبًا بك في SleepRise',sub:'لنَبْنِ معًا إيقاعًا أكثر هدوءًا للنوم والاستيقاظ، خطوةً بعد خطوة.'},
+    zh:{sleep:'Luma 照亮夜晚',wake:'Luma 带来晨光',card:'Luma 陪伴着你',cardText:'调暗屏幕，让 Luma 陪你保持舒适的节奏。',onb:'你好，我是 Luma。我会陪你度过宁静的夜晚和清晰的早晨。',title:'欢迎使用 SleepRise',sub:'让我们一步一步，共同建立更平静的睡眠与起床节奏。'},
+    ja:{sleep:'Luma が夜を照らします',wake:'Luma が朝の光を届けます',card:'Luma がそばにいます',cardText:'画面を暗くして、Luma と一緒にリズムを整えましょう。',onb:'こんにちは、Luma です。穏やかな夜とすっきりした朝をお手伝いします。',title:'SleepRise へようこそ',sub:'一緒に、より穏やかな睡眠と目覚めのリズムを少しずつ整えていきましょう。'}
+  };
+  function apply(){const x=TEXT[lang()]||TEXT.tr,mode=q('#modeSw button.on')?.dataset.mode||'sleep';const label=q('.v35-luma-label'),labelText=mode==='wake'?x.wake:x.sleep;if(label&&label.textContent!==labelText)label.textContent=labelText;const card=q('#v35LumaCard');if(card){const b=card.querySelector('b'),p=card.querySelector('p');if(b&&b.textContent!==x.card)b.textContent=x.card;if(p&&p.textContent!==x.cardText)p.textContent=x.cardText}const note=q('.v35-onb-note');if(note&&note.textContent!==x.onb)note.textContent=x.onb;const title=q('#onbTitle'),sub=q('#onbSub');if(title&&title.textContent!==x.title)title.textContent=x.title;if(sub&&sub.textContent!==x.sub)sub.textContent=x.sub}
+  apply();
+  document.addEventListener('click',e=>{if(e.target.closest('#modeSw,[data-mode],#btnLang,.langmenu'))setTimeout(apply,80)},{passive:true});
+  const watch=document.querySelector('#p-today,#onb');if(watch)new MutationObserver(()=>apply()).observe(watch,{subtree:true,childList:true,characterData:true});
+  setInterval(apply,1700);
+  window.SleepRiseVisualLumaLocaleV70={refresh:apply};
+})();
+</script>
