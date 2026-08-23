@@ -3036,7 +3036,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const wrap=q('#srTaskProfileWrap');if(wrap)wrap.setAttribute('aria-label',uiText('Görev profili','Task profile'));
   }
   function observe(){
-    const mo=new MutationObserver(()=>{installSheetExit();installSettings();decorateRelaxRows();taskProfile();patchToast()});mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','value']});
+    let queued=false;
+    const flush=()=>{queued=false;installSheetExit();installSettings();decorateRelaxRows();taskProfile();patchToast()};
+    const mo=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(flush)});
+    mo.observe(document.body,{subtree:true,childList:true});
     document.addEventListener('change',e=>{if(e.target?.id==='srTaskProfile')e.target.dataset.sr66UserTouched='1'},true);
   }
   function init(){
@@ -3089,3 +3092,124 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- SLEEPRISE_V67_AUDIO_CALL_END -->
+
+<!-- SLEEPRISE_V68_SOUND_CENTER_START -->
+<style id="sleeprise-v68-sound-center-style">
+:root{--sr68-ease:cubic-bezier(.23,1,.32,1)}
+/* Sleep and wake screens no longer contain a second sound folder. */
+#p-sounds,nav.tabs .tab[data-p="sounds"]{display:none!important}
+#p-relax #atmRow,#p-relax #v32Atmospheres,#p-relax #v32SoundDeck,#p-relax #sr44RelaxLibrary,#p-relax #sr44CinemaLibrary,#p-relax #vidLib,#p-relax #btnOwnVid,#p-relax #atmVidFile,#p-relax #atmVidSw,#p-relax #cineSw,#p-relax .sr44-relax-library,#p-relax .sr44-cinema-library,#p-relax [data-i18n="mixerT"],#p-relax #mixGrid,#p-relax #btnAddMixSound,#p-relax #mixFile,#p-relax [data-i18n="presetT"],#p-relax #presetRow,#p-relax #btnSavePreset,#p-relax [data-i18n="sleepTimerT"],#p-relax #sleepTimer,#p-relax .mixbar,#p-relax [data-i18n="mixNote"],#p-relax .babynote,#p-relax #babyGrid{display:none!important}
+#srAdProCard,#v49-settings{display:none!important}
+#sr66SoundSettings.sr68-center{margin:0 0 16px!important;padding:18px!important;border:1px solid rgba(43,107,255,.18)!important;border-radius:24px!important;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(234,243,255,.93))!important;box-shadow:0 14px 34px rgba(43,107,255,.10)!important;color:#16233a!important}
+#sr66SoundSettings.sr68-center *{box-sizing:border-box}
+.sr68-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sr68-head b{display:block;color:#16233a;font:800 20px/1.12 Inter,-apple-system,system-ui,sans-serif;letter-spacing:-.03em}
+.sr68-head p{margin:6px 0 0;color:#5a6880;font:500 12px/1.45 Inter,-apple-system,system-ui,sans-serif}
+.sr68-head-badge{flex:0 0 auto;padding:7px 9px;border-radius:10px;background:rgba(0,169,140,.12);color:#007d6b;font:800 9px/1 Inter,-apple-system,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.sr68-status{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:0 0 14px;padding:12px 13px;border:1px solid rgba(0,169,140,.2);border-radius:16px;background:linear-gradient(100deg,rgba(0,169,140,.09),rgba(43,107,255,.07));transition:transform 180ms var(--sr68-ease),box-shadow 180ms var(--sr68-ease)}
+.sr68-status.is-pulse{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,169,140,.12)}
+.sr68-status-title{display:block;color:#006f62;font:800 11px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr68-status-copy{display:block;margin-top:4px;color:#5a6880;font:600 10px/1.35 Inter,-apple-system,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr68-master-stop{min-height:38px;padding:9px 11px;border:1px solid rgba(193,63,53,.24);border-radius:11px;background:rgba(255,95,82,.10);color:#b33e35;font:800 10px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 150ms var(--sr68-ease)}
+.sr68-master-stop:active,.sr68-toggle:active,.sr68-pro button:active{transform:scale(.97)}
+.sr68-section{margin:0 0 12px;padding:13px;border:1px solid rgba(43,107,255,.12);border-radius:18px;background:rgba(255,255,255,.72)}
+.sr68-section:last-of-type{margin-bottom:0}
+.sr68-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:10px}
+.sr68-section-head b{color:#16233a;font:800 14px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr68-section-head small{display:block;margin-top:4px;color:#6c7a91;font:500 10px/1.35 Inter,-apple-system,system-ui,sans-serif}
+.sr68-sound-list{display:grid;gap:7px}
+.sr68-sound-row{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:center;min-width:0;padding:10px;border:1px solid rgba(43,107,255,.10);border-radius:14px;background:rgba(244,248,255,.72);transition:transform 180ms var(--sr68-ease),border-color 180ms var(--sr68-ease),background 180ms var(--sr68-ease),box-shadow 180ms var(--sr68-ease)}
+.sr68-sound-row:hover{transform:translateY(-1px);border-color:rgba(43,107,255,.22);box-shadow:0 7px 16px rgba(43,107,255,.08)}
+.sr68-sound-row.is-playing{border-color:rgba(0,169,140,.4);background:linear-gradient(100deg,rgba(0,169,140,.12),rgba(255,255,255,.78));box-shadow:0 8px 18px rgba(0,169,140,.11)}
+.sr68-sound-dot{width:9px;height:9px;border-radius:50%;background:#bdc9db;transition:transform 180ms var(--sr68-ease),background 180ms var(--sr68-ease),box-shadow 180ms var(--sr68-ease)}
+.sr68-sound-row.is-playing .sr68-sound-dot{background:#00a98c;transform:scale(1.22);box-shadow:0 0 0 5px rgba(0,169,140,.13)}
+.sr68-sound-name{display:block;min-width:0;color:#1d2d47;font:750 11px/1.2 Inter,-apple-system,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr68-sound-desc{display:block;margin-top:3px;color:#6c7a91;font:500 9px/1.3 Inter,-apple-system,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr68-toggle{min-width:70px;min-height:34px;padding:8px 10px;border:1px solid rgba(43,107,255,.23);border-radius:10px;background:#fff;color:#2450aa;font:800 9px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 180ms var(--sr68-ease),border-color 180ms var(--sr68-ease),color 180ms var(--sr68-ease)}
+.sr68-sound-row.is-playing .sr68-toggle{border-color:rgba(0,169,140,.35);background:#00a98c;color:#fff}
+.sr68-volume{grid-column:2/4;width:100%;height:26px;accent-color:#00a98c;cursor:pointer}
+.sr68-tools-row{display:grid;gap:8px;margin-top:11px}
+.sr68-tools-row button{min-height:38px;border:1px solid rgba(43,107,255,.17);border-radius:11px;background:#fff;color:#2450aa;font:800 10px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 180ms var(--sr68-ease)}
+.sr68-tools-row button:active{transform:scale(.97)}
+.sr68-preferences{display:grid;gap:8px}
+.sr68-preference{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(43,107,255,.10)}
+.sr68-preference:last-child{border-bottom:0;padding-bottom:0}
+.sr68-preference b{display:block;color:#1d2d47;font:750 11px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr68-preference small{display:block;margin-top:3px;color:#6c7a91;font:500 9px/1.35 Inter,-apple-system,system-ui,sans-serif}
+.sr68-preference input{width:39px;height:22px;appearance:none;border:0;border-radius:20px;background:#c9d3e2;position:relative;cursor:pointer;transition:background 180ms var(--sr68-ease)}
+.sr68-preference input:after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:transform 180ms var(--sr68-ease)}
+.sr68-preference input:checked{background:#00a98c}
+.sr68-preference input:checked:after{transform:translateX(17px)}
+.sr68-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(43,107,255,.07);color:#5a6880;font:600 9px/1.4 Inter,-apple-system,system-ui,sans-serif}
+.sr68-pro{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:14px;border-radius:17px;background:linear-gradient(135deg,#102c52,#126b73 62%,#00a98c);color:#fff;box-shadow:0 12px 26px rgba(0,106,115,.18)}
+.sr68-pro b{display:block;font:800 14px/1.15 Inter,-apple-system,system-ui,sans-serif}
+.sr68-pro p{margin:5px 0 0;color:rgba(255,255,255,.78);font:500 9px/1.4 Inter,-apple-system,system-ui,sans-serif}
+.sr68-pro button{flex:0 0 auto;min-height:36px;padding:9px 10px;border:1px solid rgba(255,255,255,.36);border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font:800 9px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 180ms var(--sr68-ease)}
+.sr68-details{margin-top:10px;border-top:1px solid rgba(43,107,255,.10);padding-top:10px}
+.sr68-details summary{cursor:pointer;color:#2450aa;font:800 10px/1.3 Inter,-apple-system,system-ui,sans-serif}
+.sr68-details[open] summary{margin-bottom:10px}
+.app.nightmode #sr66SoundSettings.sr68-center{background:linear-gradient(145deg,rgba(23,21,50,.97),rgba(26,39,77,.96))!important;color:#f4f5ff!important}
+.app.nightmode .sr68-head b,.app.nightmode .sr68-section-head b,.app.nightmode .sr68-sound-name,.app.nightmode .sr68-preference b{color:#f4f5ff}
+.app.nightmode .sr68-head p,.app.nightmode .sr68-section-head small,.app.nightmode .sr68-sound-desc,.app.nightmode .sr68-preference small,.app.nightmode .sr68-note{color:#bfc5dd}
+.app.nightmode .sr68-section,.app.nightmode .sr68-sound-row{background:rgba(31,38,78,.82);border-color:rgba(255,255,255,.12)}
+.app.nightmode .sr68-toggle,.app.nightmode .sr68-tools-row button{background:rgba(255,255,255,.08);color:#dffdfa;border-color:rgba(134,230,222,.25)}
+@media(max-width:420px){.sr68-head{display:block}.sr68-head-badge{display:inline-block;margin-top:10px}.sr68-status{grid-template-columns:1fr}.sr68-master-stop{width:100%}.sr68-pro{align-items:flex-start;flex-direction:column}.sr68-pro button{width:100%}}
+@media(prefers-reduced-motion:reduce){.sr68-status,.sr68-sound-row,.sr68-sound-dot,.sr68-toggle,.sr68-preference input,.sr68-preference input:after,.sr68-master-stop,.sr68-tools-row button,.sr68-pro button{transition:none!important}}
+</style>
+<script id="sleeprise-v68-sound-center">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV68SoundCenter)return;
+  window.__SleepRiseV68SoundCenter=true;
+  const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
+  const STATE_KEY='sleeprise_v68_sound_state';
+  const defaultState={volumes:{},ramp:true,haptics:true};
+  let state=defaultState;
+  try{state={...defaultState,...JSON.parse(localStorage.getItem(STATE_KEY)||'{}'),volumes:{...defaultState.volumes,...(JSON.parse(localStorage.getItem(STATE_KEY)||'{}').volumes||{})}}}catch(e){}
+  const save=()=>{try{localStorage.setItem(STATE_KEY,JSON.stringify(state))}catch(e){}};
+  const generated=[
+    ['rain','rain','Yağmur','Camda sürekli yağmur dokusu'],['wind','wind','Rüzgâr','Yumuşak ve düşük frekanslı rüzgâr'],['wave','wave','Dalga','Dengeli kıyı dalgası'],['white','white','Beyaz gürültü','Düz ve sakin arka plan sesi'],['fire','fire','Şömine','Sıcak çıtırtı hissi'],['forest','forest','Orman','Orman dokusu ve uzak çağrılar'],['piano','piano','Piyano','Yavaş ve rastlantısal piyano notaları'],['om','om','Om çanı','Derin ve uzun titreşim'],['alpha','alpha','Alfa 10 Hz','Odaklanmaya yardımcı ritim'],['theta','theta','Teta 6 Hz','Yavaş ritmik ton'],['delta','delta','Delta 2.5 Hz','Düşük ritimli stereo ton'],['brownnoise','brownnoise','Kahverengi gürültü','Yumuşak düşük frekanslı gürültü'],['pinknoise','pinknoise','Pembe gürültü','Dengeli spektrumlu gürültü'],['solf','solf','Solfeggio 528 Hz','Sakin sinüs tonu'],['bowl','bowl','Ses kasesi','Aralıklı rezonans vuruşları'],['crickets','crickets','Cırcır böcekleri','Gece doğası dokusu'],['drone','drone','Derin drone','Sabit ve derin ambiyans'],['storm','storm','Fırtına','Gök gürültüsü hissi ve yağmur'],['stream','stream','Dere','Akışkan su dokusu'],['iso','iso','İzokronik ton','Düşük yoğunluklu ritmik ton']
+  ].map(x=>({id:x[0],kind:x[1],title:x[2],desc:x[3],mode:'generated'}));
+  const baby=[
+    ['womb','womb','Rahim sesi','Derin ve kapalı bir arka plan'],['heart','heart','Kalp atışı','Düzenli ve yumuşak ritim'],['lullaby','lullaby','Ninni','Sade sentetik ninni dokusu'],['rock','rock','Sallanma','Yavaş sallanma hissi'],['dryer','dryer','Fön sesi','Sürekli yumuşak gürültü'],['carrain','carrain','Arabada yağmur','Kapalı araçta yağmur dokusu']
+  ].map(x=>({id:x[0],kind:x[1],title:x[2],desc:x[3],mode:'generated'}));
+  const real=[
+    ['rain-windshield','rain-windshield.mp3','Camda Yağmur','Gerçek yağmur damlaları'],['forest-ambience','forest-ambience.mp3','Orman Ambiyansı','Yumuşak orman dokusu'],['sea-waves','sea-waves.mp3','Deniz Dalgaları','Dengeli kıyı dalgaları'],['sea-waves-seagulls','sea-waves-seagulls.mp3','Dalgalar + Kuşlar','Uzak kıyı kuşları'],['small-waves-beach','small-waves-beach.mp3','Küçük Plaj Dalgaları','Yavaş ve ritmik su sesi'],['birds-at-night','birds-at-night.mp3','Gece Kuşları','Gece kuşları ve bülbül dokusu'],['evening-birds','evening-birds.mp3','Akşam Kuşları','Gün batımı kuş sesleri'],['rain-soft-public-domain','rain-soft-public-domain.mp3','Yumuşak Yağmur','Public domain gerçek kayıt'],['rain-thunder-public-domain','rain-thunder-public-domain.mp3','Yağmur + Gök Gürültüsü','Public domain gerçek kayıt'],['rain-window-public-domain','rain-window-public-domain.mp3','Pencere Yağmuru','Public domain gerçek kayıt'],['forest-realistic-cc0','forest-realistic-cc0.mp3','Gerçekçi Orman','CC0 gerçek kayıt'],['fireplace-crackle-cc0','fireplace-crackle-cc0.mp3','Şömine Çıtırtısı','CC0 gerçek kayıt'],['sea-terns-cc0','sea-terns-cc0.mp3','Deniz Kuşları','CC0 deniz kuşları kaydı']
+  ].map(x=>({id:x[0],file:x[1],title:x[2],desc:x[3],mode:'file'}));
+  const alarmFallback=[
+    ['phoneAlarm','phone-alarm.mp3','Telefon Alarmı'],['electronic1','electronic-buzzer-1.mp3','Elektronik Buzzer 1'],['electronic3','electronic-buzzer-3.mp3','Elektronik Buzzer 3'],['electronic2','electronic-buzzer-2.mp3','Elektronik Buzzer 2'],['piezo1','piezo-alarm-1.mp3','Piezo Alarm 1'],['piezo3','piezo-alarm-3.mp3','Piezo Alarm 3'],['buzzer4','buzzer-4.mp3','Buzzer 4'],['digitalPager','digital-pager.mp3','Dijital Pager'],['alphaPager','alphanumeric-pager.mp3','Alfanümerik Pager'],['digitalWatch','digital-watch-alarm.mp3','Dijital Saat Alarmı'],['siren2','two-tone-siren.mp3','İki Tonlu Siren'],['siren3','three-tone-siren.mp3','Üç Tonlu Siren'],['vehicleSiren','vehicle-siren.mp3','Araç Sireni'],['evacuation1','evacuation-alarm-1.mp3','Tahliye Alarmı 1'],['evacuation3','evacuation-alarm-3.mp3','Tahliye Alarmı 3'],['mechanicalClock','mechanical-clock.mp3','Mekanik Saat'],['clockTick5','mechanical-clock-tick-5.mp3','Mekanik Saat 5'],['clockTick3','mechanical-clock-tick-3.mp3','Mekanik Saat 3'],['shortRing','mechanical-short-ring.mp3','Kısa Saat Zili'],['doorbell','mechanical-doorbell.mp3','Mekanik Kapı Zili'],['industrialBell','industrial-doorbell.mp3','Endüstriyel Zil'],['rooster','rooster.mp3','Horoz Sesi'],['dogs','barking-dogs.mp3','Köpek Havlaması'],['crow','crow.mp3','Karga Çağrısı']
+  ].map(x=>({id:x[0],file:x[1],title:x[2],desc:'Alarm önizlemesi',mode:'alarm'}));
+  const alarms=()=>window.SleepRiseCleanupV44?.alarms?.length?window.SleepRiseCleanupV44.alarms.map(x=>({...x,mode:'alarm'})):alarmFallback;
+  const allRelax=[...generated,...baby,...real];
+  const active=new Map();
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const legacyLabel=item=>item.title;
+  const notify=msg=>{try{if(typeof toast==='function')toast(msg);else if(typeof notice==='function')notice(msg)}catch(e){}};
+  const buzz=()=>{if(!state.haptics)return;try{navigator.vibrate?.(10)}catch(e){}};
+  const volumeFor=id=>Math.max(.01,Math.min(1,Number(state.volumes[id]??.32)||.32));
+  const setVolume=(id,value)=>{state.volumes[id]=Math.max(0,Math.min(1,Number(value)||0));save();const item=active.get(id);if(item?.audio)item.audio.volume=state.volumes[id];if(item?.kind==='generated')try{Mix.set({id,kind:item.kindName},state.volumes[id])}catch(e){};const input=q('[data-sr68-volume="'+CSS.escape(id)+'"]');if(input)input.value=String(state.volumes[id])};
+  const soundCount=()=>[...active.values()].filter(x=>x.kind==='generated'||x.kind==='file').length;
+  function renderStatus(){const status=q('#sr68Status');if(!status)return;const labels=[...active.values()].map(x=>x.label);const copy=q('#sr68StatusCopy'),title=q('#sr68StatusTitle');if(copy)copy.textContent=labels.length?labels.join(' · '):'Henüz ses çalmıyor. Sesler yalnız Aç düğmesine dokunduğunda başlar.';if(title)title.textContent=labels.length?labels.length+' ses çalıyor':'Ses merkezi hazır';status.classList.remove('is-pulse');requestAnimationFrame(()=>status.classList.add('is-pulse'));qa('[data-sr68-id]').forEach(row=>{const id=row.dataset.sr68Id,on=active.has(id);row.classList.toggle('is-playing',on);const b=row.querySelector('[data-sr68-toggle]');if(b){b.textContent=on?'DURDUR':(row.dataset.sr68Mode==='alarm'?'DİNLE':'AÇ');b.setAttribute('aria-pressed',on?'true':'false')}})}
+  function mixItem(id,kind){return {id,kind};}
+  function stopOne(id){const item=active.get(id);if(!item)return;if(item.kind==='generated'){try{if(typeof Mix!=='undefined'&&Mix.off)Mix.off(id)}catch(e){}}else if(item.audio){try{item.audio.pause();item.audio.currentTime=0}catch(e){}}if(item.timer)clearTimeout(item.timer);active.delete(id);renderStatus()}
+  function stopAll(){[...active.keys()].forEach(stopOne);try{if(typeof Mix!=='undefined'&&Mix.stopAll)Mix.stopAll()}catch(e){}try{window.SleepRiseAudioController?.stopAll?.()}catch(e){}try{window.SleepRiseV49?.stopEveryRelaxSound?.()}catch(e){}try{window.SleepRiseAtmosphereV47?.stop?.()}catch(e){}qa('audio,video').forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}});renderStatus();notify('Tüm sesler durduruldu')}
+  function startGenerated(item){if(active.has(item.id)){stopOne(item.id);return}if(soundCount()>=3){notify('Aynı anda en fazla 3 rahatlama sesi açılabilir.');return}try{if(typeof Mix==='undefined'||!Mix.set){notify('Bu ses motoru hazır değil.');return}const v=volumeFor(item.id);Mix.set(mixItem(item.id,item.kind),v);active.set(item.id,{kind:'generated',kindName:item.kind,label:legacyLabel(item)});buzz();renderStatus()}catch(e){console.warn('SleepRise generated sound',e);notify('Ses başlatılamadı.');}}
+  function ensureAudio(item){let a=item._audio;if(!a){a=new Audio('audio/'+item.file);a.preload='auto';a.loop=item.mode!=='alarm';a.playsInline=true;a.setAttribute('playsinline','');item._audio=a}return a}
+  function startFile(item){if(active.has(item.id)){stopOne(item.id);return}if(item.mode!=='alarm'&&soundCount()>=3){notify('Aynı anda en fazla 3 rahatlama sesi açılabilir.');return}try{const a=ensureAudio(item);a.volume=volumeFor(item.id);a.currentTime=0;const p=a.play();active.set(item.id,{kind:'file',audio:a,label:item.title,timer:item.mode==='alarm'?setTimeout(()=>stopOne(item.id),6500):null});buzz();renderStatus();if(p?.catch)p.catch(()=>{stopOne(item.id);notify('Ses için ekrana dokunarak tekrar deneyin.')})}catch(e){console.warn('SleepRise file sound',e);notify('Ses başlatılamadı.')}}
+  function start(item){item.mode==='generated'?startGenerated(item):startFile(item)}
+  function row(item){const title=item.mode==='generated'?legacyLabel(item):item.title;return '<article class="sr68-sound-row" data-sr68-id="'+esc(item.id)+'" data-sr68-mode="'+esc(item.mode)+'"><span class="sr68-sound-dot" aria-hidden="true"></span><div><b class="sr68-sound-name">'+esc(title)+'</b><small class="sr68-sound-desc">'+esc(item.desc||'')+'</small></div><button type="button" class="sr68-toggle" data-sr68-toggle="'+esc(item.id)+'" aria-pressed="false">'+(item.mode==='alarm'?'DİNLE':'AÇ')+'</button>'+(item.mode==='alarm'?'':'<input class="sr68-volume" type="range" min="0" max="1" step=".01" value="'+volumeFor(item.id)+'" data-sr68-volume="'+esc(item.id)+'" aria-label="'+esc(title)+' ses seviyesi">')+'</article>'}
+  function build(){const tools=q('#p-tools');if(!tools)return;let card=q('#sr66SoundSettings');if(!card){card=document.createElement('section');card.id='sr66SoundSettings';tools.insertBefore(card,tools.firstElementChild)}if(card.dataset.sr68Ready==='1'){renderStatus();return}card.dataset.sr68Ready='1';card.classList.add('sr68-center');card.innerHTML='<div class="sr68-head"><div><b>Sesler ve kişisel ayarlar</b><p>Rahatlama, bebek ve alarm seslerini tek merkezden yönet.</p></div><span class="sr68-head-badge">V39 DENEYİMİ</span></div><div class="sr68-status" id="sr68Status"><div><b class="sr68-status-title" id="sr68StatusTitle">Ses merkezi hazır</b><span class="sr68-status-copy" id="sr68StatusCopy">Henüz ses çalmıyor. Sesler yalnız Aç düğmesine dokunduğunda başlar.</span></div><button type="button" class="sr68-master-stop" id="sr68StopAll">TÜMÜNÜ DURDUR</button></div><section class="sr68-section"><div class="sr68-section-head"><div><b>Rahatlama sesleri</b><small>Eski sürümdeki yerleşik sesler ve gerçek kayıtlar.</small></div></div><div class="sr68-sound-list">'+[...generated,...real].map(row).join('')+'</div><div class="sr68-tools-row"><button type="button" data-sr68-mix="sleep">UYKU MİKSİ: YAĞMUR + ORMAN + GECE</button><button type="button" data-sr68-mix="coast">KIYI MİKSİ: DALGA + KUŞLAR</button></div></section><section class="sr68-section"><div class="sr68-section-head"><div><b>Bebek sesleri</b><small>V39’daki sakinleştirici bebek sesleri.</small></div></div><div class="sr68-sound-list">'+baby.map(row).join('')+'</div></section><details class="sr68-details"><summary>Alarm seslerini merkezi olarak dinle</summary><div class="sr68-sound-list">'+alarms().map(x=>row({id:x.id,file:x.file,title:x.title,desc:x.desc||'Alarm önizlemesi',mode:'alarm'})).join('')+'</div></details><section class="sr68-section"><div class="sr68-section-head"><div><b>Kişisel ayarlar</b><small>Ses davranışını kendi kullanımına göre belirle.</small></div></div><div class="sr68-preferences"><label class="sr68-preference"><span><b>Yumuşak ses geçişi</b><small>Gerçek kayıtlar açılırken sert başlamaz.</small></span><input type="checkbox" data-sr68-pref="ramp" '+(state.ramp?'checked':'')+'></label><label class="sr68-preference"><span><b>Titreşimli düğme geri bildirimi</b><small>Bir sesi açıp kapattığında kısa geri bildirim verir.</small></span><input type="checkbox" data-sr68-pref="haptics" '+(state.haptics?'checked':'')+'></label></div><div class="sr68-note">Güvenli davranış: Uygulama açılırken hiçbir ses otomatik başlamaz. Ses yalnızca ilgili satırdaki <b>AÇ</b> veya <b>DİNLE</b> düğmesine dokununca başlar; her satırda görünür DURDUR düğmesi bulunur.</div></section><div class="sr68-pro"><div><b>SleepRise Pro</b><p>Reklamları kaldır, beklemeleri azalt ve sakin deneyimi koru.</p></div><button type="button" data-sr68-pro>PRO SEÇENEKLERİ</button></div>';
+    q('#sr68StopAll')?.addEventListener('click',()=>{buzz();stopAll()});
+    card.addEventListener('click',e=>{const b=e.target.closest('[data-sr68-toggle]');if(b){e.preventDefault();e.stopPropagation();const id=b.dataset.sr68Toggle;const item=[...allRelax,...alarms().map(x=>({...x,mode:'alarm'}))].find(x=>x.id===id);if(item)start(item);return}const mix=e.target.closest('[data-sr68-mix]');if(mix){e.preventDefault();e.stopPropagation();const ids=mix.dataset.sr68Mix==='coast'?['sea-waves','sea-waves-seagulls']:['rain','forest','birds-at-night'];ids.forEach(id=>{const item=[...allRelax].find(x=>x.id===id);if(item&&!active.has(id))start(item)});return}const pro=e.target.closest('[data-sr68-pro]');if(pro){e.preventDefault();try{window.SleepRiseSubscription?.open?.()}catch(err){notify('Pro seçenekleri henüz hazır değil.')}return}});
+    card.addEventListener('input',e=>{const input=e.target.closest('[data-sr68-volume]');if(input){e.stopPropagation();setVolume(input.dataset.sr68Volume,input.value)}});
+    card.addEventListener('change',e=>{const p=e.target.closest('[data-sr68-pref]');if(!p)return;if(p.dataset.sr68Pref==='ramp')state.ramp=p.checked;if(p.dataset.sr68Pref==='haptics')state.haptics=p.checked;save();buzz()});
+    renderStatus();
+  }
+  const legacySoundSelectors=['#p-sounds','#v32Atmospheres','#v32SoundDeck','#sr44RelaxLibrary','#sr44CinemaLibrary','#vidLib','#atmVidFile','#atmVidSw','#cineSw','#mixGrid','#btnAddMixSound','#mixFile','#presetRow','#btnSavePreset','#sleepTimer','#babyGrid','#v49-settings','#v49MixerOff','#v49AtmosphereOff'];
+  function removeLegacySoundFolders(){legacySoundSelectors.forEach(selector=>qa(selector).forEach(node=>node.remove()));qa('#p-relax [data-v42-panel-btn="plans"],#p-relax [data-v42-panel-btn="profile"],#p-relax [data-v42-panel="plans"],#p-relax [data-v42-panel="profile"]').forEach(node=>node.remove());}
+  function localizeSettingsTab(){const labels={tr:'Ayarlar',en:'Settings',es:'Ajustes',de:'Einstellungen',fr:'Réglages',pt:'Configurações',ar:'الإعدادات',zh:'设置',ja:'設定'};let code='tr';try{code=typeof lang!=='undefined'&&lang||'tr'}catch(e){}const label=q('nav.tabs .tab[data-p="tools"] [data-i18n="tab_tools"]');if(label)label.textContent=labels[code]||labels.tr;}
+  function init(){removeLegacySoundFolders();localizeSettingsTab();build();window.addEventListener('pagehide',stopAll,{once:false});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,1250),{once:true});else setTimeout(init,1250);
+})();
+</script>
+<!-- SLEEPRISE_V68_SOUND_CENTER_END -->
