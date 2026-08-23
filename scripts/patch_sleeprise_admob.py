@@ -56,6 +56,9 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
   const platform=()=>window.Capacitor?.getPlatform?.()||(/iPad|iPhone|iPod/.test(navigator.userAgent)?'ios':'android');
   const isDebug=()=>{try{return !!window.SleepRiseBuild?.isDebug?.()}catch(e){return false}};
   const isPro=()=>{try{return localStorage.getItem('sleeprise_pro_active')==='1'||localStorage.getItem('sleeprise_pro')==='1'||window.SleepRiseSubscription?.isPro?.()===true}catch(e){return false}};
+  const trialKey='sleeprise_trial_started_at_v63',trialDays=7;
+  const trialStarted=()=>{try{let v=Number(localStorage.getItem(trialKey)||0);if(!v){v=Date.now();localStorage.setItem(trialKey,String(v))}return v}catch(e){return Date.now()}};
+  const trialActive=()=>Date.now()<trialStarted()+trialDays*24*60*60*1000;
   const unit=()=>{const p=platform()==='ios'?'ios':'android';return CONFIG[p]};
   const note=msg=>{try{if(typeof notice==='function')return notice(msg);if(typeof toast==='function')return toast(msg);window.alert(msg)}catch(e){}};
   const safeSpace=on=>{document.documentElement.style.setProperty('--sr-ad-safe-space',on?'72px':'0px');q('.pages')?.classList.toggle('sr-ad-safe',!!on)};
@@ -76,7 +79,7 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
     }catch(e){console.warn('SleepRise AdMob init',e);return false}
   }
   async function showBanner(){
-    if(isPro())return removeBanner();
+    if(isPro()||trialActive())return removeBanner();
     const api=admob();
     if(!native()||!api)return false;
     if(!(await init()))return false;
@@ -88,7 +91,7 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
     bannerOn=false;safeSpace(false);
   }
   async function showRewarded(){
-    if(!native())return true;
+    if(!native()||trialActive())return true;
     const api=admob();
     if(!api||!(await init()))return false;
     try{
@@ -98,7 +101,7 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
     }catch(e){console.warn('SleepRise rewarded',e);note(tx('adUnavailable'));return false}
   }
   async function rewardAccess(purpose,count){
-    if(isPro())return true;
+    if(isPro()||trialActive())return true;
     const key='sleeprise_reward_until_'+purpose;
     if(purpose==='sleep-analysis'&&Number(localStorage.getItem(key)||0)>Date.now())return true;
     if(!native())return true;
@@ -117,7 +120,7 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
   async function guard(purpose,count,action){const ok=await rewardAccess(purpose,count);if(!ok)return false;try{await action();return true}catch(e){console.warn('SleepRise gated action',e);return false}}
   function currentPage(){return q('.pages .page.on')?.id||''}
   async function syncBanner(){
-    const should=currentPage()==='p-relax'&&!isPro();
+    const should=currentPage()==='p-relax'&&!isPro()&&!trialActive();
     if(should&&!bannerOn)await showBanner();
     if(!should&&bannerOn)await removeBanner();
     decorateAtmosphereGates();bindRelaxTimers();injectProCard();
@@ -126,7 +129,7 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
     const cards=qa('#v32Atmospheres [data-v32-atm]');
     cards.forEach(card=>{
       const old=card.querySelector('.sr-ad-atm-gate');
-      if(isPro()){old?.remove();return}
+      if(isPro()||trialActive()){old?.remove();return;}
       if(old)return;
       const gate=document.createElement('span');gate.className='sr-ad-atm-gate';gate.setAttribute('role','button');gate.setAttribute('tabindex','0');gate.textContent=tx('watchShort');
       const unlock=ev=>{ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();guard('atmosphere',1,async()=>{gate.remove();card.click()})};
@@ -135,13 +138,13 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
   }
   const relaxTimers=new WeakMap();
   function bindRelaxTimers(){
-    qa('[data-v42-relax-play]').forEach(btn=>{
+    qa('[data-v42-relax-play],[data-sr44-relax-play]').forEach(btn=>{
       if(btn.__srAdBound)return;btn.__srAdBound=true;
       btn.addEventListener('click',()=>{
         clearTimeout(relaxTimers.get(btn));
-        if(isPro())return;
+        if(isPro()||trialActive())return;
         const timer=setTimeout(async()=>{
-          const row=btn.closest('[data-v42-relax-row]');
+          const row=btn.closest('[data-v42-relax-row],[data-sr44-relax-card]');
           if(!row||!row.classList.contains('is-playing'))return;
           try{btn.click()}catch(e){}
           const ok=await rewardAccess('relax-continued',1);
@@ -180,9 +183,9 @@ SCRIPT = r'''<script id="sleeprise-admob-v51">
   function start(){
     try{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})}catch(e){}
     setTimeout(()=>{init().catch(()=>{});syncBanner().catch(()=>{})},700);
-    setInterval(()=>{const active=currentPage()==='p-relax'&&!isPro();if(active&&!bannerOn)showBanner();if(!active&&bannerOn)removeBanner();decorateAtmosphereGates();bindRelaxTimers();injectProCard()},2500);
+    setInterval(()=>{const active=currentPage()==='p-relax'&&!isPro()&&!trialActive();if(active&&!bannerOn)showBanner();if(!active&&bannerOn)removeBanner();decorateAtmosphereGates();bindRelaxTimers();injectProCard()},2500);
   }
-  window.SleepRiseAds={config:CONFIG,isPro,init,showBanner,removeBanner,showRewarded,rewardAccess,guard,privacy:async()=>{const api=admob();if(api?.showPrivacyOptionsForm)try{return api.showPrivacyOptionsForm()}catch(e){}}};
+  window.SleepRiseAds={config:CONFIG,isPro,trialActive,init,showBanner,removeBanner,showRewarded,rewardAccess,guard,privacy:async()=>{const api=admob();if(api?.showPrivacyOptionsForm)try{return api.showPrivacyOptionsForm()}catch(e){}}};
   window.SleepRiseSubscription=window.SleepRiseSubscription||{isPro,open:()=>note(tx('proPending'))};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
