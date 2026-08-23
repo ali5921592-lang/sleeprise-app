@@ -208,6 +208,119 @@ nav{height:76px!important;left:11px!important;right:11px!important;bottom:10px!i
 @media(max-width:420px){#p-today.v70-visual-shell::before{height:224px}#p-stats.v70-analysis-shell::before{height:192px}#p-relax.v70-relax-shell::before{height:168px}.v70-onb-art{width:88px;height:108px}}
 @media(prefers-reduced-motion:reduce){#p-today.v70-visual-shell::before,#p-stats.v70-analysis-shell::before,#p-relax.v70-relax-shell::before,#p-relax.v70-relax-shell .breathe.v70-breath-enhanced::after,.v70-onb-art{animation:none!important}}
 </style>
+
+<style id="sleeprise-v71-task-style">
+/* SleepRise v71 — readable onboarding and task picker */
+#onb .card2{
+  width:min(100%,560px)!important;
+  max-height:calc(100dvh - 12px)!important;
+  min-height:min(610px,calc(100dvh - 12px))!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:24px 20px calc(24px + env(safe-area-inset-bottom))!important;
+  color:#f7fbff!important;
+  background:linear-gradient(155deg,#10245a,#1a3c8d 72%,#176a8a)!important;
+  border:1px solid rgba(191,223,255,.42)!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.34)!important;
+}
+#onb .onbdots{margin-bottom:18px!important}
+#onb h2,#onb #onbTitle{
+  display:block!important;
+  max-width:100%!important;
+  margin:0!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  color:#ffffff!important;
+  font-size:clamp(25px,6.2vw,34px)!important;
+  font-weight:800!important;
+  line-height:1.14!important;
+  letter-spacing:-.035em!important;
+  text-shadow:0 2px 16px rgba(0,0,0,.24)!important;
+}
+#onb p,#onb #onbSub{
+  display:block!important;
+  max-width:42ch!important;
+  min-height:3.1em!important;
+  margin:11px 0 0!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  color:#e6efff!important;
+  font-size:15px!important;
+  font-weight:600!important;
+  line-height:1.58!important;
+}
+#onb .body,#onb #onbBody{
+  min-height:220px!important;
+  margin-top:18px!important;
+  overflow:visible!important;
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+#onb .tourart{width:100%!important;max-height:clamp(180px,34vh,300px)!important;margin:8px auto!important;overflow:visible!important}
+#onb .tourart svg{display:block!important;max-width:100%!important;max-height:clamp(180px,34vh,300px)!important;margin:auto!important}
+#onb .row{display:flex!important;gap:10px!important;margin-top:18px!important}
+#onb .row .btn{min-height:52px!important;flex:1 1 0!important;padding:13px 12px!important;font-size:15px!important;font-weight:800!important;white-space:normal!important;overflow:visible!important}
+#onb .seg,#onb .obgrid,#onb .atmrow{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#onb .seg button,#onb .obgrid button,#onb .atmrow button{min-height:58px!important;white-space:normal!important;overflow-wrap:anywhere!important;font-size:14px!important;font-weight:750!important}
+#srTaskProfileWrap,#fTask{display:none!important}
+#sr71TaskPanel{
+  margin:16px 0 20px!important;
+  padding:16px!important;
+  border:1px solid rgba(43,107,255,.24)!important;
+  border-radius:22px!important;
+  background:linear-gradient(145deg,rgba(43,107,255,.09),rgba(0,184,153,.08))!important;
+}
+#sr71TaskPanel *{box-sizing:border-box}
+.sr71-task-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:7px}
+.sr71-task-head h3{margin:0;color:var(--t1,#16233b);font-size:17px;line-height:1.2;letter-spacing:-.02em}
+.sr71-task-head p{margin:5px 0 0;color:var(--t2,#627087);font-size:12px;line-height:1.45}
+.sr71-task-count{flex:0 0 auto;min-width:34px;height:30px;display:grid;place-items:center;border-radius:10px;background:#eaf0ff;color:#3159c8;font-size:12px;font-weight:800}
+.sr71-selected{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 10px;min-height:30px}
+.sr71-chip{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:6px 9px;border-radius:10px;background:#162b58;color:#fff;font-size:11px;font-weight:750;line-height:1.2}
+.sr71-chip button{width:21px;height:21px;padding:0;border:0;border-radius:7px;background:rgba(255,255,255,.2);color:#fff;font-size:14px;line-height:1}
+.sr71-task-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.sr71-task-option{min-width:0;min-height:82px;padding:11px 10px;border:1px solid rgba(58,91,151,.18);border-radius:15px;background:rgba(255,255,255,.82);color:var(--t1,#16233b);text-align:left;cursor:pointer}
+.sr71-task-option:active{transform:scale(.985)}
+.sr71-task-option.is-selected{border-color:#3478ff;background:linear-gradient(145deg,#e9f3ff,#e8fff8);box-shadow:0 5px 14px rgba(43,107,255,.14)}
+.sr71-task-option .sr71-icon{display:inline-grid;place-items:center;width:25px;height:25px;margin-bottom:6px;border-radius:8px;background:#edf2ff;color:#315ee0;font-size:15px}
+.sr71-task-option strong{display:block;overflow-wrap:anywhere;font-size:13px;line-height:1.18}
+.sr71-task-option small{display:block;margin-top:4px;color:var(--t2,#627087);font-size:10.5px;line-height:1.28;overflow-wrap:anywhere}
+.sr71-task-option .sr71-badge{display:inline-block;margin-left:4px;padding:2px 5px;border-radius:5px;background:#ffe4af;color:#845800;font-size:9px;font-weight:900;vertical-align:2px}
+.sr71-addbar{display:flex;align-items:center;gap:9px;margin-top:11px}
+.sr71-addbar button{min-height:44px;padding:9px 12px;border:1px solid rgba(43,107,255,.28);border-radius:12px;background:#fff;color:#2d59c7;font:800 12px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr71-addbar button.primary{background:linear-gradient(135deg,#477df7,#21bfa9);border-color:transparent;color:#fff}
+.sr71-addbar span{color:var(--t2,#627087);font-size:11px;line-height:1.3}
+.sr71-extra{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(43,107,255,.2)}
+.sr71-extra.is-open{display:block}
+.sr71-extra-title{margin:0 0 8px;color:var(--t2,#627087);font-size:11px;font-weight:800}
+.sr71-grace{margin-top:14px;padding-top:13px;border-top:1px solid rgba(43,107,255,.14)}
+.sr71-grace label{display:block;margin-bottom:7px;color:var(--t1,#16233b);font-size:12px;font-weight:800}
+.sr71-grace p{margin:0 0 8px;color:var(--t2,#627087);font-size:10.5px;line-height:1.35}
+.sr71-grace-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.sr71-grace-row button,.sr71-rep-row button{min-height:40px;padding:8px 6px;border:1px solid rgba(43,107,255,.2);border-radius:10px;background:#fff;color:var(--t2,#627087);font:750 11px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr71-grace-row button.is-selected,.sr71-rep-row button.is-selected{background:#2f70eb;color:#fff;border-color:#2f70eb}
+.sr71-rep-row{display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(43,107,255,.14)}
+.sr71-rep-row.is-visible{display:block}
+.sr71-rep-row label{display:block;margin-bottom:7px;color:var(--t1,#16233b);font-size:12px;font-weight:800}
+.sr71-rep-row .sr71-reps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#sr71GraceNotice{margin:10px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,214,102,.16);border:1px solid rgba(223,159,0,.24);color:inherit;font-size:12px;line-height:1.4;text-align:center}
+#sr71FitnessTask,#sr71ObjectTask{width:100%;margin:0 auto;text-align:center}
+#sr71FitnessTask video,#sr71ObjectTask video{display:block;width:min(100%,330px);height:210px;margin:0 auto 14px;border-radius:20px;object-fit:cover;background:#07152f;border:1px solid rgba(255,255,255,.2)}
+.sr71-camera-title{margin:0;color:var(--t1,#16233b);font-size:20px;font-weight:800}
+.sr71-camera-hint{margin:8px auto 14px;max-width:38ch;color:var(--t2,#627087);font-size:12px;line-height:1.5}
+.sr71-camera-count{font-size:34px;font-weight:850;color:#2e6de6;line-height:1.1}
+.sr71-camera-actions{display:flex;gap:8px;margin-top:14px}
+.sr71-camera-actions button{flex:1;min-height:48px;padding:11px;border:0;border-radius:14px;background:linear-gradient(135deg,#477df7,#21bfa9);color:#fff;font:800 13px/1.2 Inter,-apple-system,system-ui,sans-serif}
+.sr71-camera-actions button.secondary{background:#eef3fb;color:#2d477a}
+.sr71-camera-error{margin:12px 0 0;color:#c44337;font-size:12px;line-height:1.4}
+@media(max-width:390px){.sr71-task-grid{grid-template-columns:1fr}.sr71-task-option{min-height:72px}.sr71-task-option .sr71-icon{float:left;margin:0 8px 0 0}.sr71-task-option small{padding-left:33px}.sr71-camera-actions{flex-direction:column}#onb .card2{padding-left:16px!important;padding-right:16px!important}}
+@media(prefers-reduced-motion:reduce){#onb *,.sr71-task-option{animation:none!important;transition:none!important}}
+
+</style>
 </head>
 <body>
 <div class="splash" id="splash">
@@ -2300,6 +2413,237 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   document.addEventListener('click',e=>{if(e.target.closest('#modeSw,[data-mode]'))setTimeout(apply,30)},{passive:true});
   window.SleepRiseVisualAssetsV70={refresh:apply};
 })();
+</script>
+
+<script id="sleeprise-v71-tasks">
+/* SleepRise v71 — readable single-task picker, custom task queue and camera challenges */
+(function(){
+  'use strict';
+  if(window.__SleepRiseV71Tasks)return;
+  window.__SleepRiseV71Tasks=true;
+
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const C=['tr','en','es','de','fr','pt','ar','zh','ja'];
+  const TX={
+    tr:{
+      title:'Alarmı kapatma görevi',hint:'Önce tek bir görev seç. Daha zorlu bir sabah için + Görev ekle ile görevleri sıraya koyabilirsin.',selected:'Seçilen görevler',add:'Görev ekle',done:'Hazır',none:'Görev yok',remove:'Kaldır',more:'Daha fazla görev',close:'Kapat',maxTasks:'En fazla 3 görev seçebilirsin.',
+      graceTitle:'Görevi tamamlamak için süre',graceHint:'Bu süre bir başlangıç penceresidir. Süre dolsa bile görev tamamlanmadan alarm kapanmaz.',immediate:'Hemen',twoMin:'2 dakika',fiveMin:'5 dakika',repTitle:'Egzersiz hedefi',repHint:'Kamerada görünür şekilde yap; her tekrarın ardından sayacı ilerlet.',reps5:'5 tekrar',reps10:'10 tekrar',reps15:'15 tekrar',
+      task:{none:['Görev yok','Tek dokunuşla alarm ekranı'],typing:['Cümleyi yaz','Ekrandaki ifadeyi birebir yaz'],steps:['Adım at','Belirlenen adım sayısına ulaş'],shake:['Telefonu salla','Telefonu ritmik biçimde hareket ettir'],math:['Matematik','İşlemi çöz'],memory:['Hafıza oyunu','Eşleşen kartları bul'],barcode:['Barkod tara','Kayıtlı barkodu kameraya göster'],call:['Sahte arama','Aramayı yanıtla ve tamamla'],random:['Rastgele görev','Her sabah farklı bir görev'],pushups:['Şınav çek','Kamerada hedef sayıya ulaş'],situps:['Mekik çek','Kamerada hedef sayıya ulaş'],squats:['Squat yap','Kamerada hedef sayıya ulaş'],object:['Evdeki nesneyi tara','Kayıtlı nesnenin barkodunu okut']},
+      pro:'Pro',locked:'Pro ile açılır',cameraTitle:'Kamera görevi',cameraPushups:'Kamerada şınav çek',cameraSitups:'Kamerada mekik çek',cameraSquats:'Kamerada squat yap',cameraHint:'Ön kamerayı aç, hareketi görünür şekilde yap ve her tekrarın ardından +1 düğmesine dokun.',cameraPermission:'Kamera izni gerekli. İzni açıp tekrar dene.',cameraUnavailable:'Bu cihazda kamera başlatılamadı. Alarmı kapatmak için doğru görevi tamamlaman gerekir.',cameraRetry:'Kamerayı yeniden dene',repCount:'Tekrar',addRep:'+1 tekrar',finishExercise:'Hedef tamamlandı',exerciseDone:'Egzersiz tamamlandı.',objectTitle:'Kayıtlı nesneyi tara',objectHint:'Alarmı kapatmak için daha önce kaydettiğin nesnenin barkodunu okut.',objectWrong:'Bu barkod kayıtlı nesneye ait değil.',objectMissing:'Önce alarm ayarlarında bir nesne barkodu kaydet.',manualCode:'Kodu elle yaz',verifyCode:'Kodu doğrula',scanError:'Tarayıcı başlatılamadı. Kamerayı ve izinleri kontrol et.',graceRunning:'Görev penceresi: {n}',graceExpired:'Görev süresi doldu. Alarmı kapatmak için görevi tamamla.',tasksRequired:'Alarmı kapatmak için seçilen görevleri sırayla tamamla.',invalidBarcode:'Nesne veya barkod görevi için önce bir barkod kaydet.',
+    },
+    en:{
+      title:'Dismissal task',hint:'Choose one task first. For a harder morning, use + Add task to create a sequence.',selected:'Selected tasks',add:'Add task',done:'Ready',none:'No task',remove:'Remove',more:'More tasks',close:'Close',maxTasks:'You can choose up to 3 tasks.',
+      graceTitle:'Time to complete the task',graceHint:'This is a starting window. When it ends, the alarm still requires the task to be completed.',immediate:'Immediately',twoMin:'2 minutes',fiveMin:'5 minutes',repTitle:'Exercise target',repHint:'Stay visible to the camera and advance the counter after each repetition.',reps5:'5 reps',reps10:'10 reps',reps15:'15 reps',
+      task:{none:['No task','One tap to reach the alarm screen'],typing:['Type a phrase','Copy the phrase exactly'],steps:['Walk','Reach the step target'],shake:['Shake the phone','Move the phone rhythmically'],math:['Math','Solve the calculation'],memory:['Memory game','Match the pairs'],barcode:['Scan a barcode','Show the saved barcode'],call:['Simulated call','Answer and complete the call'],random:['Random task','A different task each morning'],pushups:['Push-ups','Reach the target on camera'],situps:['Sit-ups','Reach the target on camera'],squats:['Squats','Reach the target on camera'],object:['Scan a household item','Scan the saved item barcode']},
+      pro:'Pro',locked:'Opens with Pro',cameraTitle:'Camera task',cameraPushups:'Do push-ups on camera',cameraSitups:'Do sit-ups on camera',cameraSquats:'Do squats on camera',cameraHint:'Enable the front camera, perform the movement visibly, and tap +1 after each repetition.',cameraPermission:'Camera permission is required. Allow it and try again.',cameraUnavailable:'The camera could not start on this device. The correct task is still required to dismiss the alarm.',cameraRetry:'Try camera again',repCount:'Repetitions',addRep:'+1 repetition',finishExercise:'Target reached',exerciseDone:'Exercise completed.',objectTitle:'Scan the saved item',objectHint:'Scan the barcode of the item you registered earlier to dismiss the alarm.',objectWrong:'This barcode is not the saved item.',objectMissing:'Register an item barcode in the alarm settings first.',manualCode:'Enter code manually',verifyCode:'Verify code',scanError:'The scanner could not start. Check the camera and permissions.',graceRunning:'Task window: {n}',graceExpired:'The task window ended. Complete the task to dismiss the alarm.',tasksRequired:'Complete the selected tasks in order to dismiss the alarm.',invalidBarcode:'Register a barcode before selecting the item or barcode task.'
+    },
+    es:{
+      title:'Tarea para apagar la alarma',hint:'Elige una tarea. Para una mañana más exigente, usa + Añadir tarea y crea una secuencia.',selected:'Tareas seleccionadas',add:'Añadir tarea',done:'Listo',none:'Sin tarea',remove:'Quitar',more:'Más tareas',close:'Cerrar',maxTasks:'Puedes elegir hasta 3 tareas.',
+      graceTitle:'Tiempo para completar la tarea',graceHint:'Es una ventana inicial. Aunque termine, la alarma seguirá exigiendo la tarea.',immediate:'Inmediatamente',twoMin:'2 minutos',fiveMin:'5 minutos',repTitle:'Objetivo de ejercicio',repHint:'Permanece visible ante la cámara y avanza el contador después de cada repetición.',reps5:'5 repeticiones',reps10:'10 repeticiones',reps15:'15 repeticiones',
+      task:{none:['Sin tarea','Un toque para llegar a la alarma'],typing:['Escribir una frase','Copia la frase exactamente'],steps:['Dar pasos','Alcanza el objetivo de pasos'],shake:['Agitar el teléfono','Mueve el teléfono rítmicamente'],math:['Matemáticas','Resuelve la operación'],memory:['Juego de memoria','Encuentra las parejas'],barcode:['Escanear un código','Muestra el código guardado'],call:['Llamada simulada','Responde y completa la llamada'],random:['Tarea aleatoria','Una tarea distinta cada mañana'],pushups:['Flexiones','Alcanza el objetivo ante la cámara'],situps:['Abdominales','Alcanza el objetivo ante la cámara'],squats:['Sentadillas','Alcanza el objetivo ante la cámara'],object:['Escanear un objeto','Escanea el código del objeto guardado']},
+      pro:'Pro',locked:'Se desbloquea con Pro',cameraTitle:'Tarea con cámara',cameraPushups:'Haz flexiones ante la cámara',cameraSitups:'Haz abdominales ante la cámara',cameraSquats:'Haz sentadillas ante la cámara',cameraHint:'Activa la cámara frontal, haz el movimiento de forma visible y pulsa +1 tras cada repetición.',cameraPermission:'Se necesita permiso de cámara. Concédelo y vuelve a intentarlo.',cameraUnavailable:'No se pudo iniciar la cámara. La tarea correcta sigue siendo necesaria.',cameraRetry:'Reintentar cámara',repCount:'Repeticiones',addRep:'+1 repetición',finishExercise:'Objetivo alcanzado',exerciseDone:'Ejercicio completado.',objectTitle:'Escanea el objeto guardado',objectHint:'Escanea el código de barras del objeto registrado para apagar la alarma.',objectWrong:'Este código no pertenece al objeto guardado.',objectMissing:'Primero registra un código de objeto en los ajustes de la alarma.',manualCode:'Escribir código',verifyCode:'Verificar código',scanError:'No se pudo iniciar el escáner. Revisa la cámara y los permisos.',graceRunning:'Ventana de tarea: {n}',graceExpired:'La ventana terminó. Completa la tarea para apagar la alarma.',tasksRequired:'Completa las tareas seleccionadas en orden para apagar la alarma.',invalidBarcode:'Registra un código antes de elegir una tarea de objeto o código de barras.'
+    },
+    de:{
+      title:'Aufgabe zum Ausschalten',hint:'Wähle zunächst eine Aufgabe. Mit + Aufgabe hinzufügen kannst du eine Reihenfolge erstellen.',selected:'Ausgewählte Aufgaben',add:'Aufgabe hinzufügen',done:'Fertig',none:'Keine Aufgabe',remove:'Entfernen',more:'Weitere Aufgaben',close:'Schließen',maxTasks:'Du kannst bis zu 3 Aufgaben wählen.',
+      graceTitle:'Zeit zum Erledigen der Aufgabe',graceHint:'Dies ist ein Startfenster. Danach bleibt die Aufgabe zum Ausschalten erforderlich.',immediate:'Sofort',twoMin:'2 Minuten',fiveMin:'5 Minuten',repTitle:'Trainingsziel',repHint:'Bleibe für die Kamera sichtbar und erhöhe den Zähler nach jeder Wiederholung.',reps5:'5 Wiederholungen',reps10:'10 Wiederholungen',reps15:'15 Wiederholungen',
+      task:{none:['Keine Aufgabe','Eine Berührung zum Alarmbildschirm'],typing:['Satz eingeben','Den Satz exakt abschreiben'],steps:['Schritte gehen','Das Schrittziel erreichen'],shake:['Telefon schütteln','Das Telefon rhythmisch bewegen'],math:['Mathematik','Die Rechnung lösen'],memory:['Memory-Spiel','Paare finden'],barcode:['Barcode scannen','Den gespeicherten Barcode zeigen'],call:['Simulierter Anruf','Anruf annehmen und beenden'],random:['Zufällige Aufgabe','Jeden Morgen eine andere Aufgabe'],pushups:['Liegestütze','Das Ziel vor der Kamera erreichen'],situps:['Sit-ups','Das Ziel vor der Kamera erreichen'],squats:['Kniebeugen','Das Ziel vor der Kamera erreichen'],object:['Haushaltsgegenstand scannen','Den gespeicherten Gegenstand scannen']},
+      pro:'Pro',locked:'Mit Pro verfügbar',cameraTitle:'Kameraaufgabe',cameraPushups:'Liegestütze vor der Kamera',cameraSitups:'Sit-ups vor der Kamera',cameraSquats:'Kniebeugen vor der Kamera',cameraHint:'Frontkamera aktivieren, die Bewegung sichtbar ausführen und nach jeder Wiederholung auf +1 tippen.',cameraPermission:'Kameraberechtigung erforderlich. Erlaube sie und versuche es erneut.',cameraUnavailable:'Die Kamera konnte nicht gestartet werden. Die richtige Aufgabe bleibt erforderlich.',cameraRetry:'Kamera erneut versuchen',repCount:'Wiederholungen',addRep:'+1 Wiederholung',finishExercise:'Ziel erreicht',exerciseDone:'Übung abgeschlossen.',objectTitle:'Gespeicherten Gegenstand scannen',objectHint:'Scanne den Barcode des zuvor registrierten Gegenstands, um den Alarm auszuschalten.',objectWrong:'Dieser Barcode gehört nicht zum gespeicherten Gegenstand.',objectMissing:'Registriere zuerst einen Gegenstands-Barcode in den Alarmeinstellungen.',manualCode:'Code eingeben',verifyCode:'Code prüfen',scanError:'Scanner konnte nicht gestartet werden. Kamera und Berechtigungen prüfen.',graceRunning:'Aufgabenfenster: {n}',graceExpired:'Das Aufgabenfenster ist abgelaufen. Erledige die Aufgabe zum Ausschalten.',tasksRequired:'Erledige die ausgewählten Aufgaben der Reihe nach, um den Alarm auszuschalten.',invalidBarcode:'Registriere einen Barcode, bevor du eine Gegenstands- oder Barcodeaufgabe wählst.'
+    },
+    fr:{
+      title:'Défi pour arrêter l’alarme',hint:'Choisissez une tâche. Utilisez + Ajouter une tâche pour créer une séquence plus exigeante.',selected:'Tâches sélectionnées',add:'Ajouter une tâche',done:'Prêt',none:'Aucune tâche',remove:'Retirer',more:'Plus de tâches',close:'Fermer',maxTasks:'Vous pouvez choisir jusqu’à 3 tâches.',
+      graceTitle:'Temps pour terminer la tâche',graceHint:'Il s’agit d’une fenêtre de départ. À la fin, la tâche reste obligatoire pour arrêter l’alarme.',immediate:'Immédiatement',twoMin:'2 minutes',fiveMin:'5 minutes',repTitle:'Objectif d’exercice',repHint:'Restez visible par la caméra et augmentez le compteur après chaque répétition.',reps5:'5 répétitions',reps10:'10 répétitions',reps15:'15 répétitions',
+      task:{none:['Aucune tâche','Une touche pour atteindre l’alarme'],typing:['Écrire une phrase','Recopiez la phrase exactement'],steps:['Marcher','Atteignez l’objectif de pas'],shake:['Secouer le téléphone','Bougez le téléphone rythmiquement'],math:['Maths','Résolvez le calcul'],memory:['Jeu de mémoire','Trouvez les paires'],barcode:['Scanner un code-barres','Montrez le code enregistré'],call:['Appel simulé','Répondez et terminez l’appel'],random:['Tâche aléatoire','Une tâche différente chaque matin'],pushups:['Pompes','Atteignez l’objectif devant la caméra'],situps:['Abdominaux','Atteignez l’objectif devant la caméra'],squats:['Squats','Atteignez l’objectif devant la caméra'],object:['Scanner un objet','Scannez le code de l’objet enregistré']},
+      pro:'Pro',locked:'Disponible avec Pro',cameraTitle:'Défi caméra',cameraPushups:'Faites des pompes devant la caméra',cameraSitups:'Faites des abdominaux devant la caméra',cameraSquats:'Faites des squats devant la caméra',cameraHint:'Activez la caméra frontale, faites le mouvement bien visible et touchez +1 après chaque répétition.',cameraPermission:'L’autorisation de la caméra est nécessaire. Accordez-la puis réessayez.',cameraUnavailable:'La caméra n’a pas pu démarrer. La bonne tâche reste obligatoire.',cameraRetry:'Réessayer la caméra',repCount:'Répétitions',addRep:'+1 répétition',finishExercise:'Objectif atteint',exerciseDone:'Exercice terminé.',objectTitle:'Scanner l’objet enregistré',objectHint:'Scannez le code-barres de l’objet enregistré pour arrêter l’alarme.',objectWrong:'Ce code-barres ne correspond pas à l’objet enregistré.',objectMissing:'Enregistrez d’abord le code-barres d’un objet dans les réglages de l’alarme.',manualCode:'Saisir le code',verifyCode:'Vérifier le code',scanError:'Le scanner n’a pas pu démarrer. Vérifiez la caméra et les autorisations.',graceRunning:'Fenêtre de tâche : {n}',graceExpired:'La fenêtre est terminée. Terminez la tâche pour arrêter l’alarme.',tasksRequired:'Terminez les tâches sélectionnées dans l’ordre pour arrêter l’alarme.',invalidBarcode:'Enregistrez un code-barres avant de choisir une tâche d’objet ou de code-barres.'
+    },
+    pt:{
+      title:'Tarefa para desligar o alarme',hint:'Escolha uma tarefa. Use + Adicionar tarefa para criar uma sequência mais exigente.',selected:'Tarefas selecionadas',add:'Adicionar tarefa',done:'Pronto',none:'Sem tarefa',remove:'Remover',more:'Mais tarefas',close:'Fechar',maxTasks:'Você pode escolher até 3 tarefas.',
+      graceTitle:'Tempo para concluir a tarefa',graceHint:'Este é um período inicial. Quando terminar, a tarefa continuará obrigatória para desligar o alarme.',immediate:'Imediatamente',twoMin:'2 minutos',fiveMin:'5 minutos',repTitle:'Meta de exercício',repHint:'Fique visível para a câmera e avance o contador após cada repetição.',reps5:'5 repetições',reps10:'10 repetições',reps15:'15 repetições',
+      task:{none:['Sem tarefa','Um toque para chegar ao alarme'],typing:['Digitar uma frase','Copie a frase exatamente'],steps:['Caminhar','Alcance a meta de passos'],shake:['Agitar o telefone','Mova o telefone ritmicamente'],math:['Matemática','Resolva a conta'],memory:['Jogo da memória','Encontre os pares'],barcode:['Ler código de barras','Mostre o código salvo'],call:['Chamada simulada','Atenda e conclua a chamada'],random:['Tarefa aleatória','Uma tarefa diferente a cada manhã'],pushups:['Flexões','Alcance a meta diante da câmera'],situps:['Abdominais','Alcance a meta diante da câmera'],squats:['Agachamentos','Alcance a meta diante da câmera'],object:['Ler um objeto','Leia o código do objeto salvo']},
+      pro:'Pro',locked:'Disponível no Pro',cameraTitle:'Tarefa com câmera',cameraPushups:'Faça flexões diante da câmera',cameraSitups:'Faça abdominais diante da câmera',cameraSquats:'Faça agachamentos diante da câmera',cameraHint:'Ative a câmera frontal, faça o movimento de forma visível e toque em +1 após cada repetição.',cameraPermission:'A permissão da câmera é necessária. Conceda-a e tente novamente.',cameraUnavailable:'Não foi possível iniciar a câmera. A tarefa correta continua obrigatória.',cameraRetry:'Tentar a câmera novamente',repCount:'Repetições',addRep:'+1 repetição',finishExercise:'Meta atingida',exerciseDone:'Exercício concluído.',objectTitle:'Ler o objeto salvo',objectHint:'Leia o código de barras do objeto cadastrado para desligar o alarme.',objectWrong:'Este código não pertence ao objeto salvo.',objectMissing:'Cadastre primeiro um código de objeto nas configurações do alarme.',manualCode:'Digitar código',verifyCode:'Verificar código',scanError:'Não foi possível iniciar o leitor. Verifique a câmera e as permissões.',graceRunning:'Janela da tarefa: {n}',graceExpired:'A janela terminou. Conclua a tarefa para desligar o alarme.',tasksRequired:'Conclua as tarefas selecionadas na ordem para desligar o alarme.',invalidBarcode:'Cadastre um código antes de escolher uma tarefa de objeto ou código de barras.'
+    },
+    ar:{
+      title:'مهمة إيقاف المنبه',hint:'اختر مهمة واحدة أولاً. استخدم + إضافة مهمة لإنشاء سلسلة صباحية أصعب.',selected:'المهام المختارة',add:'إضافة مهمة',done:'جاهز',none:'بدون مهمة',remove:'إزالة',more:'مهمات أخرى',close:'إغلاق',maxTasks:'يمكنك اختيار 3 مهام كحد أقصى.',
+      graceTitle:'الوقت لإكمال المهمة',graceHint:'هذه مهلة بداية. عند انتهائها تبقى المهمة مطلوبة لإيقاف المنبه.',immediate:'فوراً',twoMin:'دقيقتان',fiveMin:'5 دقائق',repTitle:'هدف التمرين',repHint:'ابقَ ظاهراً أمام الكاميرا وزد العداد بعد كل تكرار.',reps5:'5 تكرارات',reps10:'10 تكرارات',reps15:'15 تكراراً',
+      task:{none:['بدون مهمة','لمسة واحدة للوصول إلى شاشة المنبه'],typing:['اكتب عبارة','انسخ العبارة كما هي'],steps:['المشي','حقق عدد الخطوات المحدد'],shake:['هز الهاتف','حرّك الهاتف بإيقاع منتظم'],math:['رياضيات','حل المسألة'],memory:['لعبة الذاكرة','طابق الأزواج'],barcode:['مسح باركود','اعرض الباركود المحفوظ'],call:['مكالمة محاكاة','أجب عن المكالمة وأنهِها'],random:['مهمة عشوائية','مهمة مختلفة كل صباح'],pushups:['تمارين الضغط','حقق الهدف أمام الكاميرا'],situps:['تمارين البطن','حقق الهدف أمام الكاميرا'],squats:['القرفصاء','حقق الهدف أمام الكاميرا'],object:['مسح غرض منزلي','امسح باركود الغرض المحفوظ']},
+      pro:'Pro',locked:'تتطلب Pro',cameraTitle:'مهمة بالكاميرا',cameraPushups:'تمارين ضغط أمام الكاميرا',cameraSitups:'تمارين بطن أمام الكاميرا',cameraSquats:'تمارين قرفصاء أمام الكاميرا',cameraHint:'فعّل الكاميرا الأمامية، نفّذ الحركة بوضوح واضغط +1 بعد كل تكرار.',cameraPermission:'يلزم السماح بالكاميرا. فعّل الإذن وحاول مرة أخرى.',cameraUnavailable:'تعذر تشغيل الكاميرا. تبقى المهمة الصحيحة مطلوبة لإيقاف المنبه.',cameraRetry:'إعادة محاولة الكاميرا',repCount:'التكرارات',addRep:'+1 تكرار',finishExercise:'اكتمل الهدف',exerciseDone:'اكتمل التمرين.',objectTitle:'امسح الغرض المحفوظ',objectHint:'امسح باركود الغرض الذي سجلته مسبقاً لإيقاف المنبه.',objectWrong:'هذا الباركود ليس للغرض المحفوظ.',objectMissing:'سجّل باركود غرض أولاً من إعدادات المنبه.',manualCode:'اكتب الرمز',verifyCode:'تحقق من الرمز',scanError:'تعذر تشغيل الماسح. تحقق من الكاميرا والأذونات.',graceRunning:'نافذة المهمة: {n}',graceExpired:'انتهت النافذة. أكمل المهمة لإيقاف المنبه.',tasksRequired:'أكمل المهام المختارة بالترتيب لإيقاف المنبه.',invalidBarcode:'سجّل باركود قبل اختيار مهمة الغرض أو الباركود.'
+    },
+    zh:{
+      title:'关闭闹钟任务',hint:'先选择一个任务。点击“+ 添加任务”即可设置连续任务，让早晨更有挑战。',selected:'已选任务',add:'添加任务',done:'完成',none:'无需任务',remove:'移除',more:'更多任务',close:'关闭',maxTasks:'最多可选择3个任务。',
+      graceTitle:'完成任务的时间',graceHint:'这是开始缓冲时间。时间结束后仍必须完成任务才能关闭闹钟。',immediate:'立即开始',twoMin:'2分钟',fiveMin:'5分钟',repTitle:'运动目标',repHint:'保持在镜头范围内，每完成一次动作后增加计数。',reps5:'5次',reps10:'10次',reps15:'15次',
+      task:{none:['无需任务','点击一次进入闹钟界面'],typing:['输入短句','准确输入屏幕上的句子'],steps:['走步','达到设定步数'],shake:['摇动手机','有节奏地移动手机'],math:['数学','解出算式'],memory:['记忆游戏','找出配对卡片'],barcode:['扫描条码','向镜头出示已保存的条码'],call:['模拟来电','接听并完成通话'],random:['随机任务','每天早晨随机出现'],pushups:['俯卧撑','在镜头前完成目标次数'],situps:['仰卧起坐','在镜头前完成目标次数'],squats:['深蹲','在镜头前完成目标次数'],object:['扫描家中物品','扫描已保存物品的条码']},
+      pro:'Pro',locked:'Pro 专属',cameraTitle:'摄像头任务',cameraPushups:'在镜头前做俯卧撑',cameraSitups:'在镜头前做仰卧起坐',cameraSquats:'在镜头前做深蹲',cameraHint:'打开前置摄像头，清晰完成动作，每次完成后点击 +1。',cameraPermission:'需要摄像头权限。允许后重试。',cameraUnavailable:'无法在此设备启动摄像头。关闭闹钟仍需要完成正确任务。',cameraRetry:'重新尝试摄像头',repCount:'次数',addRep:'+1 次',finishExercise:'目标已完成',exerciseDone:'运动完成。',objectTitle:'扫描已保存的物品',objectHint:'扫描之前登记的物品条码即可关闭闹钟。',objectWrong:'此条码不是已保存的物品。',objectMissing:'请先在闹钟设置中登记物品条码。',manualCode:'手动输入条码',verifyCode:'验证条码',scanError:'无法启动扫描器。请检查摄像头和权限。',graceRunning:'任务窗口：{n}',graceExpired:'任务窗口已结束。完成任务后才能关闭闹钟。',tasksRequired:'按顺序完成已选任务后才能关闭闹钟。',invalidBarcode:'选择物品或条码任务前，请先登记条码。'
+    },
+    ja:{
+      title:'アラーム解除タスク',hint:'まず1つのタスクを選択します。「＋タスクを追加」で順番に複数設定できます。',selected:'選択中のタスク',add:'タスクを追加',done:'完了',none:'タスクなし',remove:'削除',more:'その他のタスク',close:'閉じる',maxTasks:'選択できるタスクは最大3つです。',
+      graceTitle:'タスクを完了する時間',graceHint:'開始猶予時間です。時間が過ぎても、タスクを完了するまでアラームは止まりません。',immediate:'すぐに開始',twoMin:'2分',fiveMin:'5分',repTitle:'運動の目標',repHint:'カメラに全身を映し、1回終えるごとにカウンターを進めます。',reps5:'5回',reps10:'10回',reps15:'15回',
+      task:{none:['タスクなし','1回タップしてアラーム画面へ'],typing:['文章を入力','表示された文章を正確に入力'],steps:['歩く','指定した歩数に到達'],shake:['スマートフォンを振る','リズムよく動かす'],math:['計算','計算問題を解く'],memory:['神経衰弱','同じカードを見つける'],barcode:['バーコードをスキャン','保存したバーコードをカメラに見せる'],call:['模擬着信','応答して通話を完了'],random:['ランダムタスク','毎朝違うタスク'],pushups:['腕立て伏せ','カメラの前で目標回数を達成'],situps:['腹筋','カメラの前で目標回数を達成'],squats:['スクワット','カメラの前で目標回数を達成'],object:['家の物をスキャン','保存した物のバーコードをスキャン']},
+      pro:'Pro',locked:'Proで利用可能',cameraTitle:'カメラタスク',cameraPushups:'カメラの前で腕立て伏せ',cameraSitups:'カメラの前で腹筋',cameraSquats:'カメラの前でスクワット',cameraHint:'前面カメラを起動し、動きを見せて1回ごとに＋1をタップします。',cameraPermission:'カメラの許可が必要です。許可して再試行してください。',cameraUnavailable:'この端末でカメラを起動できません。アラーム解除には正しいタスクが必要です。',cameraRetry:'カメラを再試行',repCount:'回数',addRep:'＋1回',finishExercise:'目標達成',exerciseDone:'運動を完了しました。',objectTitle:'保存した物をスキャン',objectHint:'登録済みの物のバーコードをスキャンするとアラームを解除できます。',objectWrong:'保存した物のバーコードではありません。',objectMissing:'アラーム設定で先に物のバーコードを登録してください。',manualCode:'コードを手入力',verifyCode:'コードを確認',scanError:'スキャナーを起動できません。カメラと権限を確認してください。',graceRunning:'タスク時間：{n}',graceExpired:'タスク時間が終了しました。解除するにはタスクを完了してください。',tasksRequired:'選択したタスクを順番に完了するとアラームを解除できます。',invalidBarcode:'物またはバーコードのタスクを選ぶ前にコードを登録してください。'
+    }
+  };
+  const TASKS=['none','typing','steps','shake','math','memory','barcode','call','random','pushups','situps','squats','object'];
+  const ICON={none:'○',typing:'⌨',steps:'♟',shake:'↯',math:'×',memory:'▦',barcode:'▥',call:'☎',random:'◇',pushups:'⇣',situps:'◒',squats:'⌄',object:'⌕'};
+  const PRO=new Set(['math','memory','barcode','object','pushups','situps','squats']);
+  const FITNESS=new Set(['pushups','situps','squats']);
+  const clean=e=>String(e||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const lang=()=>{const x=(document.documentElement.lang||'en').slice(0,2);return C.includes(x)?x:'en'};
+  const tx=()=>TX[lang()]||TX.en;
+  const fmt=(s,v)=>String(s).replace(/\{n\}/g,String(v));
+  const isPro=()=>{try{return !!(window.SleepRiseMonetization?.isPro?.()||window.SleepRiseSubscription?.isPro?.()||localStorage.getItem('sf_pro')==='1')}catch(e){return false}};
+  const trial=()=>{try{return !!window.SleepRiseMonetization?.trialActive?.()}catch(e){return false}};
+  const maybeUnlock=task=>{
+    if(!PRO.has(task)||isPro()||trial())return true;
+    try{if(typeof window.SleepRiseMonetization?.openPaywall==='function'){window.SleepRiseMonetization.openPaywall();return false}}catch(e){}
+    return true;
+  };
+  const currentTasks=()=>{
+    try{if(typeof draft!=='undefined'&&draft){const a=Array.isArray(draft.tasks)?draft.tasks.filter(x=>TASKS.includes(x)):[];if(a.length)return a;return [TASKS.includes(draft.task)?draft.task:'none']}}
+    catch(e){}
+    return ['none'];
+  };
+  const selected=()=>{const a=currentTasks();return a.length?a:['none']};
+  const setDraftTasks=a=>{try{if(typeof draft==='undefined'||!draft)return;const list=[...new Set(a.filter(x=>TASKS.includes(x)))];draft.tasks=list.length?list:['none'];draft.task=draft.tasks[0];draft.taskProfile='custom';draft.auto=false}catch(e){}};
+  const panelHost=()=>$('#sr71TaskPanel');
+  const extraIds=['optMath','optSteps','optMemory','optBarcode','optCall'];
+  const updateCoreOptions=()=>{
+    const list=selected();
+    extraIds.forEach(id=>{const el=$('#'+id);if(el)el.style.display='none'});
+    if(list.includes('math'))$('#optMath')?.style.setProperty('display','block','important');
+    if(list.some(x=>x==='steps'||x==='shake'))$('#optSteps')?.style.setProperty('display','block','important');
+    if(list.includes('memory'))$('#optMemory')?.style.setProperty('display','block','important');
+    if(list.some(x=>x==='barcode'||x==='object'))$('#optBarcode')?.style.setProperty('display','block','important');
+    if(list.includes('call'))$('#optCall')?.style.setProperty('display','block','important');
+    const b=$('#optBarcode');
+    if(b){const p=b.querySelector('p.note');const s=b.querySelector('#btnRegBarcode span');if(list.includes('object')){if(p&&p.textContent!==tx().objectMissing)p.textContent=tx().objectMissing;if(s&&s.textContent!==tx().task.object[0])s.textContent=tx().task.object[0]}else{if(s&&s.textContent!==tx().task.barcode[0])s.textContent=tx().task.barcode[0]}}
+  };
+  const renderPanel=()=>{
+    const p=panelHost();if(!p)return;
+    document.documentElement.dir=lang()==='ar'?'rtl':'ltr';
+    const x=tx(),list=selected(),fitness=list.find(t=>FITNESS.has(t));
+    const extraOpen=p.querySelector('.sr71-extra')?.classList.contains('is-open');
+    p.innerHTML=`<div class="sr71-task-head"><div><h3>${x.title}</h3><p>${x.hint}</p></div><span class="sr71-task-count">${list[0]==='none'?0:list.length}</span></div>
+      <div class="sr71-selected" aria-live="polite">${list[0]==='none'?`<span class="sr71-chip">${clean(x.none)}</span>`:list.map((id,i)=>`<span class="sr71-chip"><span>${i+1}. ${clean(x.task[id]?.[0]||id)}</span><button type="button" data-sr71-remove="${id}" aria-label="${clean(x.remove)}">×</button></span>`).join('')}</div>
+      <div class="sr71-task-grid">${TASKS.slice(0,9).map(id=>option(id,x,list.includes(id))).join('')}</div>
+      <div class="sr71-addbar"><button type="button" class="primary" id="sr71AddTask">＋ ${x.add}</button><span>${list[0]==='none'?clean(x.none):fmt(x.graceRunning,list.length)}</span></div>
+      <div class="sr71-extra${extraOpen?' is-open':''}" id="sr71Extra"><p class="sr71-extra-title">${x.more}</p><div class="sr71-task-grid">${TASKS.slice(9).map(id=>option(id,x,list.includes(id))).join('')}</div></div>
+      <div class="sr71-grace"><label>${x.graceTitle}</label><p>${x.graceHint}</p><div class="sr71-grace-row">${[['0',x.immediate],['2',x.twoMin],['5',x.fiveMin]].map(([v,l])=>`<button type="button" data-sr71-grace="${v}" class="${String(typeof draft!=='undefined'&&draft?.taskGrace||0)===v?'is-selected':''}">${clean(l)}</button>`).join('')}</div></div>
+      <div class="sr71-rep-row${fitness?' is-visible':''}"><label>${x.repTitle}</label><p>${x.repHint}</p><div class="sr71-reps">${[['5',x.reps5],['10',x.reps10],['15',x.reps15]].map(([v,l])=>`<button type="button" data-sr71-reps="${v}" class="${String(typeof draft!=='undefined'&&draft?.repCount||5)===v?'is-selected':''}">${clean(l)}</button>`).join('')}</div></div>`;
+    const add=$('#sr71AddTask');if(add)add.onclick=()=>p.querySelector('#sr71Extra')?.classList.toggle('is-open');
+    p.querySelectorAll('[data-sr71-remove]').forEach(b=>b.onclick=()=>{const id=b.dataset.sr71Remove;const n=selected().filter(x=>x!==id);setDraftTasks(n.length?n:['none']);sync();});
+    p.querySelectorAll('[data-sr71-task]').forEach(b=>b.onclick=()=>select(b.dataset.sr71Task));
+    p.querySelectorAll('[data-sr71-grace]').forEach(b=>b.onclick=()=>{try{draft.taskGrace=Number(b.dataset.sr71Grace);sync()}catch(e){}});
+    p.querySelectorAll('[data-sr71-reps]').forEach(b=>b.onclick=()=>{try{draft.repCount=Number(b.dataset.sr71Reps);sync()}catch(e){}});
+    updateCoreOptions();
+  };
+  const option=(id,x,on)=>`<button type="button" class="sr71-task-option${on?' is-selected':''}" data-sr71-task="${id}" aria-pressed="${on}"><span class="sr71-icon">${ICON[id]}</span><strong>${clean(x.task[id]?.[0]||id)}${PRO.has(id)?`<span class="sr71-badge">${clean(x.pro)}</span>`:''}</strong><small>${clean(x.task[id]?.[1]||'')}</small></button>`;
+  const select=id=>{
+    if(!maybeUnlock(id))return;
+    let list=selected();
+    if(id==='none'){setDraftTasks(['none']);sync();return}
+    list=list.filter(x=>x!=='none');
+    if(list.includes(id))list=list.filter(x=>x!==id);else{if(list.length>=3){if(typeof toast==='function')toast(tx().maxTasks);return}list.push(id);};
+    setDraftTasks(list.length?list:['none']);sync();
+  };
+  const sync=()=>{
+    try{if(typeof syncSheet==='function')syncSheet()}catch(e){}
+    renderPanel();
+  };
+  const installPanel=()=>{
+    try{
+      const f=$('#fTask');if(!f)return;
+      if(!panelHost()){
+        const panel=document.createElement('section');panel.id='sr71TaskPanel';panel.setAttribute('aria-label','Alarm task selection');
+        const anchor=$('#srTaskProfileWrap')||f.parentElement;anchor.insertAdjacentElement('afterend',panel);
+      }
+      renderPanel();
+    }catch(e){}
+  };
+  const validateSheet=ev=>{
+    try{
+      const list=selected().slice();
+      window.__sr71PendingSave={tasks:list,grace:Number(typeof draft!=='undefined'&&draft?.taskGrace||0),reps:Number(typeof draft!=='undefined'&&draft?.repCount||5)};
+      if(list.some(x=>x==='barcode'||x==='object')&&typeof draft!=='undefined'&&draft&&!String(draft.barcode||'').trim()){
+        ev.preventDefault();ev.stopImmediatePropagation();if(typeof toast==='function')toast(tx().invalidBarcode);return false;
+      }
+    }catch(e){}
+    return true;
+  };
+  const commitSelectionAfterLegacySave=()=>{
+    try{
+      const pending=window.__sr71PendingSave||{tasks:selected().slice(),grace:Number(typeof draft!=='undefined'&&draft?.taskGrace||0),reps:Number(typeof draft!=='undefined'&&draft?.repCount||5)};
+      const list=pending.tasks.length?pending.tasks:['none'],grace=Number(pending.grace||0),reps=Number(pending.reps||5);
+      if(typeof draft!=='undefined'&&draft){draft.tasks=list;draft.task=list[0];draft.taskProfile='custom';draft.taskGrace=grace;draft.repCount=reps;draft.auto=false}
+      if(typeof alarms!=='undefined'&&Array.isArray(alarms)){
+        const i=typeof editingId!=='undefined'&&editingId?alarms.findIndex(a=>String(a.id)===String(editingId)):alarms.length-1;
+        if(i>=0&&alarms[i]){alarms[i].tasks=list;alarms[i].task=list[0];alarms[i].taskProfile='custom';alarms[i].taskGrace=grace;alarms[i].repCount=reps;alarms[i].auto=false}
+      }
+      if(typeof save==='function')save();
+      if(typeof refresh==='function')refresh();
+      setTimeout(decorateAlarmCards,30);
+    }catch(e){}
+  };
+  const decorateAlarmCards=()=>{
+    try{$$('#alarmList .card').forEach(card=>{const edit=card.querySelector('[data-edit]');if(!edit)return;const alarm=(typeof alarms!=='undefined'&&Array.isArray(alarms))?alarms.find(a=>String(a.id)===String(edit.dataset.edit)):null;if(!alarm)return;const list=Array.isArray(alarm.tasks)&&alarm.tasks.length?alarm.tasks:[alarm.task||'none'];const label=list.map(id=>tx().task[id]?.[0]||id).join(' + ');const chip=card.querySelector('.meta .chip.hot');if(chip&&chip.textContent!==label)chip.textContent=label;});}catch(e){}
+  };
+  const showGrace=alarm=>{
+    const ring=$('#ring');if(!ring)return;
+    let n=$('#sr71GraceNotice');if(!n){n=document.createElement('div');n.id='sr71GraceNotice';const h=ring.querySelector('#ringButtons');(h||ring.firstElementChild)?.insertAdjacentElement('beforebegin',n)}
+    const mins=Number(alarm?.taskGrace||0);if(!mins){n.textContent=tx().immediate;return}
+    let left=mins*60;clearInterval(window.__sr71GraceTimer);const paint=()=>{const m=Math.floor(left/60),s=String(left%60).padStart(2,'0');n.textContent=left>0?fmt(tx().graceRunning,`${m}:${s}`):tx().graceExpired};paint();window.__sr71GraceTimer=setInterval(()=>{left--;paint();if(left<=0){clearInterval(window.__sr71GraceTimer);window.__sr71GraceTimer=null}},1000);
+  };
+  const stopGrace=()=>{clearInterval(window.__sr71GraceTimer);window.__sr71GraceTimer=null;$('#sr71GraceNotice')?.remove()};
+  const ringState=()=>{try{return typeof ringing!=='undefined'?ringing:null}catch(e){return null}};
+  const customPanel=(html)=>{
+    let p=$('#sr71CustomTask');if(!p){p=document.createElement('div');p.id='sr71CustomTask';$('#ring')?.appendChild(p)}
+    p.innerHTML=html;p.style.display='block';return p;
+  };
+  const closeCustom=()=>{const p=$('#sr71CustomTask');if(p)p.style.display='none';const v=p?.querySelector('video');if(v?.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}try{if(typeof stopScanner==='function')stopScanner()}catch(e){}};
+  const completeCustom=()=>{closeCustom();try{$('#ringButtons').style.display='block';taskValidated=true;finishDismiss()}catch(e){}};
+  const startFitness=task=>{
+    const x=tx(),target=Number(ringState()?.repCount||5),label=task==='pushups'?x.cameraPushups:task==='situps'?x.cameraSitups:x.cameraSquats;
+    const p=customPanel(`<video id="sr71FitnessVideo" autoplay muted playsinline></video><h3 class="sr71-camera-title">${clean(label)}</h3><p class="sr71-camera-hint">${clean(x.cameraHint)}</p><div class="sr71-camera-count"><span id="sr71RepValue">0</span> / ${target}</div><div class="sr71-camera-actions"><button type="button" id="sr71AddRep">${clean(x.addRep)}</button><button type="button" class="secondary" id="sr71RetryCamera">${clean(x.cameraRetry)}</button></div><p class="sr71-camera-error" id="sr71CameraError"></p>`);
+    let count=0;const value=$('#sr71RepValue');$('#sr71AddRep').onclick=()=>{count=Math.min(target,count+1);if(value)value.textContent=String(count);if(count>=target){toast(x.exerciseDone);completeCustom()}};$('#sr71RetryCamera').onclick=()=>startFitness(task);
+    const video=$('#sr71FitnessVideo');try{if(!navigator.mediaDevices?.getUserMedia)throw new Error('no-camera');navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false}).then(stream=>{if(video)video.srcObject=stream}).catch(()=>{const e=$('#sr71CameraError');if(e)e.textContent=x.cameraPermission});}catch(e){const er=$('#sr71CameraError');if(er)er.textContent=x.cameraUnavailable}
+  };
+  const startObject=()=>{
+    const x=tx(),code=String(ringState()?.barcode||'').trim();
+    if(!code){const p=customPanel(`<h3 class="sr71-camera-title">${clean(x.objectTitle)}</h3><p class="sr71-camera-error">${clean(x.objectMissing)}</p>`);return p}
+    const p=customPanel(`<video id="sr71ObjectVideo" autoplay muted playsinline></video><h3 class="sr71-camera-title">${clean(x.objectTitle)}</h3><p class="sr71-camera-hint">${clean(x.objectHint)}</p><input id="sr71ObjectManual" inputmode="numeric" autocomplete="off" placeholder="${clean(x.manualCode)}" style="width:100%;padding:13px;border-radius:12px;border:1px solid rgba(43,107,255,.25);text-align:center;font:600 16px/1.2 Inter,-apple-system,system-ui,sans-serif"><div class="sr71-camera-actions"><button type="button" id="sr71VerifyObject">${clean(x.verifyCode)}</button><button type="button" class="secondary" id="sr71RetryObject">${clean(x.cameraRetry)}</button></div><p class="sr71-camera-error" id="sr71ObjectError"></p>`);
+    const check=v=>{if(String(v||'').trim().toUpperCase()===code.toUpperCase())completeCustom();else{const e=$('#sr71ObjectError');if(e)e.textContent=x.objectWrong}};
+    $('#sr71VerifyObject').onclick=()=>check($('#sr71ObjectManual')?.value);$('#sr71RetryObject').onclick=()=>startObject();
+    try{if(typeof startScanner==='function')startScanner($('#sr71ObjectVideo'),check);else throw new Error('no-scanner')}catch(e){const er=$('#sr71ObjectError');if(er)er.textContent=x.scanError}
+    return p;
+  };
+  const customStart=task=>{
+    $('#ringButtons')?.style.setProperty('display','none','important');$$('.ring .task').forEach(e=>e.classList.remove('on'));taskValidated=false;
+    if(FITNESS.has(task))return startFitness(task);
+    if(task==='object')return startObject();
+    if(task==='barcode')return startObject();
+    return false;
+  };
+  const installTaskEngine=()=>{
+    try{
+      if(typeof startTask==='function'&&!startTask.__sr71Wrapped){const core=startTask;const wrapped=function(task){if(FITNESS.has(task)||task==='object'){return customStart(task)}return core.apply(this,arguments)};wrapped.__sr71Wrapped=true;window.SleepRiseCoreStartTaskV71=core;startTask=wrapped;window.startTask=wrapped}
+      if(typeof fire==='function'&&!fire.__sr71V71){const core=fire;const wrapped=function(alarm){if(!alarm)return;const list=Array.isArray(alarm.tasks)&&alarm.tasks.length?alarm.tasks.slice():[alarm.task||'none'];const valid=list.filter(t=>TASKS.includes(t));const tasks=valid.length?valid:['none'];const payload={...alarm,task:'none',tasks:['none'],auto:false};core(payload);try{if(ringing){ringing.tasks=tasks;ringing.task=tasks[0];ringing.taskGrace=Number(alarm.taskGrace||0);ringing.repCount=Number(alarm.repCount||5);ringing.__srTaskIndex=0;ringing.__srTaskComplete=false;showGrace(ringing)}}catch(e){} };wrapped.__sr71V71=true;window.SleepRiseCoreFireV71=core;fire=wrapped;window.fire=wrapped}
+      if(typeof closeRing==='function'&&!closeRing.__sr71Wrapped){const core=closeRing;const wrapped=function(){stopGrace();closeCustom();return core.apply(this,arguments)};wrapped.__sr71Wrapped=true;closeRing=wrapped;window.closeRing=wrapped}
+    }catch(e){}
+  };
+  const install=()=>{
+    installPanel();installTaskEngine();
+    const b=$('#sheetSave');if(b&&!b.__sr71Validate){b.addEventListener('click',validateSheet,true);b.addEventListener('click',()=>setTimeout(commitSelectionAfterLegacySave,0),false);b.__sr71Validate=true}
+    decorateAlarmCards();
+  };
+  const observe=()=>{
+    const sheet=$('#sheet');if(sheet&&!sheet.__sr71Observed){new MutationObserver(()=>setTimeout(install,20)).observe(sheet,{attributes:true,attributeFilter:['class']});sheet.__sr71Observed=true}
+    const list=$('#alarmList');if(list&&!list.__sr71Observed){new MutationObserver(decorateAlarmCards).observe(list,{childList:true,subtree:true});list.__sr71Observed=true}
+    const onb=$('#onb');if(onb&&!onb.__sr71Observed){new MutationObserver(()=>styleOnboarding()).observe(onb,{childList:true,subtree:true});onb.__sr71Observed=true}
+    const root=document.documentElement;if(root&&!root.__sr71LangObserved){new MutationObserver(()=>{renderPanel();styleOnboarding()}).observe(root,{attributes:true,attributeFilter:['lang']});root.__sr71LangObserved=true}
+  };
+  const styleOnboarding=()=>{try{const o=$('#onb'),c=o?.querySelector('.card2'),h=$('#onbTitle'),s=$('#onbSub');if(!c)return;c.classList.add('sr71-readable-onboarding');[h,s].forEach(e=>{if(e){e.style.whiteSpace='normal';e.style.overflow='visible';e.style.overflowWrap='anywhere'}});const d=document.documentElement.lang?.slice(0,2);if(d==='ar')c.dir='rtl'}catch(e){}};
+  const boot=()=>{install();observe();styleOnboarding();setTimeout(install,200);setTimeout(install,900);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+  window.SleepRiseV71Tasks={tasks:TASKS,fitness:[...FITNESS],select,render:renderPanel,install,tx:()=>tx(),setDraftTasks,showGrace};
+})();
+
 </script>
 </body>
 </html>
