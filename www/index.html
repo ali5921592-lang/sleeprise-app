@@ -1893,7 +1893,10 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   const code=()=>{try{const raw=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||((typeof lang!=='undefined'&&lang)||'tr');let v=raw;try{v=JSON.parse(raw)}catch(e){};v=String(v||'tr').replace(/^['\"]|['\"]$/g,'');return MSG[v]?v:'tr'}catch(e){return'tr'}};
   let announced=false;
   function render(){const box=document.querySelector('#taskBarcode');if(!box||!box.classList.contains('on')){announced=false;return}const video=document.querySelector('#bcVideo'),input=document.querySelector('#bcManual');if(video&&(!video.srcObject||video.readyState<2)){const hint=document.querySelector('#bcHint');if(hint){hint.textContent=MSG[code()];hint.dataset.sr55Fallback='1'}if(input){input.disabled=false;input.setAttribute('aria-label',MSG[code()]);if(!announced){announced=true;try{input.focus()}catch(e){}}}}}
-  render();setInterval(render,500);
+  render();
+  const box=document.querySelector('#taskBarcode');
+  if(box)new MutationObserver(render).observe(box,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('click',e=>{if(e.target?.closest?.('#btnRegBarcode,#taskBarcode'))setTimeout(render,120)},true);
 })();
 /* /v55 barcode camera fallback */
 
@@ -1964,7 +1967,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   window.SleepRiseVolumeSnooze=()=>{try{if(Number(window.SleepRiseSnoozeUsed||0)>=1)return false;const b=document.querySelector('#ring.on #btnSnooze');if(!b||b.disabled)return false;b.click();return true}catch(e){return false}};
   const syncNative=()=>{try{const active=!!document.querySelector('#ring.on');window.SleepRiseAlarmActive=active;if(window.SleepRiseNative&&SleepRiseNative.setAlarmActive)SleepRiseNative.setAlarmActive(active)}catch(e){}};
   document.addEventListener('keydown',e=>{if(e.key==='AudioVolumeDown'||e.code==='VolumeDown'){if(window.SleepRiseVolumeSnooze?.())e.preventDefault()}} ,true);
-  syncNative();setInterval(syncNative,500);document.addEventListener('click',()=>setTimeout(syncNative,40),true);
+  syncNative();document.addEventListener('click',()=>setTimeout(syncNative,40),true);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(syncNative,80)});
 })();
 /* /v57 alarm policy bridge and translations */
 </script>
@@ -2340,7 +2343,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     }
     wrapped.__srV64Wrapped=true;window.finishDismiss=wrapped;window.__srV64FinishBound=true;
   }
-  firstUsed();bind();setTimeout(bind,700);setTimeout(bind,1800);setInterval(bind,4000);maybeReview();
+  firstUsed();bind();setTimeout(bind,700);setTimeout(bind,1800);maybeReview();
   window.SleepRiseReview={recordSuccess,maybeReview,requestReview};
 })();
 </script>
@@ -2645,6 +2648,51 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
 })();
 
 </script>
+
+<!-- SLEEPRISE_V72_PERFORMANCE_CLEANUP_START -->
+<style id="sleeprise-v72-performance-style">
+/* v72: stable rendering defaults. Keep interaction motion, remove visual pulses that look like flicker. */
+#p-stats.v70-analysis-shell::before{animation:none!important}
+.d-fill,#dialFill{transition:none!important}
+/* Avoid hundreds of simultaneous child animations on long pages. */
+.page.on,.page.on>*{animation:none!important;animation-delay:0!important}
+#p-today.v70-visual-shell::before,#p-relax.v70-relax-shell::before,.v70-onb-art,.dialwrap::before{animation:none!important}
+/* Freeze all legacy SVG decoration; it is visual chrome, not functional state. */
+.app svg *{animation:none!important}
+.v35-sky .sun-rays,.v35-sky .sun,.v35-sky .cloud,.v35-sky .birds,.v35-sky,.v70-dawn-scene,.v70-dawn-veil{animation:none!important}
+/* Decorative SVG scenes are intentionally static to prevent star shimmer and paint spikes. */
+.scene .star,.scene .starbig,.scene .birdwrap,.scene .bird,.scene .milky,.scene .cloud,.scene .sun-rays,.scene .rays{animation:none!important}
+.sr72-low-power .page.on,.sr72-low-power .page.on>*{animation:none!important}
+.sr72-low-power .app::before,.sr72-low-power .app::after{filter:none!important}
+.sr72-low-power .card,.sr72-low-power .btn,.sr72-low-power .quick button,.sr72-low-power .sheet-inner,.sr72-low-power .tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.sr72-low-power #p-today.v70-visual-shell::before,.sr72-low-power #p-relax.v70-relax-shell::before,.sr72-low-power .v70-onb-art{animation:none!important}
+.sr72-low-power .sr68-sound-row,.sr72-low-power .sr71-task-option{contain:content}
+@media(max-width:480px){
+  .card,.quick button,.btn,.tabs,.sheet,.sheet-inner,.dial-c .tag{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .app::before,.app::after{filter:blur(16px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #p-today.v70-visual-shell::before,#p-relax.v70-relax-shell::before,#p-stats.v70-analysis-shell::before,.v70-onb-art{animation:none!important}
+  .page.on,.page.on>*{animation:none!important;transition:none!important}
+}
+</style>
+<script id="sleeprise-v72-performance-cleanup">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV72PerformanceCleanup)return;
+  window.__SleepRiseV72PerformanceCleanup=true;
+  try{
+    const memory=Number(navigator.deviceMemory||0),cores=Number(navigator.hardwareConcurrency||0);
+    if((memory&&memory<=2)||(cores&&cores<=2))document.documentElement.classList.add('sr72-low-power');
+  }catch(e){}
+  const freezeDecorativeMotion=()=>{try{const names=new Set(['dawnSky','veilDawn','twinkle2','flyBy','flap','drift','beamSway','moonPulse','haloSpin','sparkle']);document.getAnimations().forEach(a=>{if(names.has(a.animationName)){a.cancel();const target=a.effect?.target;if(target?.style)target.style.animation='none'}})}catch(e){}};
+  freezeDecorativeMotion();
+  document.addEventListener('click',()=>setTimeout(freezeDecorativeMotion,90),true);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(freezeDecorativeMotion,90)});
+})();
+</script>
+<!-- SLEEPRISE_V72_PERFORMANCE_CLEANUP_END -->
+
 </body>
 </html>
 <script id="sleeprise-features-v42">
@@ -2891,7 +2939,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     box.querySelectorAll('[data-sr44-tone]').forEach(b=>b.addEventListener('click',()=>{if(typeof draft!=='undefined'&&draft){draft.tone=b.dataset.sr44Tone;try{if(typeof syncSheet==='function')syncSheet()}catch(e){}sync()}}));
     box.querySelector('[data-sr44-tone-preview]').addEventListener('click',()=>previewAlarm((typeof draft!=='undefined'&&draft?.tone)||selected));sync();
   }
-  function patchOnboarding(){const o=$('#v42Onboarding');if(!o)return;o.querySelectorAll('[data-v42-female-note]').forEach(x=>x.remove());const spans=o.querySelectorAll('.v42-onboard-features span');spans.forEach(x=>{if((x.textContent||'').includes('ilaç')||(x.textContent||'').includes('nöbet'))x.textContent='Uyku planı, alarm sesleri, radyo ile uyanma ve rahatlama modları.'})}
+  function patchOnboarding(){const o=$('#v42Onboarding');if(!o)return false;o.querySelectorAll('[data-v42-female-note]').forEach(x=>x.remove());const spans=o.querySelectorAll('.v42-onboard-features span');spans.forEach(x=>{if((x.textContent||'').includes('ilaç')||(x.textContent||'').includes('nöbet'))x.textContent='Uyku planı, alarm sesleri, radyo ile uyanma ve rahatlama modları.'});return true}
   function createRelaxLibrary(){const page=$('#p-relax');if(!page||$('#sr44RelaxLibrary'))return;$('#sleepriseRelaxLibrary')?.remove();const section=document.createElement('section');section.id='sr44RelaxLibrary';section.className='sr44-relax-library';section.innerHTML='<div class="sr44-section-head"><div><span>RAHATLAMA SESLERİ</span><h3>Sesleri klasörüne göre seç</h3><p>Ses ve görüntüyü ayrı ayrı kontrol et.</p></div><button type="button" data-sr44-relax-stop>DURDUR</button></div><div class="sr44-category-tabs" data-sr44-relax-tabs><button class="on" data-sr44-relax-filter="all">Tümü</button><button data-sr44-relax-filter="Yağmur">Yağmur</button><button data-sr44-relax-filter="Orman">Orman</button><button data-sr44-relax-filter="Su ve dalga">Su ve dalga</button><button data-sr44-relax-filter="Gece">Gece</button></div><div class="sr44-relax-list">'+RELAX.map(a=>'<article class="sr44-relax-card" data-sr44-relax-card="'+a.id+'" data-sr44-relax-group="'+a.group+'"><span class="sr44-relax-icon">'+(a.group==='Su ve dalga'?'≈':a.group==='Gece'?'◌':a.group==='Yağmur'?'≋':'♧')+'</span><div><b>'+a.title+'</b><small>'+a.desc+'</small></div><button type="button" data-sr44-relax-play="'+a.id+'">BAŞLAT</button><input type="range" min="0" max="1" step=".01" value=".32" data-sr44-relax-volume="'+a.id+'"></article>').join('')+'</div><div class="sr44-mix"><button type="button" data-sr44-mix="sleep">Uyku miksini başlat</button><button type="button" data-sr44-mix="coast">Kıyı miksini başlat</button></div>';
     const anchor=$('#v32SoundDeck')||page.firstElementChild;anchor?.after(section);if(!anchor)page.appendChild(section);wireRelax(section);createCinemaLibrary(page);
   }
@@ -2902,7 +2950,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function closeCinema(){if(cinemaVideo){cinemaVideo.pause();cinemaVideo=null}document.querySelector('.sr44-cinema-overlay')?.remove()}
   function installStyles(){if($('#sr44Style'))return;const s=document.createElement('style');s.id='sr44Style';s.textContent=`#sleepriseAlarmLibrary,#sleepriseRelaxLibrary{display:none!important}.sr44-tone-head{margin:10px 0}.sr44-tone-head b,.sr44-tone-head small{display:block}.sr44-tone-head b{font:800 15px Inter,sans-serif;color:#fff}.sr44-tone-head small{margin-top:3px;color:#9fb1d2;font:500 10px Inter,sans-serif}.sr44-tone-filters,.sr44-category-tabs{display:flex;gap:6px;overflow:auto;scrollbar-width:none;padding:3px 0 9px}.sr44-tone-filters::-webkit-scrollbar,.sr44-category-tabs::-webkit-scrollbar{display:none}.sr44-tone-filters button,.sr44-category-tabs button{border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.06);color:#b9c8e3;padding:8px 10px;white-space:nowrap;font:700 9px Inter,sans-serif}.sr44-tone-filters button.on,.sr44-category-tabs button.on{background:#86e6de;color:#102c45;border-color:#86e6de}.sr44-tone-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:270px;overflow:auto;padding-right:2px}.sr44-tone-card{display:grid;grid-template-columns:24px 1fr;column-gap:7px;align-items:center;border:1px solid rgba(255,255,255,.12);border-radius:11px;background:rgba(255,255,255,.06);padding:8px;text-align:left;color:#fff}.sr44-tone-card.on{background:rgba(134,230,222,.18);outline:1px solid #86e6de}.sr44-tone-card[hidden]{display:none}.sr44-tone-card span{grid-row:span 2;color:#86e6de;font:700 17px Georgia,serif}.sr44-tone-card b{font:700 10px Inter,sans-serif}.sr44-tone-card small{color:#9fb1d2;font:500 8px/1.2 Inter,sans-serif}.sr44-tone-preview{width:100%;margin-top:8px;border:1px solid rgba(134,230,222,.4);border-radius:10px;background:rgba(134,230,222,.12);color:#b9fff7;padding:9px;font:800 10px Inter,sans-serif}.sr44-radio-moved{margin:12px 0!important;padding:12px!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(24,37,79,.9),rgba(12,20,44,.92))!important}.sr44-radio-moved .v42-radio-form{grid-template-columns:1fr!important}.sr44-relax-library,.sr44-cinema-library{margin:16px 0;padding:15px;border:1px solid rgba(150,175,255,.16);border-radius:20px;background:linear-gradient(145deg,rgba(24,37,79,.92),rgba(12,20,44,.92))}.sr44-section-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.sr44-section-head span{color:#86e6de;font:800 9px Inter,sans-serif;letter-spacing:.12em}.sr44-section-head h3{margin:4px 0;color:#fff;font:800 18px Inter,sans-serif}.sr44-section-head p{margin:0;color:#aebdd8;font:500 10px/1.4 Inter,sans-serif}.sr44-section-head button{border:0;border-radius:10px;background:rgba(255,255,255,.08);color:#dbe8ff;padding:9px;font:800 9px Inter,sans-serif}.sr44-relax-list{display:grid;gap:7px}.sr44-relax-card{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:8px;padding:9px;border-radius:13px;background:rgba(255,255,255,.06)}.sr44-relax-card.is-playing{background:rgba(134,230,222,.13);outline:1px solid rgba(134,230,222,.28)}.sr44-relax-card[hidden],.sr44-video-card[hidden]{display:none}.sr44-relax-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(134,230,222,.12);color:#86e6de;font:700 16px Georgia,serif}.sr44-relax-card b,.sr44-video-card b{display:block;color:#fff;font:700 11px Inter,sans-serif}.sr44-relax-card small,.sr44-video-card small{display:block;margin-top:2px;color:#9fb1d2;font:500 9px Inter,sans-serif}.sr44-relax-card button,.sr44-mix button,.sr44-video-card button{border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.07);color:#bffbf5;padding:8px;font:800 8px Inter,sans-serif}.sr44-relax-card input{grid-column:2/4;width:100%;accent-color:#86e6de}.sr44-mix{display:flex;gap:7px;margin-top:10px}.sr44-mix button{flex:1}.sr44-video-grid{display:grid;gap:8px}.sr44-video-card{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:9px;padding:8px;border-radius:13px;background:rgba(255,255,255,.06)}.sr44-video-card video{width:72px;height:52px;object-fit:cover;border-radius:9px;background:#0b1530}.sr44-license-note{display:block;margin-top:10px;color:#7f90b0;font:500 8px/1.4 Inter,sans-serif}.sr44-cinema-overlay{position:fixed;inset:0;z-index:20000;background:#050914;display:flex;align-items:center;justify-content:center;overflow:hidden}.sr44-cinema-overlay video{width:100%;height:100%;object-fit:cover;opacity:.86}.sr44-cinema-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:18px;color:#eff7ff;background:linear-gradient(rgba(3,8,18,.7),transparent);font:800 10px Inter,sans-serif}.sr44-cinema-top button{border:1px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(5,12,27,.55);color:#fff;padding:9px 11px;font:800 9px Inter,sans-serif}.sr44-cinema-bottom{position:absolute;left:18px;right:18px;bottom:16px;padding:10px 12px;border-radius:12px;background:rgba(5,12,27,.55);color:#d3e0f2;font:500 9px/1.35 Inter,sans-serif}.sr44-toast{position:fixed;left:18px;right:18px;bottom:86px;z-index:21000;padding:12px;border-radius:12px;background:#172a51;color:#fff;font:600 11px Inter,sans-serif}@media(max-width:420px){.sr44-tone-grid{grid-template-columns:1fr}.sr44-video-card{grid-template-columns:62px 1fr auto}.sr44-video-card video{width:62px;height:48px}.sr44-relax-card button,.sr44-video-card button{padding:8px 6px}}`;document.head.appendChild(s)}
   function silenceStartupAudio(){try{if(typeof Atm!=='undefined'&&Atm&&typeof Atm.stop==='function')Atm.stop()}catch(e){}try{document.querySelectorAll('audio').forEach(a=>{a.pause();a.currentTime=0})}catch(e){}}
-  function init(){silenceStartupAudio();moveRadio();removeReminderUI();buildAlarmPicker();createRelaxLibrary();installStyles();patchOnboarding();const old=window.renderTones;window.renderTones=function(){buildAlarmPicker();if(typeof old==='function'&&false)old()};document.addEventListener('click',e=>{if(e.target.closest('#btnAdd,#alarmList button'))setTimeout(()=>{moveRadio();buildAlarmPicker()},80)},true);const observer=new MutationObserver(patchOnboarding);observer.observe(document.body,{childList:true,subtree:true});setTimeout(patchOnboarding,500);window.SleepRiseCleanupV44={alarms:ALARMS,relax:RELAX,videos:VIDEOS,stopRelax,closeCinema};}
+  function init(){silenceStartupAudio();moveRadio();removeReminderUI();buildAlarmPicker();createRelaxLibrary();installStyles();patchOnboarding();const old=window.renderTones;window.renderTones=function(){buildAlarmPicker();if(typeof old==='function'&&false)old()};document.addEventListener('click',e=>{if(e.target.closest('#btnAdd,#alarmList button'))setTimeout(()=>{moveRadio();buildAlarmPicker()},80)},true);const observer=new MutationObserver(()=>{if(patchOnboarding())observer.disconnect()});if(!patchOnboarding())observer.observe(document.body,{childList:true,subtree:true});setTimeout(()=>{if(patchOnboarding())observer.disconnect()},500);window.SleepRiseCleanupV44={alarms:ALARMS,relax:RELAX,videos:VIDEOS,stopRelax,closeCinema};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
@@ -3683,7 +3731,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     qa('#sr66SoundSettings [data-sr68-id]').forEach(row=>{const id=row.dataset.sr68Id;const name=N[code()]?.[id]||N.en[id]||id;set(row.querySelector('.sr68-sound-name'),name);set(row.querySelector('.sr68-sound-desc'),row.dataset.sr68Mode==='alarm'?(window.SleepRiseV50ToneName?.(id)||txt('alarmSection')):txt('relaxSection'));const b=row.querySelector('[data-sr68-toggle]');if(b)b.textContent=row.classList.contains('is-playing')?txt('stop'):(row.dataset.sr68Mode==='alarm'?txt('listen'):txt('open'))});
   }
   function patchOnboarding(){const o=q('#onb');if(!o)return;setKey(o.querySelector('.v35-onb-note'),'onbNote');setKey(o.querySelector('#onbTitle'),'onbTitle');setKey(o.querySelector('#onbSub'),'onbSub');setKey(o.querySelector('.v33-onb-dursun .hello'),'onbHello');setKey(o.querySelector('.v33-onb-dursun .caption'),'onbCaption');qa('#onb button').forEach(b=>{const v=(b.textContent||'').trim();if(/^(Skip|Atla|Saltar|Überspringen|Ignorer|Pular|تخط|跳过|スキップ)$/i.test(v))set(b,code()==='tr'?'Atla':code()==='en'?'Skip':code()==='es'?'Omitir':code()==='de'?'Überspringen':code()==='fr'?'Ignorer':code()==='pt'?'Pular':code()==='ar'?'تخطى':code()==='zh'?'跳过':'スキップ');if(/^(Continue|Devam|Continuar|Weiter|Continuer|続ける|继续)$/i.test(v))set(b,txt('start'))});}
-  function patchCamera(){const s=q('#regScan');if(!s)return;if(!s.querySelector('.sr69-camera-help')){const n=document.createElement('div');n.className='sr69-camera-help';n.textContent=txt('cameraHelp');s.insertBefore(n,s.firstChild)}else s.querySelector('.sr69-camera-help').textContent=txt('cameraHelp')}
+  function patchCamera(){const s=q('#regScan');if(!s)return false;if(!s.querySelector('.sr69-camera-help')){const n=document.createElement('div');n.className='sr69-camera-help';n.textContent=txt('cameraHelp');s.insertBefore(n,s.firstChild)}else{const n=s.querySelector('.sr69-camera-help');if(n&&n.textContent!==txt('cameraHelp'))n.textContent=txt('cameraHelp')}return true}
   function pauseUnexpectedMedia(){if(q('.sr44-cinema-overlay'))return;qa('audio,video').forEach(a=>{if(a.autoplay||(!a.paused&&a.dataset.sr69UserStarted!=='1')){try{a.pause();a.currentTime=0}catch(e){}}})}
   function refresh(){patchRelax();patchSoundCenter();patchOnboarding();patchCamera();pauseUnexpectedMedia();document.documentElement.lang=LOCALE[code()]||'tr-TR';document.documentElement.dir=code()==='ar'?'rtl':'ltr';try{window.SleepRiseV69LocalePolish?.apply?.()}catch(e){}}
   const alarmTitle=()=>{try{return window.SleepRiseV54Locale?.text?.('wakeCenter')||'SleepRise'}catch(e){return 'SleepRise'}};
@@ -3699,7 +3747,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       const notifications=[];alarms.forEach(a=>{const base=820000+(Number(a.id)||0)%10000;const days=Array.isArray(a.days)?a.days:[];if(days.length)days.forEach((d,i)=>notifications.push({id:base+i,title:alarmTitle(),body:alarmBody(),sound:'alarm_default.wav',schedule:{on:{weekday:d===0?1:d+1,hour:Number(a.h)||0,minute:Number(a.m)||0},allowWhileIdle:true},extra:{sleepRiseAlarmId:a.id,task:a.task||'none'}}));else{const at=new Date();at.setHours(Number(a.h)||0,Number(a.m)||0,0,0);if(at.getTime()<=Date.now())at.setDate(at.getDate()+1);notifications.push({id:base,title:alarmTitle(),body:alarmBody(),sound:'alarm_default.wav',schedule:{at,allowWhileIdle:true},extra:{sleepRiseAlarmId:a.id,task:a.task||'none'}})}});if(notifications.length)await api.schedule({notifications});lastAlarmSignature=sig;try{window.SleepRiseNativeAlarmState={count:notifications.length,lastSync:Date.now()}}catch(e){}
     }catch(e){console.warn('SleepRise native alarm sync',e)}finally{syncing=false}
   }
-  function init(){refresh();setTimeout(refresh,500);setTimeout(refresh,1400);setInterval(refresh,1200);setInterval(syncNativeAlarms,2500);syncNativeAlarms();document.addEventListener('click',e=>{if(e.target?.closest?.('#langMenu [data-l],#langGrid [data-l],#sr53GateGrid [data-sr53-lang]'))setTimeout(()=>{refresh();try{window.SleepRiseV69LocalePolish?.apply?.()}catch(_){}},520)},true);document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();syncNativeAlarms()}});window.addEventListener('pageshow',()=>{refresh();syncNativeAlarms()});const mo=new MutationObserver(()=>{patchCamera()});mo.observe(document.body,{childList:true,subtree:true})}
+  function init(){refresh();setTimeout(refresh,500);setTimeout(refresh,1400);syncNativeAlarms();document.addEventListener('click',e=>{if(e.target?.closest?.('#langMenu [data-l],#langGrid [data-l],#sr53GateGrid [data-sr53-lang]'))setTimeout(()=>{refresh();try{window.SleepRiseV69LocalePolish?.apply?.()}catch(_){}},520)},true);document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();syncNativeAlarms()}});window.addEventListener('pageshow',()=>{refresh();syncNativeAlarms()});const mo=new MutationObserver(()=>{if(patchCamera())mo.disconnect()});if(!patchCamera())mo.observe(document.body,{childList:true,subtree:true})}
   window.SleepRiseV69={refresh,syncNativeAlarms,code,translations:T,soundNames:N,breathText:()=>BREATH_RUNTIME[code()]||BREATH_RUNTIME.en};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,400),{once:true});else setTimeout(init,400);
 })();
@@ -3768,7 +3816,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function dataLocale(){const root=q('#p-relax');if(!root)return;root.querySelectorAll('[data-sr54-key]').forEach(e=>{const k=e.dataset.sr54Key,v=tx(k);if(v&&v!==k)set(e,v)});root.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.dataset.i18n,v=tx(k);if(v&&v!==k)set(e,v)});const on=q('#onb');if(on)on.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.dataset.i18n,v=tx(k);if(v&&v!==k)set(e,v)});const cc=current(),vt=VIDEO_TEXT[cc]||VIDEO_TEXT.en,silent={tr:'sessiz arka plan',en:'silent background',es:'fondo silencioso',de:'stiller Hintergrund',fr:'arrière-plan silencieux',pt:'fundo silencioso',ar:'خلفية صامتة',zh:'静音背景',ja:'無音の背景'}[cc]||'silent background',close={tr:'KAPAT',en:'CLOSE',es:'CERRAR',de:'SCHLIESSEN',fr:'FERMER',pt:'FECHAR',ar:'إغلاق',zh:'关闭',ja:'閉じる'}[cc]||'CLOSE',bottom={tr:'Görüntü sessizdir. Ses için rahatlama klasöründen bir atmosfer seç.',en:'The image is silent. Choose an atmosphere from the relaxation library for sound.',es:'La imagen es silenciosa. Elige un ambiente en la biblioteca de relajación para añadir sonido.',de:'Das Bild ist lautlos. Wähle für Ton eine Atmosphäre aus der Entspannungsbibliothek.',fr:'L’image est silencieuse. Choisissez une ambiance dans la bibliothèque de relaxation pour le son.',pt:'A imagem é silenciosa. Escolha uma atmosfera na biblioteca de relaxamento para ouvir sons.',ar:'الصورة صامتة. اختر أجواءً من مكتبة الاسترخاء لإضافة الصوت.',zh:'画面没有声音。需要声音时，请从放松库选择氛围。',ja:'映像は無音です。音を出すにはリラックスライブラリから雰囲気音を選んでください。'}[cc]||'The image is silent. Choose an atmosphere from the relaxation library for sound.';root.querySelectorAll('[data-sr44-video-card]').forEach(card=>{const item=vt[card.dataset.sr44VideoCard];if(!item)return;set(card.querySelector('b'),item[0]);set(card.querySelector('small'),item[1]+' · '+silent)});const license=tx('license'),licenseNode=q('#sr44CinemaLibrary .sr44-license-note');if(license&&license!=='license')set(licenseNode,license);const overlay=q('.sr44-cinema-overlay');if(overlay){const item=vt[overlay.dataset.sr44VideoId];if(item){set(overlay.querySelector('.sr44-cinema-top span'),tx('cinemaTitle')+' · '+item[0]);set(overlay.querySelector('[data-sr44-cinema-close]'),close);set(overlay.querySelector('.sr44-cinema-bottom span'),bottom)}}}
   function apply(){p();center();onb();dataLocale();}
   window.SleepRiseV69LocalePolish={apply,soundNames:S};
-  apply();setInterval(apply,900);
+  apply();
+  let applyTimer=null;
+  const schedule=()=>{if(applyTimer)return;applyTimer=setTimeout(()=>{applyTimer=null;apply()},100)};
+  document.addEventListener('click',e=>{if(e.target?.closest?.('#langMenu [data-l],#langGrid [data-l],#sr53GateGrid [data-sr53-lang],#modeSw,[data-mode],nav.tabs [data-p],#btnAdd,#alarmList button,[data-sr44-video-open],[data-sr44-cinema-close]'))schedule()},true);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule()});
 })();
 </script>
 <!-- SLEEPRISE_V69_LOCALE_POLISH_END -->
@@ -3786,11 +3838,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     zh:{sleep:'Luma 照亮夜晚',wake:'Luma 带来晨光',card:'Luma 陪伴着你',cardText:'调暗屏幕，让 Luma 陪你保持舒适的节奏。',onb:'你好，我是 Luma。我会陪你度过宁静的夜晚和清晰的早晨。',title:'欢迎使用 SleepRise',sub:'让我们一步一步，共同建立更平静的睡眠与起床节奏。'},
     ja:{sleep:'Luma が夜を照らします',wake:'Luma が朝の光を届けます',card:'Luma がそばにいます',cardText:'画面を暗くして、Luma と一緒にリズムを整えましょう。',onb:'こんにちは、Luma です。穏やかな夜とすっきりした朝をお手伝いします。',title:'SleepRise へようこそ',sub:'一緒に、より穏やかな睡眠と目覚めのリズムを少しずつ整えていきましょう。'}
   };
-  function apply(){const x=TEXT[lang()]||TEXT.tr,mode=q('#modeSw button.on')?.dataset.mode||'sleep';const label=q('.v35-luma-label'),labelText=mode==='wake'?x.wake:x.sleep;if(label&&label.textContent!==labelText)label.textContent=labelText;const card=q('#v35LumaCard');if(card){const b=card.querySelector('b'),p=card.querySelector('p');if(b&&b.textContent!==x.card)b.textContent=x.card;if(p&&p.textContent!==x.cardText)p.textContent=x.cardText}const note=q('.v35-onb-note');if(note&&note.textContent!==x.onb)note.textContent=x.onb;const title=q('#onbTitle'),sub=q('#onbSub');if(title&&title.textContent!==x.title)title.textContent=x.title;if(sub&&sub.textContent!==x.sub)sub.textContent=x.sub}
+  function apply(){const x=TEXT[lang()]||TEXT.tr,mode=q('#modeSw button.on')?.dataset.mode||'sleep';const label=q('.v35-luma-label'),labelText=mode==='wake'?x.wake:x.sleep;if(label&&label.textContent!==labelText)label.textContent=labelText;const card=q('#v35LumaCard');if(card){const b=card.querySelector('b'),p=card.querySelector('p');if(b&&b.textContent!==x.card)b.textContent=x.card;if(p&&p.textContent!==x.cardText)p.textContent=x.cardText}const note=q('.v35-onb-note');if(note&&note.textContent!==x.onb)note.textContent=x.onb;const onb=q('#onb');let step=0;try{step=typeof obStep!=='undefined'?Number(obStep)||0:0}catch(e){}const tourStep=!!onb?.classList.contains('on')&&step>0;const title=q('#onbTitle'),sub=q('#onbSub');if(!tourStep&&title&&title.textContent!==x.title)title.textContent=x.title;if(!tourStep&&sub&&sub.textContent!==x.sub)sub.textContent=x.sub}
   apply();
   document.addEventListener('click',e=>{if(e.target.closest('#modeSw,[data-mode],#btnLang,.langmenu'))setTimeout(apply,80)},{passive:true});
-  const watch=document.querySelector('#p-today,#onb');if(watch)new MutationObserver(()=>apply()).observe(watch,{subtree:true,childList:true,characterData:true});
-  setInterval(apply,1700);
+  document.addEventListener('click',e=>{if(e.target?.closest?.('#onb button'))setTimeout(apply,120)},{passive:true});
   window.SleepRiseVisualLumaLocaleV70={refresh:apply};
 })();
 </script>
