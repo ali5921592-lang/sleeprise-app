@@ -207,7 +207,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         return PendingIntent.getBroadcast(context, id, intent, flags);
     }
 
-    private static void rescheduleSaved(Context context) {
+    public static void rescheduleSaved(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         Set<String> saved = prefs.getStringSet(IDS, new HashSet<>());
         for (String value : new ArrayList<>(saved)) {

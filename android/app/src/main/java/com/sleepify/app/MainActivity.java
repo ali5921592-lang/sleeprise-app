@@ -11,6 +11,8 @@ import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.WebView;
+import android.app.NotificationManager;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -41,6 +43,8 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        configureAlarmWindow();
+        requestNotificationPermissionIfNeeded();
 
         WebView webView = getBridge().getWebView();
         webView.getSettings().setJavaScriptEnabled(true);
@@ -169,6 +173,35 @@ public class MainActivity extends BridgeActivity {
         else request.grant(granted.toArray(new String[0]));
     }
 
+    private void configureAlarmWindow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        } else {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    | android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 4110);
+        }
+    }
+
+    private boolean canUseFullScreenIntent() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true;
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        return manager == null || manager.canUseFullScreenIntent();
+    }
+
     private final class SleepRiseAlarmBridge {
         @JavascriptInterface
         public void scheduleAlarm(int id, long atMillis, String sound, String alarmId, String locale) {
@@ -184,6 +217,22 @@ public class MainActivity extends BridgeActivity {
         public void stopAlarmSound() {
             SleepRiseAlarmService.stop(MainActivity.this);
             SleepRiseAlarmReceiver.stopCurrent(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public boolean canUseFullScreenIntent() {
+            return MainActivity.this.canUseFullScreenIntent();
+        }
+
+        @JavascriptInterface
+        public void openFullScreenIntentSettings() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                try {
+                    Intent settings = new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+                            .setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(settings);
+                } catch (Exception ignored) { }
+            }
         }
     }
 

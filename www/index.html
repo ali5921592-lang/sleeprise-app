@@ -341,6 +341,26 @@ nav{height:76px!important;left:11px!important;right:11px!important;bottom:10px!i
 @media(min-width:391px){#sr71CustomTask{max-width:760px}.sr71-camera-actions{max-width:760px;margin-left:auto;margin-right:auto}}
 @media(max-width:390px){.sr71-camera-stage{height:clamp(300px,58vh,520px)}.sr71-camera-frame{inset:5% 12% 7%}.sr71-fitness-stage .sr71-camera-frame{inset:2% 8% 2%}.sr71-camera-frame:after{font-size:8px}.sr71-pose-guide,.sr71-pose-feedback{font-size:11px}}
 
+/* V85 pose feedback: make a validated repetition unmistakably visible. */
+.sr71-fitness-stage.pose-good{outline:4px solid rgba(86,255,142,.92);outline-offset:-4px;box-shadow:0 0 0 4px rgba(86,255,142,.24),0 0 34px rgba(86,255,142,.72),0 10px 30px rgba(7,21,47,.24)}
+.sr71-fitness-stage.pose-good .sr71-camera-frame{border-color:#65ff9a!important;box-shadow:0 0 0 999px rgba(4,13,34,.05),inset 0 0 34px rgba(86,255,142,.36)!important}
+.sr71-fitness-stage[data-kind="good"] .sr71-camera-live{background:#159b61!important}
+.sr71-pose-feedback[data-kind="good"]{border:1px solid rgba(22,139,100,.24);box-shadow:0 0 0 3px rgba(86,255,142,.08)}
+@media(prefers-reduced-motion:reduce){.sr71-fitness-stage.pose-good{outline:3px solid rgba(86,255,142,.92)}}
+
+</style>
+<style id="sleeprise-v85-safe-area">
+:root{--sr-safe-top:env(safe-area-inset-top,0px);--sr-safe-bottom:env(safe-area-inset-bottom,0px)}
+body{padding:0!important;min-height:100dvh!important}
+.app{height:100dvh!important;min-height:100dvh!important;max-height:none!important}
+.top{height:calc(68px + var(--sr-safe-top))!important;min-height:calc(68px + var(--sr-safe-top))!important;padding:var(--sr-safe-top) 18px 0!important;box-sizing:border-box!important}
+.toprt,.icobtn,#btnLang{position:relative;z-index:42!important}
+#btnLang{min-width:40px!important;min-height:40px!important;margin-right:2px!important}
+.pages{padding-top:18px!important;padding-bottom:calc(124px + var(--sr-safe-bottom))!important;overscroll-behavior-y:contain!important}
+.tabs{bottom:calc(16px + var(--sr-safe-bottom))!important}
+.ring{padding-top:calc(50px + var(--sr-safe-top))!important;padding-bottom:calc(34px + var(--sr-safe-bottom))!important}
+.call,.langmodal{padding-top:calc(76px + var(--sr-safe-top))!important;padding-bottom:calc(34px + var(--sr-safe-bottom))!important}
+#sr-ad-safe-space,.sr-ad-safe-space,.sr-ad-bottom,.ad-safe-space{display:none!important;height:0!important;min-height:0!important;background:transparent!important;border:0!important}
 </style>
 </head>
 <body>
@@ -2629,7 +2649,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
   };
   const stopGrace=()=>{clearInterval(window.__sr71GraceTimer);window.__sr71GraceTimer=null;$('#sr71GraceNotice')?.remove()};
   const ringState=()=>{try{return typeof ringing!=='undefined'?ringing:null}catch(e){return null}};
-  const SR73_CAMERA_STATE={stream:null,video:null,canvas:null,timer:null,pose:null,posePromise:null,busy:false,session:0,mode:'auto',exercise:null,phase:'ready',lastPose:null,lastVideoTimestamp:0,downFrames:0,upFrames:0,metricSmoothed:null,missingFrames:0};
+  const SR73_CAMERA_STATE={stream:null,video:null,canvas:null,stage:null,timer:null,pose:null,posePromise:null,busy:false,session:0,mode:'auto',exercise:null,phase:'ready',lastPose:null,lastVideoTimestamp:0,downFrames:0,upFrames:0,metricSmoothed:null,missingFrames:0};
   const SR73_SCANNER_STATE={controls:null,stream:null,video:null,timer:null,finished:false};
   const stopTrackedScanner=()=>{const s=SR73_SCANNER_STATE;s.finished=true;if(s.timer){clearInterval(s.timer);s.timer=null}try{s.controls?.stop?.()}catch(e){}s.controls=null;try{s.stream?.getTracks?.().forEach(t=>t.stop())}catch(e){}s.stream=null;if(s.video){try{s.video.pause();s.video.srcObject=null}catch(e){}}s.video=null};
   const startTrackedScanner=async(video,onCode)=>{stopTrackedScanner();const s=SR73_SCANNER_STATE;s.finished=false;s.video=video;try{if(!video||!navigator.mediaDevices?.getUserMedia)throw new Error('camera-unavailable');const constraints={audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}};
@@ -2637,7 +2657,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     s.stream=await navigator.mediaDevices.getUserMedia(constraints);video.srcObject=s.stream;video.muted=true;video.autoplay=true;video.playsInline=true;await video.play();if('BarcodeDetector' in window){let detector=null;try{detector=new window.BarcodeDetector()}catch(e){}if(detector){s.timer=setInterval(async()=>{if(s.finished||!video.videoWidth)return;try{const hits=await detector.detect(video);const raw=hits?.[0]?.rawValue;if(raw){s.finished=true;onCode(String(raw).trim());setTimeout(stopTrackedScanner,100)}}catch(e){}},240);return true}}return true;
   }catch(e){stopTrackedScanner();throw e}};
   const cameraText=()=>tx();
-  const cameraStatus=(text,kind='info')=>{const el=$('#sr71TrackerStatus');if(el){el.textContent=text;el.dataset.kind=kind}const fb=$('#sr71PoseFeedback');if(fb){fb.textContent=text;fb.dataset.kind=kind}};
+  const cameraStatus=(text,kind='info')=>{const el=$('#sr71TrackerStatus');if(el){el.textContent=kind==='fallback'?'':text;el.dataset.kind=kind}const fb=$('#sr71PoseFeedback');if(fb){fb.textContent=text;fb.dataset.kind=kind}const stage=SR73_CAMERA_STATE.stage||$('.sr71-fitness-stage');if(stage){stage.dataset.kind=kind;if(kind==='good'){stage.classList.remove('pose-good');void stage.offsetWidth;stage.classList.add('pose-good');clearTimeout(window.__sr73GoodPulse);window.__sr73GoodPulse=setTimeout(()=>stage.classList.remove('pose-good'),620)}}};
   const ensureCameraPermission=()=>new Promise(resolve=>{
     try{
       const native=window.SleepRiseNative;
@@ -2657,7 +2677,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     try{st.stream?.getTracks?.().forEach(t=>t.stop())}catch(e){}st.stream=null;
     if(st.video){try{st.video.pause();st.video.srcObject=null}catch(e){}}st.video=null;st.canvas=null;
   };
-  const waitForVideoReady=video=>new Promise((resolve,reject)=>{if(video?.readyState>=2&&video.videoWidth>0&&video.videoHeight>0){resolve();return}let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(timer);video?.removeEventListener('loadedmetadata',onReady);video?.removeEventListener('canplay',onReady);ok?resolve():reject(new Error('camera-video-not-ready'))};const onReady=()=>{if(video?.videoWidth>0&&video?.videoHeight>0)finish(true)};const timer=setTimeout(()=>finish(false),6000);video?.addEventListener('loadedmetadata',onReady,{once:false});video?.addEventListener('canplay',onReady,{once:false});});
+  const waitForVideoReady=video=>new Promise((resolve,reject)=>{if(video?.readyState>=2&&video.videoWidth>0&&video.videoHeight>0){resolve();return}let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(timer);['loadedmetadata','loadeddata','canplay','playing'].forEach(name=>video?.removeEventListener(name,onReady));ok?resolve():reject(new Error('camera-video-not-ready'))};const onReady=()=>{if(video?.videoWidth>0&&video?.videoHeight>0)finish(true)};const timer=setTimeout(()=>finish(false),8000);['loadedmetadata','loadeddata','canplay','playing'].forEach(name=>video?.addEventListener(name,onReady,{once:false}));});
   const openCameraStream=async(video,facing='user')=>{
     if(!video)throw new Error('camera-video-missing');
     stopCameraTracking();const ok=await ensureCameraPermission();if(!ok)throw new Error('camera-permission');
@@ -2667,10 +2687,9 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     let stream=null,lastError=null;
     for(const constraints of attempts){try{stream=await navigator.mediaDevices.getUserMedia({audio:false,video:constraints});if(stream)break}catch(e){lastError=e}}
     if(!stream)throw(lastError||new Error('camera-unavailable'));
-    SR73_CAMERA_STATE.stream=stream;SR73_CAMERA_STATE.video=video;video.srcObject=stream;video.muted=true;video.autoplay=true;video.playsInline=true;
-    try{await video.play()}catch(e){}
+    SR73_CAMERA_STATE.stream=stream;SR73_CAMERA_STATE.video=video;video.muted=true;video.autoplay=true;video.playsInline=true;video.setAttribute('autoplay','');video.setAttribute('muted','');video.setAttribute('playsinline','');video.setAttribute('webkit-playsinline','');video.srcObject=stream
     await waitForVideoReady(video);
-    try{await video.play()}catch(e){}
+    try{await video.play()}catch(e){await new Promise(r=>setTimeout(r,180));try{await video.play()}catch(_){} }
     return stream;
   };
   const loadPoseLandmarker=async()=>{
@@ -2740,14 +2759,15 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
     p.innerHTML=html;p.style.display='block';return p;
   };
   const closeCustom=()=>{stopCameraTracking();const p=$('#sr71CustomTask');if(p)p.style.display='none';const v=p?.querySelector('video');if(v?.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}try{if(typeof stopScanner==='function')stopScanner()}catch(e){}};
-  const advanceTaskQueue=()=>{const r=ringState();if(!r)return false;const list=Array.isArray(r.tasks)&&r.tasks.length?r.tasks:[r.task||'none'],idx=Math.max(0,Number(r.__srTaskIndex||0));if(idx+1>=list.length)return false;r.__srTaskIndex=idx+1;r.task=list[r.__srTaskIndex];r.__srTaskComplete=false;taskValidated=false;$('#ringButtons')?.style.setProperty('display','none','important');setTimeout(()=>{try{if(ringing===r&&r.tasks?.[r.__srTaskIndex]===r.task){if(r.task==='call')incomingCall(pickCaller(r),true);else startTask(r.task)}}catch(e){}},80);return true};
+  const launchAlarmTask=(r,task,attempt=0)=>{if(!r||!task)return false;const ring=$('#ring');if(!ring?.classList.contains('on')||typeof startTask!=='function'){if(attempt<24)setTimeout(()=>launchAlarmTask(r,task,attempt+1),100);return false}try{if(task==='call'){incomingCall(pickCaller(r),true);return true}const result=startTask(task);if(result===false&&attempt<8)setTimeout(()=>launchAlarmTask(r,task,attempt+1),160);return result!==false}catch(e){if(attempt<8)setTimeout(()=>launchAlarmTask(r,task,attempt+1),160);return false}};
+  const advanceTaskQueue=()=>{const r=ringState();if(!r)return false;const list=Array.isArray(r.tasks)&&r.tasks.length?r.tasks:[r.task||'none'],idx=Math.max(0,Number(r.__srTaskIndex||0));if(idx+1>=list.length)return false;r.__srTaskIndex=idx+1;r.task=list[r.__srTaskIndex];r.__srTaskComplete=false;taskValidated=false;$('#ringButtons')?.style.setProperty('display','none','important');setTimeout(()=>{try{if(ringing===r&&r.tasks?.[r.__srTaskIndex]===r.task)launchAlarmTask(r,r.task)}catch(e){}},80);return true};
   const completeCustom=()=>{closeCustom();try{if(advanceTaskQueue())return;$('#ringButtons').style.display='block';taskValidated=true;finishDismiss()}catch(e){}};
   const startFitness=task=>{
     stopCameraTracking();const x=tx(),target=Math.max(1,Number(ringState()?.repCount||5)),label=task==='pushups'?x.cameraPushups:task==='situps'?x.cameraSitups:task==='squats'?x.cameraSquats:task==='burpees'?x.cameraBurpees:x.cameraPullups;
     const p=customPanel(`<div class="sr71-camera-stage sr71-fitness-stage" data-guide-label="${clean(x.cameraAdjust)}"><video id="sr71FitnessVideo" autoplay muted playsinline></video><canvas id="sr71FitnessCanvas" aria-hidden="true"></canvas><div class="sr71-camera-frame" data-frame-label="${clean(x.cameraTitle)}" aria-hidden="true"></div><span class="sr71-camera-live">${clean(x.cameraLive)}</span></div><h3 class="sr71-camera-title">${clean(label)}</h3><p class="sr71-camera-hint">${clean(x.cameraHint)}</p><p class="sr71-pose-guide">${clean(x.cameraGuide)}</p><div class="sr71-camera-count"><span id="sr71RepValue">0</span> / ${target}</div><p class="sr71-tracker-status" id="sr71TrackerStatus">${clean(x.cameraTitle)}</p><p class="sr71-pose-feedback" id="sr71PoseFeedback">${clean(x.cameraAdjust)}</p><div class="sr71-camera-actions"><button type="button" id="sr71AddRep" style="display:none">${clean(x.addRep)}</button><button type="button" class="secondary" id="sr71UseManual">${clean(x.cameraManual)}</button><button type="button" class="secondary" id="sr71RetryCamera">${clean(x.cameraRetry)}</button></div><p class="sr71-camera-error" id="sr71CameraError"></p>`);
     let count=0;const value=$('#sr71RepValue');const manual=$('#sr71AddRep');const advance=()=>{count=Math.min(target,count+1);if(value)value.textContent=String(count);haptic(12);if(count>=target){toast(x.exerciseDone);completeCustom()}};
     if(manual)manual.onclick=advance;$('#sr71UseManual').onclick=()=>setManualMode(true);$('#sr71RetryCamera').onclick=()=>startFitness(task);
-    SR73_CAMERA_STATE.exercise=task;SR73_CAMERA_STATE.phase='ready';SR73_CAMERA_STATE.downFrames=0;SR73_CAMERA_STATE.upFrames=0;SR73_CAMERA_STATE.metricSmoothed=null;SR73_CAMERA_STATE.missingFrames=0;SR73_CAMERA_STATE.mode='auto';SR73_CAMERA_STATE.canvas=$('#sr71FitnessCanvas');cameraStatus(x.cameraTitle,'info');
+    SR73_CAMERA_STATE.exercise=task;SR73_CAMERA_STATE.phase='ready';SR73_CAMERA_STATE.downFrames=0;SR73_CAMERA_STATE.upFrames=0;SR73_CAMERA_STATE.metricSmoothed=null;SR73_CAMERA_STATE.missingFrames=0;SR73_CAMERA_STATE.mode='auto';SR73_CAMERA_STATE.canvas=$('#sr71FitnessCanvas');SR73_CAMERA_STATE.stage=$('#sr71CustomTask .sr71-fitness-stage');cameraStatus(x.cameraTitle,'info');
     (async()=>{try{const video=$('#sr71FitnessVideo');await openCameraStream(video,'user');if(!video)return;cameraStatus(x.cameraTracking,'info');const pose=await loadPoseLandmarker();if(SR73_CAMERA_STATE.session===0)return;SR73_CAMERA_STATE.pose=pose;cameraStatus(x.cameraTracking,'ready');startPoseLoop(task,target,advance)}catch(e){stopCameraTracking();const er=$('#sr71CameraError');if(er)er.textContent=e?.message==='camera-permission'?x.cameraPermission:x.cameraUnavailable;setManualMode(true)}})();
     return p;
   };
@@ -2774,7 +2794,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
       if(typeof startScanner==='function'&&!startScanner.__sr71CameraPermission){const coreScanner=startScanner,coreStop=typeof stopScanner==='function'?stopScanner:null;const guardedScanner=async function(video,onCode){const ok=await ensureCameraPermission();if(!ok){cameraStatus(tx().cameraPermission,'warning');return null}try{return await startTrackedScanner(video,onCode)}catch(e){try{const fallback=await coreScanner(video,onCode);return fallback===undefined?true:fallback}catch(f){cameraStatus(tx().scanError,'warning');return null}}};guardedScanner.__sr71CameraPermission=true;const guardedStop=function(){stopTrackedScanner();try{coreStop?.()}catch(e){}};window.SleepRiseCoreStartScannerV71=coreScanner;startScanner=guardedScanner;stopScanner=guardedStop;window.startScanner=guardedScanner;window.stopScanner=guardedStop}
       if(typeof startTask==='function'&&!startTask.__sr71Wrapped){const core=startTask;const wrapped=function(task){if(FITNESS.has(task)||task==='object'||task==='barcode'||task==='call'){return customStart(task)}return core.apply(this,arguments)};wrapped.__sr71Wrapped=true;window.SleepRiseCoreStartTaskV71=core;startTask=wrapped;window.startTask=wrapped}
       if(typeof finishDismiss==='function'&&!finishDismiss.__sr71Queue){const coreFinish=finishDismiss;const wrappedFinish=function(){const r=ringState(),list=Array.isArray(r?.tasks)&&r.tasks.length?r.tasks:[r?.task||'none'];if(r&&taskValidated&&list.length>1&&advanceTaskQueue())return;return coreFinish.apply(this,arguments)};wrappedFinish.__sr71Queue=true;window.SleepRiseCoreFinishV71=coreFinish;finishDismiss=wrappedFinish;window.finishDismiss=wrappedFinish}
-      if(typeof fire==='function'&&!fire.__sr71V71){const core=fire;const wrapped=function(alarm){if(!alarm)return;const list=Array.isArray(alarm.tasks)&&alarm.tasks.length?alarm.tasks.slice():[alarm.task||'none'];const valid=list.filter(t=>TASKS.includes(t)&&!(t==='call'&&!(typeof contacts!=='undefined'&&Array.isArray(contacts)&&contacts.length)));const tasks=(valid.length?valid:['none']).map(t=>t==='random'?['math','memory','typing','steps','shake'][Math.floor(Math.random()*5)]:t);const payload={...alarm,task:'none',tasks:['none'],auto:false};core(payload);try{if(ringing){ringing.tasks=tasks;ringing.task=tasks[0];ringing.taskGrace=Number(alarm.taskGrace||0);ringing.repCount=Number(alarm.repCount||5);ringing.__srTaskIndex=0;ringing.__srTaskComplete=false;showGrace(ringing);if((FITNESS.has(tasks[0])||tasks[0]==='object'||tasks[0]==='barcode'||tasks[0]==='call')&&typeof startTask==='function'){setTimeout(()=>{try{if(ringing&&ringing.tasks?.[ringing.__srTaskIndex||0]===tasks[0])startTask(tasks[0])}catch(e){}},120)}}}catch(e){} };wrapped.__sr71V71=true;window.SleepRiseCoreFireV71=core;fire=wrapped;window.fire=wrapped}
+      if(typeof fire==='function'&&!fire.__sr71V71){const core=fire;const wrapped=function(alarm){if(!alarm)return;const list=Array.isArray(alarm.tasks)&&alarm.tasks.length?alarm.tasks.slice():[alarm.task||'none'];const valid=list.filter(t=>TASKS.includes(t)&&!(t==='call'&&!(typeof contacts!=='undefined'&&Array.isArray(contacts)&&contacts.length)));const tasks=(valid.length?valid:['none']).map(t=>t==='random'?['math','memory','typing','steps','shake'][Math.floor(Math.random()*5)]:t);const payload={...alarm,task:'none',tasks:['none'],auto:false};core(payload);try{if(ringing){ringing.tasks=tasks;ringing.task=tasks[0];ringing.taskGrace=Number(alarm.taskGrace||0);ringing.repCount=Number(alarm.repCount||5);ringing.__srTaskIndex=0;ringing.__srTaskComplete=false;showGrace(ringing);if((FITNESS.has(tasks[0])||tasks[0]==='object'||tasks[0]==='barcode'||tasks[0]==='call')&&typeof startTask==='function'){setTimeout(()=>{try{if(ringing&&ringing.tasks?.[ringing.__srTaskIndex||0]===tasks[0])launchAlarmTask(ringing,tasks[0])}catch(e){}},120)}}}catch(e){} };wrapped.__sr71V71=true;window.SleepRiseCoreFireV71=core;fire=wrapped;window.fire=wrapped}
       if(typeof closeRing==='function'&&!closeRing.__sr71Wrapped){const core=closeRing;const wrapped=function(){stopGrace();closeCustom();return core.apply(this,arguments)};wrapped.__sr71Wrapped=true;closeRing=wrapped;window.closeRing=wrapped}
       bindCallTaskQueue();
     }catch(e){}
@@ -3205,11 +3225,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const nativeIds=()=>{try{return JSON.parse(localStorage.getItem('sleeprise_v49_native_ids')||'[]')}catch(e){return[]}};
   const saveNativeIds=x=>{try{localStorage.setItem('sleeprise_v49_native_ids',JSON.stringify(x))}catch(e){}};
   function alarmOccurrences(a,limit=14){const out=[],now=new Date();for(let day=0;day<32&&out.length<limit;day++){const d=new Date(now);d.setDate(now.getDate()+day);d.setHours(a.h,a.m,0,0);if(d<=now)continue;if(!a.days?.length||a.days.includes(d.getDay()))out.push(d)}return out}
-  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}try{window.SleepRiseAlarmNative?.cancelAll?.()}catch(e){}const nativeAlarm=window.SleepRiseAlarmNative;let nativePlanOk=!!nativeAlarm&&typeof nativeAlarm.scheduleAlarm==='function';const active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_v81_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:null,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,a.days?.length?14:1)){const id=300000+(seq++);ids.push(id);try{if(nativePlanOk)nativeAlarm.scheduleAlarm(id,when.getTime(),base,String(a.id),String(document.documentElement.lang||'en'))}catch(e){nativePlanOk=false;try{nativeAlarm?.cancelAll?.()}catch(x){}}notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_v81_'+base,sound:window.Capacitor?.getPlatform?.()==='ios'?'alarm_default.wav':null,ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(nativePlanOk&&active.length)notes.length=0;if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
+  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}try{window.SleepRiseAlarmNative?.cancelAll?.()}catch(e){}const nativeAlarm=window.SleepRiseAlarmNative;const isIOS=window.Capacitor?.getPlatform?.()==='ios';let nativePlanOk=!!nativeAlarm&&typeof nativeAlarm.scheduleAlarm==='function';const active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_v81_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:null,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,isIOS?1:(a.days?.length?14:1))){const id=300000+(seq++);ids.push(id);try{if(nativePlanOk)nativeAlarm.scheduleAlarm(id,when.getTime(),base,String(a.id),String(document.documentElement.lang||'en'))}catch(e){nativePlanOk=false;try{nativeAlarm?.cancelAll?.()}catch(x){}}notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_v81_'+base,sound:window.Capacitor?.getPlatform?.()==='ios'?'alarm_default.wav':null,ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(isIOS&&notes.length){const originals=notes.splice(0);const burst=[];ids.length=0;originals.forEach(n=>{for(let k=0;k<12&&burst.length<60;k++){const id=700000+(Number(n.id)||0)*100+k;ids.push(id);burst.push({...n,id,sound:'alarm_default_loop.wav',schedule:{at:new Date(n.schedule.at.getTime()+k*29000),allowWhileIdle:true}})}});notes.push(...burst)}if(nativePlanOk&&active.length)notes.length=0;if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
+  async function cancelScheduledAlarmNotifications(){const ln=nativePlugin();const ids=nativeIds();if(ln?.cancel&&ids.length){try{await ln.cancel({notifications:ids.map(id=>({id}))})}catch(e){}saveNativeIds([])}}
+  window.SleepRiseCancelAlarmNotifications=cancelScheduledAlarmNotifications;
   function hookNativeScheduling(){
     const oldRefresh=window.refresh;if(typeof oldRefresh==='function'&&!oldRefresh.__v49){const wrapped=function(){const r=oldRefresh.apply(this,arguments);setTimeout(syncNativeAlarms,120);return r};wrapped.__v49=true;window.refresh=wrapped}
     setTimeout(syncNativeAlarms,1400);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(syncNativeAlarms,300)});
-    const ln=nativePlugin();if(ln&&ln.addListener){const handleAlarmNotification=ev=>{const x=ev.notification?.extra||{};try{window.SleepRiseAlarmNative?.stopAlarmSound?.()}catch(e){}const a=typeof alarms!=='undefined'&&alarms.find(z=>String(z.id)===String(x.alarmId));if(a&&typeof fire==='function')fire(a);if(x.radioUrl){try{const ra=new Audio(x.radioUrl);ra.dataset.sr69UserStarted='1';ra.loop=true;ra.volume=.8;ra.play().catch(()=>notifyV49('Radyo için ekrana dokunarak aç.'))}catch(e){}}};ln.addListener('localNotificationActionPerformed',handleAlarmNotification);ln.addListener('localNotificationReceived',handleAlarmNotification)}
+    const ln=nativePlugin();if(ln&&ln.addListener){let lastAlarmNotification='';const handleAlarmNotification=ev=>{const x=ev.notification?.extra||{};const alarmId=String(x.alarmId||x.sleepRiseAlarmId||'');if(!alarmId)return;const key=alarmId+':'+String(ev.notification?.id||'');if(key===lastAlarmNotification)return;lastAlarmNotification=key;const openTask=(attempt=0)=>{try{const action=window.SleepRiseNativeAlarmAction;if(typeof action==='function'){const ok=action(alarmId);if(ok)return}}catch(e){}if(attempt<24)setTimeout(()=>openTask(attempt+1),120)};openTask();if(x.radioUrl){try{const ra=new Audio(x.radioUrl);ra.dataset.sr69UserStarted='1';ra.loop=true;ra.volume=.8;ra.play().catch(()=>notifyV49('Radyo için ekrana dokunarak aç.'))}catch(e){}}};ln.addListener('localNotificationActionPerformed',handleAlarmNotification);ln.addListener('localNotificationReceived',handleAlarmNotification)}
   }
   function setupRealFire(){
     const grid=q('#mixGrid');if(!grid||grid.dataset.v49fire==='1')return;grid.dataset.v49fire='1';let fireAudio=null;const stop=()=>{if(fireAudio){try{fireAudio.pause();fireAudio.currentTime=0}catch(e){}fireAudio=null}};document.addEventListener('click',e=>{const tap=e.target.closest('[data-tap="fire"]');if(!tap)return;e.preventDefault();e.stopImmediatePropagation();if(fireAudio){stop();return}try{fireAudio=new Audio('audio/fireplace-crackle-cc0.mp3');fireAudio.dataset.sr69UserStarted='1';fireAudio.loop=true;fireAudio.volume=.42;fireAudio.play().catch(()=>notifyV49('Şömine sesini başlatmak için ekrana dokun.'))}catch(err){}},true);document.addEventListener('input',e=>{const v=e.target.closest('[data-vol="fire"]');if(v&&fireAudio)fireAudio.volume=Number(v.value)/100*.65},true);q('#v49MixerOff')?.addEventListener('click',stop);window.addEventListener('pagehide',stop)}
@@ -3283,10 +3305,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
-\n
-\n
-\n
-\n
 
 <script id="sleeprise-v53-language-onboarding">
 (function(){
@@ -4053,10 +4071,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   'use strict';
   if(window.__SleepRiseV81NativeAlarmStop)return;
   window.__SleepRiseV81NativeAlarmStop=true;
-  const stop=()=>{try{window.SleepRiseAlarmNative?.stopAlarmSound?.()}catch(e){}};
+  const stop=()=>{try{window.SleepRiseAlarmNative?.stopAlarmSound?.()}catch(e){}try{window.SleepRiseCancelAlarmNotifications?.()}catch(e){}};
   const bind=()=>{
     try{
-      if(typeof window.fire==='function'&&!window.fire.__sr81NativeStop){const core=window.fire;const wrapped=function(){stop();return core.apply(this,arguments)};wrapped.__sr81NativeStop=true;window.fire=wrapped}
+      if(typeof window.fire==='function'&&!window.fire.__sr81NativeStop){const core=window.fire;const wrapped=function(){return core.apply(this,arguments)};wrapped.__sr81NativeStop=true;window.fire=wrapped}
       if(typeof window.finishDismiss==='function'&&!window.finishDismiss.__sr81NativeStop){const core=window.finishDismiss;const wrapped=function(){stop();return core.apply(this,arguments)};wrapped.__sr81NativeStop=true;window.finishDismiss=wrapped}
     }catch(e){}
   };
@@ -4073,7 +4091,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.__SleepRiseV81NativeAction=true;
   window.SleepRiseNativeAlarmAction=function(alarmId){
     try{
-      if(window.SleepRiseAlarmNative?.stopAlarmSound)window.SleepRiseAlarmNative.stopAlarmSound();
       const list=typeof alarms!=='undefined'&&Array.isArray(alarms)?alarms:[];
       const alarm=list.find(a=>String(a.id)===String(alarmId));
       if(!alarm||typeof window.fire!=='function')return false;
@@ -4106,5 +4123,41 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   let timer=0;
   const render=()=>{const root=document.querySelector('#onb'),body=root?.querySelector('#onbBody'),title=root?.querySelector('#onbTitle'),sub=root?.querySelector('#onbSub');if(!root||!body)return;let step=-1;try{step=Number(obStep)}catch(e){}const buttons=[...body.querySelectorAll('button')],text=buttons.map(b=>(b.textContent||'').trim());const isAtmosphere=step===6||english.some(x=>text.includes(x))||/^(Atmosphere|Ambiente|Atmosphäre|Ambiance|الأجواء|氛围|雰囲気)$/.test((title?.textContent||'').trim());if(!isAtmosphere)return;const c=code(),n=names[c],h=titles[c]||titles.en;if(title&&title.textContent!==h[0])title.textContent=h[0];if(sub&&sub.textContent!==h[1])sub.textContent=h[1];buttons.slice(0,5).forEach((b,i)=>{if(n[i]&&(b.textContent||'').trim()!==n[i])b.textContent=n[i]})};
   const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{timer=0;render()},0)};render();document.addEventListener('click',e=>{if(e.target?.closest?.('#onb,#btnLang,#langGrid'))schedule()},true);try{new MutationObserver(schedule).observe(document.querySelector('#onb')||document.body,{subtree:true,childList:true})}catch(e){}
+})();
+</script>
+
+<script id="sleeprise-v85-fullscreen-guard">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV85FullscreenGuard)return;
+  window.__SleepRiseV85FullscreenGuard=true;
+  const $=s=>document.querySelector(s);
+  const copy={
+    tr:{title:'Tam ekran alarm izni',body:'Android alarmı kilit ekranında doğrudan göstermek için tam ekran alarm izni gerekiyor.',open:'Ayarları aç',later:'Daha sonra'},
+    en:{title:'Full-screen alarm permission',body:'Android needs full-screen alarm permission to show the alarm directly over the lock screen.',open:'Open settings',later:'Later'},
+    es:{title:'Permiso de alarma a pantalla completa',body:'Android necesita este permiso para mostrar la alarma directamente sobre la pantalla bloqueada.',open:'Abrir ajustes',later:'Más tarde'},
+    de:{title:'Berechtigung für Vollbildwecker',body:'Android benötigt diese Berechtigung, um den Alarm direkt über dem Sperrbildschirm anzuzeigen.',open:'Einstellungen öffnen',later:'Später'},
+    fr:{title:'Autorisation d’alarme en plein écran',body:'Android a besoin de cette autorisation pour afficher l’alarme directement sur l’écran verrouillé.',open:'Ouvrir les réglages',later:'Plus tard'},
+    pt:{title:'Permissão de alarme em tela cheia',body:'O Android precisa dessa permissão para mostrar o alarme diretamente sobre a tela bloqueada.',open:'Abrir configurações',later:'Mais tarde'},
+    ar:{title:'إذن المنبه بملء الشاشة',body:'يحتاج Android إلى هذا الإذن لإظهار المنبه مباشرة فوق شاشة القفل.',open:'فتح الإعدادات',later:'لاحقًا'},
+    zh:{title:'全屏闹钟权限',body:'Android 需要全屏闹钟权限，才能直接在锁屏上显示闹钟。',open:'打开设置',later:'稍后'},
+    ja:{title:'全画面アラームの権限',body:'ロック画面にアラームを直接表示するには、Android の全画面アラーム権限が必要です。',open:'設定を開く',later:'後で'}
+  };
+  const lang=()=>{try{let v=localStorage.getItem('sr_locale_v55')||localStorage.getItem('sf_lang')||document.documentElement.lang||'tr';try{v=JSON.parse(v)}catch(e){};v=String(v).slice(0,2).toLowerCase();return copy[v]?v:'tr'}catch(e){return'tr'}};
+  const alarmCount=()=>{try{return Array.isArray(window.alarms)?window.alarms.filter(a=>a&&a.enabled!==false).length:document.querySelectorAll('#alarmList .alarm-card,.alarm-card').length}catch(e){return 0}};
+  const remove=()=>{$('#sr85FsiNotice')?.remove()};
+  const render=()=>{
+    if($('#sr85FsiNotice')||alarmCount()<1)return;
+    const x=copy[lang()]||copy.en;
+    const box=document.createElement('aside');box.id='sr85FsiNotice';box.setAttribute('role','status');box.innerHTML='<div class="sr85-fsi-copy"><b></b><p></p></div><div class="sr85-fsi-actions"><button type="button" data-sr85-open></button><button type="button" data-sr85-later></button></div>';
+    box.querySelector('b').textContent=x.title;box.querySelector('p').textContent=x.body;box.querySelector('[data-sr85-open]').textContent=x.open;box.querySelector('[data-sr85-later]').textContent=x.later;
+    box.querySelector('[data-sr85-open]').addEventListener('click',()=>{try{window.SleepRiseAlarmNative?.openFullScreenIntentSettings?.()}catch(e){};box.remove()});
+    box.querySelector('[data-sr85-later]').addEventListener('click',()=>{try{localStorage.setItem('sleeprise_v85_fsi_later',String(Date.now()))}catch(e){};box.remove()});
+    const anchor=$('#alarmList')||$('.pages');if(anchor?.parentNode)anchor.parentNode.insertBefore(box,anchor);
+  };
+  const check=()=>{try{const native=window.SleepRiseAlarmNative;if(!native||typeof native.canUseFullScreenIntent!=='function')return;const allowed=!!native.canUseFullScreenIntent();if(allowed){remove();return}let later=0;try{later=Number(localStorage.getItem('sleeprise_v85_fsi_later')||0)}catch(e){};if(Date.now()-later>86400000)render()}catch(e){}}
+  const style=document.createElement('style');style.textContent='#sr85FsiNotice{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:13px 14px;border:1px solid rgba(255,159,28,.34);border-radius:18px;background:linear-gradient(135deg,rgba(255,248,229,.96),rgba(255,255,255,.9));box-shadow:0 8px 22px rgba(22,35,58,.08)}#sr85FsiNotice .sr85-fsi-copy{min-width:0}#sr85FsiNotice b{display:block;color:#6d4610;font-size:12px;line-height:1.25}#sr85FsiNotice p{margin:4px 0 0;color:#715f3e;font-size:10.5px;line-height:1.35}#sr85FsiNotice .sr85-fsi-actions{display:flex;flex:0 0 auto;gap:6px;align-items:center}#sr85FsiNotice button{padding:8px 9px;border-radius:10px;font-size:10px;font-weight:700;background:#ff9f1c;color:#fff}#sr85FsiNotice [data-sr85-later]{background:transparent;color:#8a6c36;border:1px solid rgba(138,108,54,.25)}@media(max-width:360px){#sr85FsiNotice{display:block}#sr85FsiNotice .sr85-fsi-actions{margin-top:9px}}';document.head.appendChild(style);
+  window.SleepRiseAndroidFSI={check,remove};
+  setTimeout(check,1800);setTimeout(check,5000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(check,400)});
 })();
 </script>

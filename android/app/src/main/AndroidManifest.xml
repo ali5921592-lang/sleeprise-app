@@ -18,6 +18,13 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.sleepify.app.SLEEP_RISE_ALARM_FIRE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".SleepRiseBootReceiver"
+            android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
