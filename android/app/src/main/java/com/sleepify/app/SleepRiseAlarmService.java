@@ -7,10 +7,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -19,9 +23,13 @@ import androidx.core.app.NotificationCompat;
 public class SleepRiseAlarmService extends Service {
     public static final String ACTION_START = "com.sleepify.app.SLEEP_RISE_START_SOUND";
     public static final String ACTION_STOP = "com.sleepify.app.SLEEP_RISE_STOP_SOUND";
-    private static final String CHANNEL_ID = "sleeprise_native_alarm_v81";
+    private static final String CHANNEL_ID = "sleeprise_native_alarm_v86";
     private static final int NOTIFICATION_BASE = 720000;
+    private static final String STATE_PREFS = "sleeprise_native_alarm_service";
     private static MediaPlayer player;
+    private static AudioManager audioManager;
+    private static AudioFocusRequest audioFocusRequest;
+    private static PowerManager.WakeLock wakeLock;
     private static int notificationId = -1;
 
     public static void start(Context context, int id, String sound, String alarmId, String locale) {
@@ -40,6 +48,7 @@ public class SleepRiseAlarmService extends Service {
 
     public static void stop(Context context) {
         Context app = context.getApplicationContext();
+        app.getSharedPreferences(STATE_PREFS, Context.MODE_PRIVATE).edit().clear().apply();
         try { app.startService(new Intent(app, SleepRiseAlarmService.class).setAction(ACTION_STOP)); } catch (Exception ignored) { }
         try { app.stopService(new Intent(app, SleepRiseAlarmService.class)); } catch (Exception ignored) { }
         release(app);
@@ -48,6 +57,7 @@ public class SleepRiseAlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && ACTION_STOP.equals(intent.getAction())) {
+            getSharedPreferences(STATE_PREFS, MODE_PRIVATE).edit().clear().apply();
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -56,12 +66,35 @@ public class SleepRiseAlarmService extends Service {
             String sound = intent.getStringExtra("sound");
             String alarmId = intent.getStringExtra("alarmId");
             String locale = intent.getStringExtra("locale");
-            ensureChannel(this);
-            notificationId = NOTIFICATION_BASE + Math.max(0, id);
-            startForeground(notificationId, buildNotification(this, alarmId, locale));
-            play(this, sound);
+            getSharedPreferences(STATE_PREFS, MODE_PRIVATE).edit()
+                    .putBoolean("running", true)
+                    .putInt("notificationId", id)
+                    .putString("sound", sound == null ? "phone_alarm" : sound)
+                    .putString("alarmId", alarmId == null ? "" : alarmId)
+                    .putString("locale", locale == null ? "en" : locale)
+                    .apply();
+            startAlarmPlayback(id, sound, alarmId, locale);
+        } else if (intent == null) {
+            SharedPreferences state = getSharedPreferences(STATE_PREFS, MODE_PRIVATE);
+            if (state.getBoolean("running", false)) {
+                startAlarmPlayback(state.getInt("notificationId", -1),
+                        state.getString("sound", "phone_alarm"),
+                        state.getString("alarmId", ""),
+                        state.getString("locale", "en"));
+            }
         }
         return START_STICKY;
+    }
+
+    private void startAlarmPlayback(int id, String sound, String alarmId, String locale) {
+        ensureChannel(this);
+        notificationId = NOTIFICATION_BASE + Math.max(0, id);
+        startForeground(notificationId, buildNotification(this, alarmId, locale));
+        acquireWakeLock(this);
+        requestAudioFocus(this);
+        if (!play(this, sound)) {
+            if (!play(this, "phone_alarm")) play(this, "alarm_default");
+        }
     }
 
     @Override
@@ -74,8 +107,44 @@ public class SleepRiseAlarmService extends Service {
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
-    private static void play(Context context, String sound) {
-        release(context);
+    private static void requestAudioFocus(Context context) {
+        try {
+            audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+            if (audioManager == null) return;
+            AudioAttributes attributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                        .setAudioAttributes(attributes)
+                        .setWillPauseWhenDucked(false)
+                        .build();
+                audioManager.requestAudioFocus(audioFocusRequest);
+            } else {
+                audioManager.requestAudioFocus(null, AudioManager.STREAM_ALARM,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            }
+        } catch (Exception ignored) { }
+    }
+
+    private static void releaseAudioFocus() {
+        try {
+            if (audioManager == null) return;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioFocusRequest != null) {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            } else {
+                audioManager.abandonAudioFocus(null);
+            }
+        } catch (Exception ignored) { }
+        audioFocusRequest = null;
+        audioManager = null;
+    }
+
+    private static boolean play(Context context, String sound) {
+        // Do not call release(context) here: it would cancel the foreground
+        // notification immediately after startForeground(). Only replace audio.
+        releasePlayer();
         String safe = String.valueOf(sound == null ? "phone_alarm" : sound)
                 .replace(".mp3", "")
                 .replace(".wav", "")
@@ -84,10 +153,10 @@ public class SleepRiseAlarmService extends Service {
         int resource = context.getResources().getIdentifier(safe, "raw", context.getPackageName());
         if (resource == 0) resource = context.getResources().getIdentifier("phone_alarm", "raw", context.getPackageName());
         if (resource == 0) resource = context.getResources().getIdentifier("alarm_default", "raw", context.getPackageName());
-        if (resource == 0) return;
+        if (resource == 0) return false;
         try {
             MediaPlayer next = MediaPlayer.create(context, resource);
-            if (next == null) return;
+            if (next == null) return false;
             next.setAudioAttributes(new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_ALARM)
@@ -96,7 +165,11 @@ public class SleepRiseAlarmService extends Service {
             next.setVolume(1f, 1f);
             next.start();
             player = next;
-        } catch (Exception ignored) { }
+            return true;
+        } catch (Exception ignored) {
+            releasePlayer();
+            return false;
+        }
     }
 
     private static Notification buildNotification(Context context, String alarmId, String locale) {
@@ -119,6 +192,9 @@ public class SleepRiseAlarmService extends Service {
                 .setAutoCancel(false)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(pending);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) builder.setFullScreenIntent(pending, true);
         return builder.build();
     }
@@ -169,12 +245,33 @@ public class SleepRiseAlarmService extends Service {
         }
     }
 
+    private static void releasePlayer() {
+        if (player != null) {
+            try { player.stop(); } catch (Exception ignored) { }
+            try { player.release(); } catch (Exception ignored) { }
+            player = null;
+        }
+    }
+
+    private static void acquireWakeLock(Context context) {
+        try {
+            PowerManager manager = (PowerManager) context.getSystemService(POWER_SERVICE);
+            if (manager == null) return;
+            if (wakeLock == null) {
+                wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SleepRise:Alarm");
+                wakeLock.setReferenceCounted(false);
+            }
+            if (!wakeLock.isHeld()) wakeLock.acquire(30 * 60 * 1000L);
+        } catch (Exception ignored) { }
+    }
+
     private static void release(Context context) {
         synchronized (SleepRiseAlarmService.class) {
-            if (player != null) {
-                try { player.stop(); } catch (Exception ignored) { }
-                try { player.release(); } catch (Exception ignored) { }
-                player = null;
+            releasePlayer();
+            releaseAudioFocus();
+            if (wakeLock != null) {
+                try { if (wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) { }
+                wakeLock = null;
             }
             if (context != null && notificationId >= 0) {
                 NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

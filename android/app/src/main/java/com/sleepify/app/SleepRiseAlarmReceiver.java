@@ -10,10 +10,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
@@ -32,10 +35,13 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
     private static final String PREFS = "sleeprise_native_alarm_v81";
     private static final String IDS = "ids";
     private static final String ACTIVE_ID = "active_id";
-    private static final String CHANNEL_ID = "sleeprise_native_alarm_v81";
+    private static final String CHANNEL_ID = "sleeprise_native_alarm_v86";
     private static final int NOTIFICATION_BASE = 720000;
 
     private static MediaPlayer activePlayer;
+    private static AudioManager audioManager;
+    private static AudioFocusRequest audioFocusRequest;
+    private static PowerManager.WakeLock wakeLock;
     private static int activeNotificationId = -1;
 
     @Override
@@ -56,7 +62,9 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
             SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId, locale);
         } catch (Exception error) {
             // Fallback for devices that reject a foreground-service start.
-            playAlarmSound(context.getApplicationContext(), sound);
+            if (!playAlarmSound(context.getApplicationContext(), sound) && !"phone_alarm".equals(sound)) {
+                playAlarmSound(context.getApplicationContext(), "phone_alarm");
+            }
             showAlarmNotification(context.getApplicationContext(), id, alarmId, locale);
         }
     }
@@ -74,7 +82,15 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         if (alarmManager == null) return;
         long trigger = Math.max(atMillis, System.currentTimeMillis() + 1000L);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
+            try {
+                // AlarmClock is the OS-sanctioned exact path for alarm-clock apps and is
+                // treated as a user-visible wake-up alarm during Doze/standby.
+                PendingIntent show = showIntent(app, id, alarmId, locale);
+                AlarmManager.AlarmClockInfo alarmClock = new AlarmManager.AlarmClockInfo(trigger, show);
+                alarmManager.setAlarmClock(alarmClock, pending);
+            } catch (SecurityException denied) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
+            }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
         } else {
@@ -109,8 +125,55 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 } catch (Exception ignored) { }
             }
         }
+        // Rescheduling must not silence an alarm that is currently ringing.
+        // The explicit stopAlarmSound bridge is the only path allowed to stop it.
         prefs.edit().clear().apply();
-        stopCurrent(app);
+    }
+
+    private static void acquireWakeLock(Context context) {
+        try {
+            PowerManager manager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            if (manager == null) return;
+            if (wakeLock == null) {
+                wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SleepRise:AlarmFallback");
+                wakeLock.setReferenceCounted(false);
+            }
+            if (!wakeLock.isHeld()) wakeLock.acquire(30 * 60 * 1000L);
+        } catch (Exception ignored) { }
+    }
+
+    private static void requestAudioFocus(Context context) {
+        try {
+            audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager == null) return;
+            AudioAttributes attributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                        .setAudioAttributes(attributes)
+                        .setWillPauseWhenDucked(false)
+                        .build();
+                audioManager.requestAudioFocus(audioFocusRequest);
+            } else {
+                audioManager.requestAudioFocus(null, AudioManager.STREAM_ALARM,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            }
+        } catch (Exception ignored) { }
+    }
+
+    private static void releaseAudioFocus() {
+        try {
+            if (audioManager == null) return;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioFocusRequest != null) {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            } else {
+                audioManager.abandonAudioFocus(null);
+            }
+        } catch (Exception ignored) { }
+        audioFocusRequest = null;
+        audioManager = null;
     }
 
     public static void stopCurrent(Context context) {
@@ -119,6 +182,11 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 try { activePlayer.stop(); } catch (Exception ignored) { }
                 try { activePlayer.release(); } catch (Exception ignored) { }
                 activePlayer = null;
+            }
+            releaseAudioFocus();
+            if (wakeLock != null) {
+                try { if (wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) { }
+                wakeLock = null;
             }
             Context app = context.getApplicationContext();
             int id = activeNotificationId;
@@ -131,9 +199,11 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private static void playAlarmSound(Context context, String sound) {
+    private static boolean playAlarmSound(Context context, String sound) {
         synchronized (SleepRiseAlarmReceiver.class) {
             stopCurrent(context);
+            acquireWakeLock(context);
+            requestAudioFocus(context);
             String safe = String.valueOf(sound == null ? "phone_alarm" : sound)
                     .replace(".mp3", "")
                     .replace(".wav", "")
@@ -142,10 +212,10 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
             int resource = context.getResources().getIdentifier(safe, "raw", context.getPackageName());
             if (resource == 0) resource = context.getResources().getIdentifier("phone_alarm", "raw", context.getPackageName());
             if (resource == 0) resource = context.getResources().getIdentifier("alarm_default", "raw", context.getPackageName());
-            if (resource == 0) return;
+            if (resource == 0) return false;
             try {
                 MediaPlayer player = MediaPlayer.create(context, resource);
-                if (player == null) return;
+                if (player == null) return false;
                 AudioAttributes attributes = new AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .setUsage(AudioAttributes.USAGE_ALARM)
@@ -155,7 +225,14 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 player.setVolume(1.0f, 1.0f);
                 player.start();
                 activePlayer = player;
-            } catch (Exception ignored) { }
+                return true;
+            } catch (Exception ignored) {
+                if (activePlayer != null) {
+                    try { activePlayer.release(); } catch (Exception ignoredAgain) { }
+                    activePlayer = null;
+                }
+                return false;
+            }
         }
     }
 
@@ -185,6 +262,9 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 .setAutoCancel(false)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(content);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) builder.setFullScreenIntent(content, true);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) manager.notify(notificationId, builder.build());
@@ -205,6 +285,18 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) flags |= PendingIntent.FLAG_IMMUTABLE;
         return PendingIntent.getBroadcast(context, id, intent, flags);
+    }
+
+    private static PendingIntent showIntent(Context context, int id, String alarmId, String locale) {
+        Intent show = new Intent(context, MainActivity.class)
+                .setAction(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
+                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra("SLEEPRISE_ALARM_ID", alarmId == null ? "" : alarmId)
+                .putExtra("SLEEPRISE_ALARM_LOCALE", normalizeLocale(locale));
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) flags |= PendingIntent.FLAG_IMMUTABLE;
+        return PendingIntent.getActivity(context, 900000 + Math.max(0, id), show, flags);
     }
 
     public static void rescheduleSaved(Context context) {

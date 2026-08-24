@@ -12,6 +12,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.WebView;
 import android.app.NotificationManager;
+import android.app.AlarmManager;
 import android.provider.Settings;
 
 import androidx.annotation.NonNull;
@@ -233,6 +234,54 @@ public class MainActivity extends BridgeActivity {
                     startActivity(settings);
                 } catch (Exception ignored) { }
             }
+        }
+
+        @JavascriptInterface
+        public boolean isNotificationGranted() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true;
+            return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+
+        @JavascriptInterface
+        public void openNotificationSettings() {
+            try {
+                Intent settings = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                startActivity(settings);
+            } catch (Exception ignored) { }
+        }
+
+        @JavascriptInterface
+        public boolean canScheduleExactAlarms() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true;
+            AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            return manager == null || manager.canScheduleExactAlarms();
+        }
+
+        @JavascriptInterface
+        public void openExactAlarmSettings() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                try {
+                    Intent settings = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                            .setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(settings);
+                } catch (Exception ignored) { }
+            }
+        }
+
+        @JavascriptInterface
+        public boolean isIgnoringBatteryOptimizations() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+            android.os.PowerManager power = (android.os.PowerManager) getSystemService(POWER_SERVICE);
+            return power == null || power.isIgnoringBatteryOptimizations(getPackageName());
+        }
+
+        @JavascriptInterface
+        public void openBatteryOptimizationSettings() {
+            try {
+                startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+            } catch (Exception ignored) { }
         }
     }
 

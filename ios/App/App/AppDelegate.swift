@@ -11,7 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         do {
             let audio = AVAudioSession.sharedInstance()
-            try audio.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try audio.setCategory(.playback, mode: .default, options: [.duckOthers])
             try audio.setActive(true)
         } catch {
             NSLog("SleepRise audio session setup failed: %@", String(describing: error))

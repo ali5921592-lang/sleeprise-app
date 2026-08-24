@@ -14,7 +14,7 @@
   "plugins": {
     "LocalNotifications": {
       "iconColor": "#00B899",
-      "sound": "alarm_default.wav",
+      "sound": "alarm_default_loop.wav",
       "presentationOptions": [
         "badge",
         "sound",
