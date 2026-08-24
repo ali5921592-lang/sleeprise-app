@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.KeyEvent;
 import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
@@ -52,6 +53,8 @@ public class MainActivity extends BridgeActivity {
         webView.addJavascriptInterface(new SleepRiseTtsBridge(), "SleepRiseTTS");
         webView.addJavascriptInterface(new SleepRiseBuildBridge(), "SleepRiseBuild");
         webView.addJavascriptInterface(new SleepRiseNativeBridge(), "SleepRiseNative");
+        webView.addJavascriptInterface(new SleepRiseAlarmBridge(), "SleepRiseAlarmNative");
+        webView.postDelayed(() -> dispatchNativeAlarmIntent(getIntent()), 900);
 
         webView.setWebChromeClient(new BridgeWebChromeClient(getBridge()) {
             @Override
@@ -165,6 +168,24 @@ public class MainActivity extends BridgeActivity {
         else request.grant(granted.toArray(new String[0]));
     }
 
+    private final class SleepRiseAlarmBridge {
+        @JavascriptInterface
+        public void scheduleAlarm(int id, long atMillis, String sound, String alarmId) {
+            SleepRiseAlarmReceiver.schedule(MainActivity.this, id, atMillis, sound, alarmId);
+        }
+
+        @JavascriptInterface
+        public void cancelAll() {
+            SleepRiseAlarmReceiver.cancelAll(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void stopAlarmSound() {
+            SleepRiseAlarmService.stop(MainActivity.this);
+            SleepRiseAlarmReceiver.stopCurrent(MainActivity.this);
+        }
+    }
+
     private final class SleepRiseNativeBridge {
         @JavascriptInterface
         public void setAlarmActive(boolean active) { alarmActive = active; }
@@ -190,6 +211,24 @@ public class MainActivity extends BridgeActivity {
             });
             return false;
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        dispatchNativeAlarmIntent(intent);
+    }
+
+    private void dispatchNativeAlarmIntent(Intent intent) {
+        if (intent == null) return;
+        String alarmId = intent.getStringExtra("SLEEPRISE_ALARM_ID");
+        if (alarmId == null || alarmId.isEmpty()) return;
+        String escaped = alarmId.replace("\\", "\\\\").replace("'", "\\'");
+        WebView webView = getBridge().getWebView();
+        webView.postDelayed(() -> webView.evaluateJavascript(
+                "window.SleepRiseNativeAlarmAction && window.SleepRiseNativeAlarmAction('" + escaped + "')", null),
+                webView.getUrl() == null ? 900 : 120);
     }
 
     @Override

@@ -2031,7 +2031,7 @@ function playTone(e,t,a){if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=AUDIO+SLE
       fire=function(e){
         const p=e&&e.taskProfile;
         const ts=e&&Array.isArray(e.tasks)&&e.tasks.length?e.tasks.slice():tasksFor(p||'gentle');
-        const clean=ts.filter(t=>['math','memory','typing','steps','shake','barcode','call','none'].includes(t)).map(t=>t==='barcode'&&!e.barcode?'steps':t);
+        const allowedTasks=['none','typing','steps','shake','math','memory','barcode','call','random','pushups','situps','squats','pullups','burpees','object'];const clean=ts.filter(t=>allowedTasks.includes(t)).map(t=>t==='barcode'&&!e.barcode?'steps':t);
         const normalized={...e,tasks:clean.length?clean:['math'],task:(clean[0]||e.task||'math'),auto:false};
         coreFire(normalized);
         try{if(ringing){ringing.tasks=normalized.tasks.slice();ringing.__srTaskIndex=0;ringing.__srTaskComplete=false}}catch(x){}
@@ -3177,11 +3177,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const nativeIds=()=>{try{return JSON.parse(localStorage.getItem('sleeprise_v49_native_ids')||'[]')}catch(e){return[]}};
   const saveNativeIds=x=>{try{localStorage.setItem('sleeprise_v49_native_ids',JSON.stringify(x))}catch(e){}};
   function alarmOccurrences(a,limit=14){const out=[],now=new Date();for(let day=0;day<32&&out.length<limit;day++){const d=new Date(now);d.setDate(now.getDate()+day);d.setHours(a.h,a.m,0,0);if(d<=now)continue;if(!a.days?.length||a.days.includes(d.getDay()))out.push(d)}return out}
-  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}const active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_v53_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:base,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,a.days?.length?14:1)){const id=300000+(seq++);ids.push(id);notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_v53_'+base,sound:window.Capacitor?.getPlatform?.()==='ios'?'alarm_default.wav':base,ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
+  async function syncNativeAlarms(){const ln=nativePlugin();if(!ln||typeof alarms==='undefined')return{ok:false,reason:'not-native'};try{const p=await ln.checkPermissions();if(p.display!=='granted'){const r=await ln.requestPermissions();if(r.display!=='granted'){notifyV49('Bildirim izni verilmedi; alarm uygulama kapalıyken çalışmayabilir.');return{ok:false,reason:'permission'}}}const old=nativeIds();if(old.length)try{await ln.cancel({notifications:old.map(id=>({id}))})}catch(e){}try{window.SleepRiseAlarmNative?.cancelAll?.()}catch(e){}const nativeAlarm=window.SleepRiseAlarmNative,active=alarms.filter(a=>a.on),notes=[],ids=[];let seq=0;for(const a of active){const base=(toneFiles[a.tone]||toneFiles.phoneAlarm).replace(/\.mp3$/,'').replace(/[^a-z0-9_]/gi,'_').toLowerCase();try{await ln.createChannel({id:'sleeprise_alarm_v81_'+base,name:'SleepRise · '+(a.label||'Alarm'),description:'SleepRise alarm sound',importance:5,sound:null,vibration:true,lights:true})}catch(e){}for(const when of alarmOccurrences(a,a.days?.length?14:1)){const id=300000+(seq++);ids.push(id);try{nativeAlarm?.scheduleAlarm?.(id,when.getTime(),base,String(a.id))}catch(e){}notes.push({id,title:'SleepRise · '+String(a.h).padStart(2,'0')+':'+String(a.m).padStart(2,'0'),body:a.label||'Uyanma zamanı geldi.',schedule:{at:when,allowWhileIdle:true},channelId:'sleeprise_alarm_v81_'+base,sound:window.Capacitor?.getPlatform?.()==='ios'?'alarm_default.wav':null,ongoing:true,autoCancel:false,extra:{alarmId:a.id,tone:a.tone,radioUrl:(()=>{try{return JSON.parse(localStorage.getItem('sleeprise_features_v42_radio')||'{}').url||''}catch(e){return ''}})()}})}}if(nativeAlarm&&typeof nativeAlarm.scheduleAlarm==='function')notes.length=0;if(notes.length)await ln.schedule({notifications:notes});saveNativeIds(ids);try{const ex=ln.checkExactNotificationSetting?await ln.checkExactNotificationSetting():null;if(ex&&ex.status&&ex.status!=='granted')notifyV49(langText('exactAlarm','Android Ayarlar > Uygulamalar > SleepRise > Alarmlar ve hatırlatıcılar iznini aç.'))}catch(e){}if(notes.length)notifyV49(langText('nativeAlarm','Alarm cihazda kaydedildi'));return{ok:true,count:notes.length}}catch(err){console.warn('SleepRise native alarms',err);notifyV49('Cihaz alarmı kaydedilemedi; bildirim izinlerini kontrol et.');return{ok:false,reason:String(err)}}}
   function hookNativeScheduling(){
     const oldRefresh=window.refresh;if(typeof oldRefresh==='function'&&!oldRefresh.__v49){const wrapped=function(){const r=oldRefresh.apply(this,arguments);setTimeout(syncNativeAlarms,120);return r};wrapped.__v49=true;window.refresh=wrapped}
     setTimeout(syncNativeAlarms,1400);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(syncNativeAlarms,300)});
-    const ln=nativePlugin();if(ln&&ln.addListener)ln.addListener('localNotificationActionPerformed',ev=>{const x=ev.notification?.extra||{},a=typeof alarms!=='undefined'&&alarms.find(z=>String(z.id)===String(x.alarmId));if(a&&typeof fire==='function')fire(a);if(x.radioUrl){try{const ra=new Audio(x.radioUrl);ra.dataset.sr69UserStarted='1';ra.loop=true;ra.volume=.8;ra.play().catch(()=>notifyV49('Radyo için ekrana dokunarak aç.'))}catch(e){}}});
+    const ln=nativePlugin();if(ln&&ln.addListener){const handleAlarmNotification=ev=>{const x=ev.notification?.extra||{};try{window.SleepRiseAlarmNative?.stopAlarmSound?.()}catch(e){}const a=typeof alarms!=='undefined'&&alarms.find(z=>String(z.id)===String(x.alarmId));if(a&&typeof fire==='function')fire(a);if(x.radioUrl){try{const ra=new Audio(x.radioUrl);ra.dataset.sr69UserStarted='1';ra.loop=true;ra.volume=.8;ra.play().catch(()=>notifyV49('Radyo için ekrana dokunarak aç.'))}catch(e){}}};ln.addListener('localNotificationActionPerformed',handleAlarmNotification);ln.addListener('localNotificationReceived',handleAlarmNotification)}
   }
   function setupRealFire(){
     const grid=q('#mixGrid');if(!grid||grid.dataset.v49fire==='1')return;grid.dataset.v49fire='1';let fireAudio=null;const stop=()=>{if(fireAudio){try{fireAudio.pause();fireAudio.currentTime=0}catch(e){}fireAudio=null}};document.addEventListener('click',e=>{const tap=e.target.closest('[data-tap="fire"]');if(!tap)return;e.preventDefault();e.stopImmediatePropagation();if(fireAudio){stop();return}try{fireAudio=new Audio('audio/fireplace-crackle-cc0.mp3');fireAudio.dataset.sr69UserStarted='1';fireAudio.loop=true;fireAudio.volume=.42;fireAudio.play().catch(()=>notifyV49('Şömine sesini başlatmak için ekrana dokun.'))}catch(err){}},true);document.addEventListener('input',e=>{const v=e.target.closest('[data-vol="fire"]');if(v&&fireAudio)fireAudio.volume=Number(v.value)/100*.65},true);q('#v49MixerOff')?.addEventListener('click',stop);window.addEventListener('pagehide',stop)}
@@ -4018,3 +4018,41 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- SLEEPRISE_REVIEW_MODE_V74_END -->
+
+<!-- SLEEPRISE_V81_NATIVE_ALARM_STOP_START -->
+<script id="sleeprise-v81-native-alarm-stop">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV81NativeAlarmStop)return;
+  window.__SleepRiseV81NativeAlarmStop=true;
+  const stop=()=>{try{window.SleepRiseAlarmNative?.stopAlarmSound?.()}catch(e){}};
+  const bind=()=>{
+    try{
+      if(typeof window.fire==='function'&&!window.fire.__sr81NativeStop){const core=window.fire;const wrapped=function(){stop();return core.apply(this,arguments)};wrapped.__sr81NativeStop=true;window.fire=wrapped}
+      if(typeof window.finishDismiss==='function'&&!window.finishDismiss.__sr81NativeStop){const core=window.finishDismiss;const wrapped=function(){stop();return core.apply(this,arguments)};wrapped.__sr81NativeStop=true;window.finishDismiss=wrapped}
+    }catch(e){}
+  };
+  bind();setTimeout(bind,500);setTimeout(bind,1600);
+})();
+</script>
+<!-- SLEEPRISE_V81_NATIVE_ALARM_STOP_END -->
+
+<!-- SLEEPRISE_V81_NATIVE_ACTION_START -->
+<script id="sleeprise-v81-native-action">
+(function(){
+  'use strict';
+  if(window.__SleepRiseV81NativeAction)return;
+  window.__SleepRiseV81NativeAction=true;
+  window.SleepRiseNativeAlarmAction=function(alarmId){
+    try{
+      if(window.SleepRiseAlarmNative?.stopAlarmSound)window.SleepRiseAlarmNative.stopAlarmSound();
+      const list=typeof alarms!=='undefined'&&Array.isArray(alarms)?alarms:[];
+      const alarm=list.find(a=>String(a.id)===String(alarmId));
+      if(!alarm||typeof window.fire!=='function')return false;
+      window.fire({...alarm,auto:false});
+      return true;
+    }catch(e){return false}
+  };
+})();
+</script>
+<!-- SLEEPRISE_V81_NATIVE_ACTION_END -->
