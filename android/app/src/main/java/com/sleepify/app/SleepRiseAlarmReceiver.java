@@ -51,22 +51,24 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         int id = intent.getIntExtra("notificationId", -1);
         String sound = intent.getStringExtra("sound");
         String alarmId = intent.getStringExtra("alarmId");
+        String locale = intent.getStringExtra("locale");
         try {
-            SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId);
+            SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId, locale);
         } catch (Exception error) {
             // Fallback for devices that reject a foreground-service start.
             playAlarmSound(context.getApplicationContext(), sound);
-            showAlarmNotification(context.getApplicationContext(), id, alarmId);
+            showAlarmNotification(context.getApplicationContext(), id, alarmId, locale);
         }
     }
 
-    public static void schedule(Context context, int id, long atMillis, String sound, String alarmId) {
+    public static void schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale) {
         Context app = context.getApplicationContext();
         Intent intent = new Intent(app, SleepRiseAlarmReceiver.class)
                 .setAction(ACTION_FIRE)
                 .putExtra("notificationId", id)
                 .putExtra("sound", sound == null ? "phone_alarm" : sound)
-                .putExtra("alarmId", alarmId == null ? "" : alarmId);
+                .putExtra("alarmId", alarmId == null ? "" : alarmId)
+                .putExtra("locale", normalizeLocale(locale));
         PendingIntent pending = pendingIntent(app, id, intent);
         AlarmManager alarmManager = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager == null) return;
@@ -87,6 +89,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 .putLong("at_" + id, trigger)
                 .putString("sound_" + id, sound == null ? "phone_alarm" : sound)
                 .putString("alarm_" + id, alarmId == null ? "" : alarmId)
+                .putString("locale_" + id, normalizeLocale(locale))
                 .apply();
     }
 
@@ -156,7 +159,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private static void showAlarmNotification(Context context, int id, String alarmId) {
+    private static void showAlarmNotification(Context context, int id, String alarmId, String locale) {
         ensureChannel(context);
         int notificationId = NOTIFICATION_BASE + Math.max(0, id);
         activeNotificationId = notificationId;
@@ -173,8 +176,8 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(com.sleepify.app.R.mipmap.ic_launcher)
-                .setContentTitle("SleepRise")
-                .setContentText("Alarm çalıyor · görevi tamamla")
+                .setContentTitle("SleepRise · " + notificationTitle(locale))
+                .setContentText(notificationBody(locale))
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -212,8 +215,42 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 int id = Integer.parseInt(value);
                 long at = prefs.getLong("at_" + id, 0L);
                 if (at <= System.currentTimeMillis() + 1000L) continue;
-                schedule(context, id, at, prefs.getString("sound_" + id, "phone_alarm"), prefs.getString("alarm_" + id, ""));
+                schedule(context, id, at, prefs.getString("sound_" + id, "phone_alarm"), prefs.getString("alarm_" + id, ""), prefs.getString("locale_" + id, "en"));
             } catch (Exception ignored) { }
+        }
+    }
+
+    private static String normalizeLocale(String locale) {
+        String value = locale == null ? "en" : locale.toLowerCase();
+        if (value.length() > 2) value = value.substring(0, 2);
+        return value;
+    }
+
+    private static String notificationTitle(String locale) {
+        switch (normalizeLocale(locale)) {
+            case "tr": return "Alarm";
+            case "es": return "Alarma";
+            case "de": return "Alarm";
+            case "fr": return "Alarme";
+            case "pt": return "Alarme";
+            case "ar": return "منبه";
+            case "zh": return "闹钟";
+            case "ja": return "アラーム";
+            default: return "Alarm";
+        }
+    }
+
+    private static String notificationBody(String locale) {
+        switch (normalizeLocale(locale)) {
+            case "tr": return "Alarm çalıyor · görevi tamamla";
+            case "es": return "La alarma está sonando · completa la tarea";
+            case "de": return "Der Alarm klingelt · Aufgabe erledigen";
+            case "fr": return "L’alarme sonne · terminez la tâche";
+            case "pt": return "O alarme está tocando · conclua a tarefa";
+            case "ar": return "المنبه يرن · أكمل المهمة";
+            case "zh": return "闹钟正在响 · 完成任务";
+            case "ja": return "アラームが鳴っています · タスクを完了してください";
+            default: return "The alarm is ringing · complete the task";
         }
     }
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
 import android.content.Intent;
 import android.view.KeyEvent;
 import android.speech.tts.TextToSpeech;
@@ -170,8 +171,8 @@ public class MainActivity extends BridgeActivity {
 
     private final class SleepRiseAlarmBridge {
         @JavascriptInterface
-        public void scheduleAlarm(int id, long atMillis, String sound, String alarmId) {
-            SleepRiseAlarmReceiver.schedule(MainActivity.this, id, atMillis, sound, alarmId);
+        public void scheduleAlarm(int id, long atMillis, String sound, String alarmId, String locale) {
+            SleepRiseAlarmReceiver.schedule(MainActivity.this, id, atMillis, sound, alarmId, locale);
         }
 
         @JavascriptInterface
@@ -225,10 +226,19 @@ public class MainActivity extends BridgeActivity {
         String alarmId = intent.getStringExtra("SLEEPRISE_ALARM_ID");
         if (alarmId == null || alarmId.isEmpty()) return;
         String escaped = alarmId.replace("\\", "\\\\").replace("'", "\\'");
-        WebView webView = getBridge().getWebView();
+        dispatchNativeAlarmIntent(getBridge().getWebView(), escaped, 0);
+    }
+
+    private void dispatchNativeAlarmIntent(WebView webView, String escapedAlarmId, int attempt) {
+        if (webView == null || isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isDestroyed())) return;
+        long delay = attempt == 0 ? (webView.getUrl() == null ? 700L : 120L) : 250L;
         webView.postDelayed(() -> webView.evaluateJavascript(
-                "window.SleepRiseNativeAlarmAction && window.SleepRiseNativeAlarmAction('" + escaped + "')", null),
-                webView.getUrl() == null ? 900 : 120);
+                "typeof window.SleepRiseNativeAlarmAction === 'function' ? String(window.SleepRiseNativeAlarmAction('" + escapedAlarmId + "')) : 'waiting'",
+                result -> {
+                    if (attempt < 20 && (result == null || result.contains("waiting") || result.contains("false"))) {
+                        dispatchNativeAlarmIntent(webView, escapedAlarmId, attempt + 1);
+                    }
+                }), delay);
     }
 
     @Override

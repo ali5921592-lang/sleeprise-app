@@ -24,12 +24,13 @@ public class SleepRiseAlarmService extends Service {
     private static MediaPlayer player;
     private static int notificationId = -1;
 
-    public static void start(Context context, int id, String sound, String alarmId) {
+    public static void start(Context context, int id, String sound, String alarmId, String locale) {
         Intent intent = new Intent(context.getApplicationContext(), SleepRiseAlarmService.class)
                 .setAction(ACTION_START)
                 .putExtra("notificationId", id)
                 .putExtra("sound", sound == null ? "phone_alarm" : sound)
-                .putExtra("alarmId", alarmId == null ? "" : alarmId);
+                .putExtra("alarmId", alarmId == null ? "" : alarmId)
+                .putExtra("locale", normalizeLocale(locale));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {
@@ -54,9 +55,10 @@ public class SleepRiseAlarmService extends Service {
             int id = intent.getIntExtra("notificationId", -1);
             String sound = intent.getStringExtra("sound");
             String alarmId = intent.getStringExtra("alarmId");
+            String locale = intent.getStringExtra("locale");
             ensureChannel(this);
             notificationId = NOTIFICATION_BASE + Math.max(0, id);
-            startForeground(notificationId, buildNotification(this, alarmId));
+            startForeground(notificationId, buildNotification(this, alarmId, locale));
             play(this, sound);
         }
         return START_STICKY;
@@ -97,7 +99,7 @@ public class SleepRiseAlarmService extends Service {
         } catch (Exception ignored) { }
     }
 
-    private static Notification buildNotification(Context context, String alarmId) {
+    private static Notification buildNotification(Context context, String alarmId, String locale) {
         Intent open = new Intent(context, MainActivity.class)
                 .setAction(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -108,8 +110,8 @@ public class SleepRiseAlarmService extends Service {
         PendingIntent pending = PendingIntent.getActivity(context, notificationId, open, flags);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(com.sleepify.app.R.mipmap.ic_launcher)
-                .setContentTitle("SleepRise")
-                .setContentText("Alarm çalıyor · görevi tamamla")
+                .setContentTitle("SleepRise · " + notificationTitle(locale))
+                .setContentText(notificationBody(locale))
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -131,6 +133,40 @@ public class SleepRiseAlarmService extends Service {
         // The actual tone is played by MediaPlayer with USAGE_ALARM, so the OS alarm volume is used.
         channel.setSound(null, null);
         manager.createNotificationChannel(channel);
+    }
+
+    private static String normalizeLocale(String locale) {
+        String value = locale == null ? "en" : locale.toLowerCase();
+        if (value.length() > 2) value = value.substring(0, 2);
+        return value;
+    }
+
+    private static String notificationTitle(String locale) {
+        switch (normalizeLocale(locale)) {
+            case "tr": return "Alarm";
+            case "es": return "Alarma";
+            case "de": return "Alarm";
+            case "fr": return "Alarme";
+            case "pt": return "Alarme";
+            case "ar": return "منبه";
+            case "zh": return "闹钟";
+            case "ja": return "アラーム";
+            default: return "Alarm";
+        }
+    }
+
+    private static String notificationBody(String locale) {
+        switch (normalizeLocale(locale)) {
+            case "tr": return "Alarm çalıyor · görevi tamamla";
+            case "es": return "La alarma está sonando · completa la tarea";
+            case "de": return "Der Alarm klingelt · Aufgabe erledigen";
+            case "fr": return "L’alarme sonne · terminez la tâche";
+            case "pt": return "O alarme está tocando · conclua a tarefa";
+            case "ar": return "المنبه يرن · أكمل المهمة";
+            case "zh": return "闹钟正在响 · 完成任务";
+            case "ja": return "アラームが鳴っています · タスクを完了してください";
+            default: return "The alarm is ringing · complete the task";
+        }
     }
 
     private static void release(Context context) {
