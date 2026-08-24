@@ -32,6 +32,7 @@ import java.util.Locale;
 public class MainActivity extends BridgeActivity {
     private static final int REQUEST_MEDIA = 4107;
     private PermissionRequest pendingMediaRequest;
+    private boolean pendingCameraBridgeRequest = false;
     private TextToSpeech sleepRiseTts;
     private boolean alarmActive = false;
 
@@ -42,6 +43,7 @@ public class MainActivity extends BridgeActivity {
         WebView webView = getBridge().getWebView();
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         sleepRiseTts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS && sleepRiseTts != null) {
                 sleepRiseTts.setLanguage(Locale.forLanguageTag("tr-TR"));
@@ -95,7 +97,7 @@ public class MainActivity extends BridgeActivity {
 
     private void handleWebMediaRequest(PermissionRequest request) {
         Uri origin = request.getOrigin();
-        if (origin == null || !"https".equalsIgnoreCase(origin.getScheme())) {
+        if (origin == null || !isAllowedMediaOrigin(origin)) {
             request.deny();
             return;
         }
@@ -130,10 +132,21 @@ public class MainActivity extends BridgeActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode != REQUEST_MEDIA || pendingMediaRequest == null) return;
-        PermissionRequest request = pendingMediaRequest;
-        pendingMediaRequest = null;
-        grantRequestedMedia(request);
+        if (requestCode != REQUEST_MEDIA) return;
+        if (pendingMediaRequest != null) {
+            PermissionRequest request = pendingMediaRequest;
+            pendingMediaRequest = null;
+            grantRequestedMedia(request);
+            return;
+        }
+        if (pendingCameraBridgeRequest) {
+            pendingCameraBridgeRequest = false;
+            boolean granted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED;
+            getBridge().getWebView().evaluateJavascript(
+                    "window.SleepRiseCameraPermissionResult && window.SleepRiseCameraPermissionResult(" + granted + ")",
+                    null);
+        }
     }
 
     private void grantRequestedMedia(PermissionRequest request) {
@@ -155,6 +168,28 @@ public class MainActivity extends BridgeActivity {
     private final class SleepRiseNativeBridge {
         @JavascriptInterface
         public void setAlarmActive(boolean active) { alarmActive = active; }
+
+        @JavascriptInterface
+        public boolean isCameraGranted() {
+            return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+
+        @JavascriptInterface
+        public boolean requestCameraPermission() {
+            if (isCameraGranted()) return true;
+            runOnUiThread(() -> {
+                if (isCameraGranted()) {
+                    getBridge().getWebView().evaluateJavascript(
+                            "window.SleepRiseCameraPermissionResult && window.SleepRiseCameraPermissionResult(true)", null);
+                    return;
+                }
+                pendingCameraBridgeRequest = true;
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.CAMERA}, REQUEST_MEDIA);
+            });
+            return false;
+        }
     }
 
     @Override
@@ -185,6 +220,13 @@ public class MainActivity extends BridgeActivity {
             sleepRiseTts.shutdown();
         }
         super.onDestroy();
+    }
+
+    private boolean isAllowedMediaOrigin(Uri origin) {
+        if ("https".equalsIgnoreCase(origin.getScheme())) return true;
+        String host = origin.getHost();
+        return "http".equalsIgnoreCase(origin.getScheme())
+                && ("localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host));
     }
 
     private boolean hasResource(PermissionRequest request, String resource) {
