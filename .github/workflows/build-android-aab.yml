@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   build-release-aab:
@@ -48,22 +49,19 @@ jobs:
             echo "ANDROID_KEY_ALIAS=$EXISTING_KEY_ALIAS" >> "$GITHUB_ENV"
             echo "ANDROID_KEY_PASSWORD=$EXISTING_KEY_PASSWORD" >> "$GITHUB_ENV"
           else
-            echo "::warning::Existing Android signing secret is missing or invalid; generating a new upload keystore for this build."
-            rm -f "$KEYSTORE"
-            STORE_PASSWORD="$(openssl rand -hex 24)"
-            KEY_ALIAS="sleeprise-upload"
-            KEY_PASSWORD="$STORE_PASSWORD"
-            keytool -genkeypair -noprompt \
-              -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
-              -storetype JKS -keystore "$KEYSTORE" \
-              -storepass "$STORE_PASSWORD" -keypass "$KEY_PASSWORD" \
-              -dname "CN=SleepRise, OU=Mobile, O=SleepRise, L=Istanbul, ST=Istanbul, C=TR" >/dev/null 2>&1
-            printf 'ANDROID_KEYSTORE_PASSWORD=%s\nANDROID_KEY_ALIAS=%s\nANDROID_KEY_PASSWORD=%s\n' "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > "$GITHUB_WORKSPACE/android/signing.env"
-            chmod 600 "$KEYSTORE" "$GITHUB_WORKSPACE/android/signing.env"
-            echo "SLEEPRISE_SIGNING_SOURCE=generated" >> "$GITHUB_ENV"
-            echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
-            echo "ANDROID_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
-            echo "ANDROID_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "::notice::Release signing secret unavailable; restoring the last verified SleepRise upload key backup."
+            BACKUP_DIR="$RUNNER_TEMP/sleeprise-upload-key-backup"
+            rm -rf "$BACKUP_DIR"
+            if ! GH_TOKEN="${{ github.token }}" gh run download 32244934903 --repo "$GITHUB_REPOSITORY" --name sleeprise-upload-key-backup --dir "$BACKUP_DIR"; then
+              echo "::error::No verified upload key is available. Refusing to generate a new key for an existing Play app."
+              exit 1
+            fi
+            cp "$BACKUP_DIR/sleeprise-upload-key.jks" "$KEYSTORE"
+            chmod 600 "$KEYSTORE"
+            test -s "$BACKUP_DIR/signing.env"
+            cat "$BACKUP_DIR/signing.env" >> "$GITHUB_ENV"
+            echo "SLEEPRISE_SIGNING_SOURCE=verified-backup" >> "$GITHUB_ENV"
+            keytool -list -keystore "$KEYSTORE" -storepass "$(grep '^ANDROID_KEYSTORE_PASSWORD=' "$BACKUP_DIR/signing.env" | cut -d= -f2-)" -alias "$(grep '^ANDROID_KEY_ALIAS=' "$BACKUP_DIR/signing.env" | cut -d= -f2-)" >/dev/null 2>&1
           fi
           test -s "$KEYSTORE"
 
@@ -87,24 +85,13 @@ jobs:
           test -n "$ANDROID_KEY_PASSWORD"
           chmod +x android/gradlew
           cd android
-          ./gradlew bundleRelease --no-daemon
+          ./gradlew bundleRelease --no-daemon -PversionCode="${GITHUB_RUN_NUMBER}" -PversionName="1.0"
 
       - name: İmzalı AAB artefaktını yükle
         uses: actions/upload-artifact@v4
         with:
           name: sleeprise-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Yeni oluşturulan imzalama materyalini yükle
-        if: env.SLEEPRISE_SIGNING_SOURCE == 'generated'
-        uses: actions/upload-artifact@v4
-        with:
-          name: sleeprise-upload-key-backup
-          path: |
-            android/sleeprise-upload-key.jks
-            android/signing.env
           if-no-files-found: error
           retention-days: 14
 

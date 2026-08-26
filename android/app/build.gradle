@@ -5,6 +5,8 @@ def releaseStorePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
 def releaseKeyAlias = System.getenv('ANDROID_KEY_ALIAS')
 def releaseKeyPassword = System.getenv('ANDROID_KEY_PASSWORD')
 def hasReleaseSigning = releaseKeystorePath && file(releaseKeystorePath).exists() && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+def releaseVersionCode = (project.findProperty('versionCode') ?: System.getenv('ANDROID_VERSION_CODE') ?: '1').toString().toInteger()
+def releaseVersionName = (project.findProperty('versionName') ?: System.getenv('ANDROID_VERSION_NAME') ?: '1.0').toString()
 
 android {
     namespace "com.sleepify.app"
@@ -13,8 +15,8 @@ android {
         applicationId "com.sleepify.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode releaseVersionCode
+        versionName releaseVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
