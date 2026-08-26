@@ -49,10 +49,10 @@ jobs:
             echo "ANDROID_KEY_ALIAS=$EXISTING_KEY_ALIAS" >> "$GITHUB_ENV"
             echo "ANDROID_KEY_PASSWORD=$EXISTING_KEY_PASSWORD" >> "$GITHUB_ENV"
           else
-            echo "::notice::Release signing secret unavailable; restoring the last verified SleepRise upload key backup."
+            echo "::notice::Release signing secret unavailable; restoring the verified Play upload key backup from run 32144480128."
             BACKUP_DIR="$RUNNER_TEMP/sleeprise-upload-key-backup"
             rm -rf "$BACKUP_DIR"
-            if ! GH_TOKEN="${{ github.token }}" gh run download 32244934903 --repo "$GITHUB_REPOSITORY" --name sleeprise-upload-key-backup --dir "$BACKUP_DIR"; then
+            if ! GH_TOKEN="${{ github.token }}" gh run download 32144480128 --repo "$GITHUB_REPOSITORY" --name sleeprise-upload-key-backup --dir "$BACKUP_DIR"; then
               echo "::error::No verified upload key is available. Refusing to generate a new key for an existing Play app."
               exit 1
             fi
