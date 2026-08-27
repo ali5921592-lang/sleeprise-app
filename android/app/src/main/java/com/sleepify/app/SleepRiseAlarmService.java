@@ -23,7 +23,7 @@ import androidx.core.app.NotificationCompat;
 public class SleepRiseAlarmService extends Service {
     public static final String ACTION_START = "com.sleepify.app.SLEEP_RISE_START_SOUND";
     public static final String ACTION_STOP = "com.sleepify.app.SLEEP_RISE_STOP_SOUND";
-    private static final String CHANNEL_ID = "sleeprise_native_alarm_v86";
+    private static final String CHANNEL_ID = "sleeprise_native_alarm_v90";
     private static final int NOTIFICATION_BASE = 720000;
     private static final String STATE_PREFS = "sleeprise_native_alarm_service";
     private static MediaPlayer player;
@@ -33,12 +33,17 @@ public class SleepRiseAlarmService extends Service {
     private static int notificationId = -1;
 
     public static void start(Context context, int id, String sound, String alarmId, String locale) {
+        start(context, id, sound, alarmId, locale, "");
+    }
+
+    public static void start(Context context, int id, String sound, String alarmId, String locale, String radioUrl) {
         Intent intent = new Intent(context.getApplicationContext(), SleepRiseAlarmService.class)
                 .setAction(ACTION_START)
                 .putExtra("notificationId", id)
                 .putExtra("sound", sound == null ? "phone_alarm" : sound)
                 .putExtra("alarmId", alarmId == null ? "" : alarmId)
-                .putExtra("locale", normalizeLocale(locale));
+                .putExtra("locale", normalizeLocale(locale))
+                .putExtra("radioUrl", radioUrl == null ? "" : radioUrl);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {
@@ -66,34 +71,79 @@ public class SleepRiseAlarmService extends Service {
             String sound = intent.getStringExtra("sound");
             String alarmId = intent.getStringExtra("alarmId");
             String locale = intent.getStringExtra("locale");
+            String radioUrl = intent.getStringExtra("radioUrl");
             getSharedPreferences(STATE_PREFS, MODE_PRIVATE).edit()
                     .putBoolean("running", true)
                     .putInt("notificationId", id)
                     .putString("sound", sound == null ? "phone_alarm" : sound)
                     .putString("alarmId", alarmId == null ? "" : alarmId)
                     .putString("locale", locale == null ? "en" : locale)
+                    .putString("radioUrl", radioUrl == null ? "" : radioUrl)
                     .apply();
-            startAlarmPlayback(id, sound, alarmId, locale);
+            startAlarmPlayback(id, sound, alarmId, locale, radioUrl);
         } else if (intent == null) {
             SharedPreferences state = getSharedPreferences(STATE_PREFS, MODE_PRIVATE);
             if (state.getBoolean("running", false)) {
                 startAlarmPlayback(state.getInt("notificationId", -1),
                         state.getString("sound", "phone_alarm"),
                         state.getString("alarmId", ""),
-                        state.getString("locale", "en"));
+                        state.getString("locale", "en"),
+                        state.getString("radioUrl", ""));
             }
         }
         return START_STICKY;
     }
 
-    private void startAlarmPlayback(int id, String sound, String alarmId, String locale) {
+    private boolean playRadio(Context context, String url) {
+        if (url == null || url.trim().isEmpty()) return false;
+        releasePlayer();
+        try {
+            MediaPlayer next = new MediaPlayer();
+            next.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
+            next.setAudioAttributes(new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build());
+            next.setLooping(true);
+            next.setOnPreparedListener(mp -> {
+                try {
+                    if (player != next) { mp.release(); return; }
+                    mp.setVolume(1f, 1f); mp.start();
+                } catch (Exception ignored) { play(context, "phone_alarm"); }
+            });
+            next.setOnErrorListener((mp, what, extra) -> {
+                releasePlayer();
+                play(context, "phone_alarm");
+                return true;
+            });
+            next.setDataSource(context, android.net.Uri.parse(url.trim()));
+            player = next;
+            next.prepareAsync();
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                try {
+                    if (player == next && !next.isPlaying()) {
+                        releasePlayer();
+                        play(context, "phone_alarm");
+                    }
+                } catch (Exception ignored) { }
+            }, 8000L);
+            return true;
+        } catch (Exception ignored) {
+            releasePlayer();
+            return false;
+        }
+    }
+
+    private void startAlarmPlayback(int id, String sound, String alarmId, String locale, String radioUrl) {
         ensureChannel(this);
         notificationId = NOTIFICATION_BASE + Math.max(0, id);
         startForeground(notificationId, buildNotification(this, alarmId, locale));
         acquireWakeLock(this);
         requestAudioFocus(this);
-        if (!play(this, sound)) {
-            if (!play(this, "phone_alarm")) play(this, "alarm_default");
+        if (!(radioUrl != null && !radioUrl.trim().isEmpty() && playRadio(this, radioUrl))) {
+            if (!play(this, sound)) {
+                if (!play(this, "phone_alarm")) play(this, "alarm_default");
+            }
         }
     }
 
@@ -116,7 +166,7 @@ public class SleepRiseAlarmService extends Service {
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .build();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                         .setAudioAttributes(attributes)
                         .setWillPauseWhenDucked(false)
                         .build();
@@ -157,12 +207,17 @@ public class SleepRiseAlarmService extends Service {
         try {
             MediaPlayer next = MediaPlayer.create(context, resource);
             if (next == null) return false;
+            next.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
             next.setAudioAttributes(new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .build());
             next.setLooping(true);
             next.setVolume(1f, 1f);
+            next.setOnErrorListener((mp, what, extra) -> {
+                releasePlayer();
+                return true;
+            });
             next.start();
             player = next;
             return true;
@@ -203,8 +258,8 @@ public class SleepRiseAlarmService extends Service {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null) return;
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "SleepRise alarmı", NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("SleepRise gerçek alarm sesi");
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "SleepRise Alarm", NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription("SleepRise alarm sound");
         channel.enableVibration(true);
         // The actual tone is played by MediaPlayer with USAGE_ALARM, so the OS alarm volume is used.
         channel.setSound(null, null);

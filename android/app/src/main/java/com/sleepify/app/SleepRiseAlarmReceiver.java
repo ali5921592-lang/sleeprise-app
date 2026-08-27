@@ -35,7 +35,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
     private static final String PREFS = "sleeprise_native_alarm_v81";
     private static final String IDS = "ids";
     private static final String ACTIVE_ID = "active_id";
-    private static final String CHANNEL_ID = "sleeprise_native_alarm_v86";
+    private static final String CHANNEL_ID = "sleeprise_native_alarm_v90";
     private static final int NOTIFICATION_BASE = 720000;
 
     private static MediaPlayer activePlayer;
@@ -58,8 +58,9 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         String sound = intent.getStringExtra("sound");
         String alarmId = intent.getStringExtra("alarmId");
         String locale = intent.getStringExtra("locale");
+        String radioUrl = intent.getStringExtra("radioUrl");
         try {
-            SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId, locale);
+            SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId, locale, radioUrl);
         } catch (Exception error) {
             // Fallback for devices that reject a foreground-service start.
             if (!playAlarmSound(context.getApplicationContext(), sound) && !"phone_alarm".equals(sound)) {
@@ -70,13 +71,18 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
     }
 
     public static void schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale) {
+        schedule(context, id, atMillis, sound, alarmId, locale, "");
+    }
+
+    public static void schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale, String radioUrl) {
         Context app = context.getApplicationContext();
         Intent intent = new Intent(app, SleepRiseAlarmReceiver.class)
                 .setAction(ACTION_FIRE)
                 .putExtra("notificationId", id)
                 .putExtra("sound", sound == null ? "phone_alarm" : sound)
                 .putExtra("alarmId", alarmId == null ? "" : alarmId)
-                .putExtra("locale", normalizeLocale(locale));
+                .putExtra("locale", normalizeLocale(locale))
+                .putExtra("radioUrl", radioUrl == null ? "" : radioUrl);
         PendingIntent pending = pendingIntent(app, id, intent);
         AlarmManager alarmManager = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager == null) return;
@@ -106,6 +112,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 .putString("sound_" + id, sound == null ? "phone_alarm" : sound)
                 .putString("alarm_" + id, alarmId == null ? "" : alarmId)
                 .putString("locale_" + id, normalizeLocale(locale))
+                .putString("radio_" + id, radioUrl == null ? "" : radioUrl)
                 .apply();
     }
 
@@ -151,7 +158,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .build();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                         .setAudioAttributes(attributes)
                         .setWillPauseWhenDucked(false)
                         .build();
@@ -220,9 +227,14 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .setUsage(AudioAttributes.USAGE_ALARM)
                         .build();
+                player.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
                 player.setAudioAttributes(attributes);
                 player.setLooping(true);
                 player.setVolume(1.0f, 1.0f);
+                player.setOnErrorListener((mp, what, extra) -> {
+                    stopCurrent(context);
+                    return true;
+                });
                 player.start();
                 activePlayer = player;
                 return true;
@@ -307,7 +319,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 int id = Integer.parseInt(value);
                 long at = prefs.getLong("at_" + id, 0L);
                 if (at <= System.currentTimeMillis() + 1000L) continue;
-                schedule(context, id, at, prefs.getString("sound_" + id, "phone_alarm"), prefs.getString("alarm_" + id, ""), prefs.getString("locale_" + id, "en"));
+                schedule(context, id, at, prefs.getString("sound_" + id, "phone_alarm"), prefs.getString("alarm_" + id, ""), prefs.getString("locale_" + id, "en"), prefs.getString("radio_" + id, ""));
             } catch (Exception ignored) { }
         }
     }
