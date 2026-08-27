@@ -231,7 +231,14 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 player.setAudioAttributes(attributes);
                 player.setLooping(true);
                 player.setVolume(1.0f, 1.0f);
+                final String requestedSound = safe;
                 player.setOnErrorListener((mp, what, extra) -> {
+                    synchronized (SleepRiseAlarmReceiver.class) {
+                        if (activePlayer != player) return true;
+                    }
+                    // Never leave the user with silence after a native player error.
+                    if (!"phone_alarm".equals(requestedSound) && playAlarmSound(context, "phone_alarm")) return true;
+                    if (!"alarm_default".equals(requestedSound) && playAlarmSound(context, "alarm_default")) return true;
                     stopCurrent(context);
                     return true;
                 });
