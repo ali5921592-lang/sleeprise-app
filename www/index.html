@@ -1368,249 +1368,8 @@ function playTone(e,t,a){t=!1;if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=(typ
 
 
 
-<style id="sleeprise-subscription-v52-style">
-.sr-pro-sheet{position:fixed;inset:0;z-index:12000;display:none;align-items:flex-end;justify-content:center;background:rgba(5,13,31,.48);backdrop-filter:blur(8px);padding:18px}.sr-pro-sheet.on{display:flex}.sr-pro-panel{width:min(520px,100%);max-height:min(86vh,720px);overflow:auto;border-radius:26px 26px 18px 18px;background:var(--surface,#fff);color:var(--ink,#10233f);box-shadow:0 26px 70px rgba(3,13,34,.35);padding:20px}.sr-pro-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.sr-pro-head b{font-size:20px;letter-spacing:-.035em}.sr-pro-head p{margin:6px 0 0;color:var(--muted,#6f7f96);font-size:11px;line-height:1.45}.sr-pro-close{width:32px;height:32px;border:1px solid var(--line,#dce5f1);border-radius:50%;background:transparent;color:var(--ink,#10233f);font-size:20px;cursor:pointer}.sr-pro-products{display:grid;gap:10px;margin:18px 0}.sr-pro-product{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--line,#dce5f1);border-radius:17px;background:var(--surface2,#f5f8fc)}.sr-pro-product b{display:block;font-size:13px}.sr-pro-product small{display:block;margin-top:3px;color:var(--muted,#6f7f96);font-size:10px}.sr-pro-product button,.sr-pro-actions button{border:0;border-radius:11px;padding:10px 12px;background:#00a98e;color:#fff;font:800 11px/1 Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap}.sr-pro-product button:disabled{opacity:.55;cursor:wait}.sr-pro-actions{display:flex;gap:8px;flex-wrap:wrap}.sr-pro-actions button.secondary{background:transparent;color:var(--ink,#10233f);border:1px solid var(--line,#dce5f1)}.sr-pro-foot{margin-top:14px;color:var(--muted,#6f7f96);font-size:10px;line-height:1.45}.app.nightmode .sr-pro-panel{background:#171532;color:#f4f5ff}.app.nightmode .sr-pro-product{background:#211e47;border-color:rgba(255,255,255,.12)}.app.nightmode .sr-pro-head p,.app.nightmode .sr-pro-product small,.app.nightmode .sr-pro-foot{color:#bfc5dd}.app.nightmode .sr-pro-close,.app.nightmode .sr-pro-actions button.secondary{color:#f4f5ff;border-color:rgba(255,255,255,.16)}
-@media(prefers-reduced-motion:reduce){.sr-pro-sheet,.sr-pro-panel{animation:none!important;transition:none!important}}
-</style>
-<script id="sleeprise-subscription-v52">
-(function(){
-  'use strict';
-  const CONFIG=Object.freeze({
-    monthly:{id:'com.sleepify.app.pro.monthly',plan:'monthly'},
-    yearly:{id:'com.sleepify.app.pro.yearly',plan:'yearly'},
-    entitlement:'sleeprise_pro_active',source:'sleeprise_pro_source',product:'sleeprise_pro_product'
-  });
-  const q=s=>document.querySelector(s), native=()=>!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
-  const api=()=>window.Capacitor?.Plugins?.NativePurchases||null;
-  const langCode=()=>{const raw=(document.documentElement.lang||'').slice(0,2).toLowerCase();return raw||'en'};
-  const TX={tr:{title:'SleepRise Pro',sub:'Reklamları kaldır ve uygulamanın sakin akışını koru.',month:'Aylık Pro',year:'Yıllık Pro',yearNote:'Daha avantajlı yıllık seçenek',buy:'Abone ol',restore:'Satın alımları geri yükle',manage:'Aboneliği yönet',close:'Kapat',loading:'Mağaza fiyatları yükleniyor…',notReady:'Mağaza ürünleri henüz hazır değil. Google Play Console ve App Store Connect’te ürünleri oluşturduktan sonra tekrar dene.',success:'SleepRise Pro etkin. Reklamlar kaldırıldı.',cancel:'Satın alma iptal edildi.',error:'Satın alma tamamlanamadı. Lütfen tekrar dene.',footer:'Fiyat ve para birimi mağaza tarafından belirlenir; uygulama sabit fiyat dayatmaz.'},en:{title:'SleepRise Pro',sub:'Remove ads and keep the calm flow of the app.',month:'Monthly Pro',year:'Yearly Pro',yearNote:'Better annual value',buy:'Subscribe',restore:'Restore purchases',manage:'Manage subscription',close:'Close',loading:'Loading store prices…',notReady:'Store products are not ready yet. Create them in Google Play Console and App Store Connect, then try again.',success:'SleepRise Pro is active. Ads are removed.',cancel:'Purchase cancelled.',error:'The purchase could not be completed. Please try again.',footer:'Price and currency are supplied by the store; the app does not force a fixed price.'},es:{title:'SleepRise Pro',sub:'Elimina los anuncios y conserva una experiencia tranquila.',month:'Pro mensual',year:'Pro anual',yearNote:'Mejor valor anual',buy:'Suscribirse',restore:'Restaurar compras',manage:'Gestionar suscripción',close:'Cerrar',loading:'Cargando precios de la tienda…',notReady:'Los productos aún no están listos. Créelos en Google Play Console y App Store Connect y vuelva a intentarlo.',success:'SleepRise Pro está activo. Los anuncios se han eliminado.',cancel:'Compra cancelada.',error:'No se pudo completar la compra. Inténtalo de nuevo.',footer:'La tienda proporciona el precio y la moneda; la aplicación no impone un precio fijo.'},de:{title:'SleepRise Pro',sub:'Entferne Anzeigen und bewahre den ruhigen Ablauf.',month:'Pro monatlich',year:'Pro jährlich',yearNote:'Besserer Jahreswert',buy:'Abonnieren',restore:'Käufe wiederherstellen',manage:'Abo verwalten',close:'Schließen',loading:'Store-Preise werden geladen…',notReady:'Store-Produkte sind noch nicht bereit. Erstelle sie in Google Play Console und App Store Connect und versuche es erneut.',success:'SleepRise Pro ist aktiv. Anzeigen wurden entfernt.',cancel:'Kauf abgebrochen.',error:'Der Kauf konnte nicht abgeschlossen werden. Bitte versuche es erneut.',footer:'Preis und Währung kommen aus dem Store; die App erzwingt keinen festen Preis.'},fr:{title:'SleepRise Pro',sub:'Supprimez les annonces et gardez un parcours apaisant.',month:'Pro mensuel',year:'Pro annuel',yearNote:'Meilleure valeur annuelle',buy:'S’abonner',restore:'Restaurer les achats',manage:'Gérer l’abonnement',close:'Fermer',loading:'Chargement des prix…',notReady:'Les produits ne sont pas encore prêts. Créez-les dans Google Play Console et App Store Connect, puis réessayez.',success:'SleepRise Pro est actif. Les annonces sont supprimées.',cancel:'Achat annulé.',error:'Achat impossible. Veuillez réessayer.',footer:'Le prix et la devise sont fournis par la boutique ; l’application n’impose pas de prix fixe.'},pt:{title:'SleepRise Pro',sub:'Remova os anúncios e mantenha o fluxo tranquilo do app.',month:'Pro mensal',year:'Pro anual',yearNote:'Melhor valor anual',buy:'Assinar',restore:'Restaurar compras',manage:'Gerenciar assinatura',close:'Fechar',loading:'Carregando preços da loja…',notReady:'Os produtos ainda não estão prontos. Crie-os no Google Play Console e App Store Connect e tente novamente.',success:'SleepRise Pro está ativo. Os anúncios foram removidos.',cancel:'Compra cancelada.',error:'Não foi possível concluir a compra. Tente novamente.',footer:'O preço e a moeda são fornecidos pela loja; o app não impõe um preço fixo.'},ar:{title:'SleepRise Pro',sub:'أزل الإعلانات وحافظ على تجربة التطبيق الهادئة.',month:'Pro شهري',year:'Pro سنوي',yearNote:'قيمة سنوية أفضل',buy:'اشترك',restore:'استعادة المشتريات',manage:'إدارة الاشتراك',close:'إغلاق',loading:'جارٍ تحميل أسعار المتجر…',notReady:'منتجات المتجر غير جاهزة بعد. أنشئها في Google Play Console وApp Store Connect ثم حاول مرة أخرى.',success:'SleepRise Pro نشط. تمت إزالة الإعلانات.',cancel:'تم إلغاء الشراء.',error:'تعذر إتمام الشراء. حاول مرة أخرى.',footer:'المتجر يحدد السعر والعملة؛ التطبيق لا يفرض سعراً ثابتاً.'},zh:{title:'SleepRise Pro',sub:'移除广告，保持安静的使用体验。',month:'Pro 月度',year:'Pro 年度',yearNote:'年度方案更划算',buy:'订阅',restore:'恢复购买',manage:'管理订阅',close:'关闭',loading:'正在加载商店价格…',notReady:'商店商品尚未准备好。请在 Google Play Console 和 App Store Connect 中创建商品后重试。',success:'SleepRise Pro 已启用，广告已移除。',cancel:'已取消购买。',error:'购买未完成，请重试。',footer:'价格和货币由商店提供；应用不会强制固定价格。'},ja:{title:'SleepRise Pro',sub:'広告を削除し、落ち着いた体験を保ちます。',month:'Pro 月額',year:'Pro 年額',yearNote:'年間プランがお得',buy:'登録する',restore:'購入を復元',manage:'サブスクリプションを管理',close:'閉じる',loading:'ストア価格を読み込み中…',notReady:'ストア商品がまだ準備されていません。Google Play Console と App Store Connect で商品を作成してから再試行してください。',success:'SleepRise Pro が有効になり、広告が削除されました。',cancel:'購入をキャンセルしました。',error:'購入を完了できませんでした。もう一度お試しください。',footer:'価格と通貨はストアが提供します。アプリが固定価格を強制することはありません。'}};
-  const t=k=>(TX[langCode()]||TX.en)[k]||TX.en[k]||k;
-  let products=[],busy=false,ready=false;
-  function list(){return [CONFIG.monthly.id,CONFIG.yearly.id]}
-  function setPro(active,product){try{if(active){localStorage.setItem(CONFIG.entitlement,'1');localStorage.setItem(CONFIG.source,'native');if(product)localStorage.setItem(CONFIG.product,product)}else{localStorage.removeItem(CONFIG.entitlement);localStorage.removeItem(CONFIG.source);localStorage.removeItem(CONFIG.product)}}catch(e){};window.dispatchEvent(new CustomEvent('sleeprise-pro-changed',{detail:{active}}));}
-  function isPro(){return localStorage.getItem(CONFIG.entitlement)==='1'&&localStorage.getItem(CONFIG.source)==='native'}
-  function msg(text){try{if(typeof notice==='function')return notice(text);if(typeof toast==='function')return toast(text);console.info(text)}catch(e){}}
-  function productFor(id){return products.find(p=>p.identifier===id||p.planIdentifier===id)}
-  function productText(p,key){if(!p)return t(key);return p.priceString?`${t(key)} · ${p.priceString}`:t(key)}
-  function render(){
-    const sheet=q('#srProSheet');if(!sheet)return;
-    const listEl=sheet.querySelector('[data-sr-products]');
-    if(isPro()){listEl.innerHTML='<div class="sr-pro-product"><div><b>'+t('title')+'</b><small>'+t('success')+'</small></div></div>';sheet.querySelector('[data-sr-restore]').style.display='none';return}
-    if(!native()||!ready){listEl.innerHTML='<div class="sr-pro-product"><div><b>'+t('title')+'</b><small>'+t('notReady')+'</small></div></div>';}
-    else if(!products.length){listEl.innerHTML='<div class="sr-pro-product"><div><b>'+t('title')+'</b><small>'+t('notReady')+'</small></div></div>';}
-    else{listEl.innerHTML=[['monthly',CONFIG.monthly.id,'month'],['yearly',CONFIG.yearly.id,'year']].map(([kind,id,label])=>{const p=productFor(id);const note=label==='year'?'<small>'+t('yearNote')+'</small>':'';return '<div class="sr-pro-product"><div><b>'+productText(p,label)+'</b>'+note+'</div><button type="button" data-sr-pro-buy="'+id+'" '+(busy?'disabled':'')+'>'+t('buy')+'</button></div>'}).join('')}
-    sheet.querySelector('[data-sr-restore]').textContent=t('restore');sheet.querySelector('[data-sr-manage]').textContent=t('manage');sheet.querySelector('[data-sr-pro-close]').textContent=t('close');sheet.querySelector('[data-sr-foot]').textContent=t('footer');
-  }
-  function ensureSheet(){
-    if(q('#srProSheet'))return;
-    const sheet=document.createElement('div');sheet.id='srProSheet';sheet.className='sr-pro-sheet';sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');
-    sheet.innerHTML='<div class="sr-pro-panel"><div class="sr-pro-head"><div><b>'+t('title')+'</b><p>'+t('sub')+'</p></div><button type="button" class="sr-pro-close" data-sr-pro-close aria-label="'+t('close')+'">×</button></div><div class="sr-pro-products" data-sr-products></div><div class="sr-pro-actions"><button type="button" class="secondary" data-sr-restore>'+t('restore')+'</button><button type="button" class="secondary" data-sr-manage>'+t('manage')+'</button></div><div class="sr-pro-foot" data-sr-foot>'+t('footer')+'</div></div>';
-    document.body.appendChild(sheet);
-    sheet.addEventListener('click',ev=>{if(ev.target===sheet||ev.target.closest('[data-sr-pro-close]'))sheet.classList.remove('on')});
-    sheet.addEventListener('click',ev=>{const buy=ev.target.closest('[data-sr-pro-buy]');if(buy)buyProduct(buy.dataset.srProBuy);if(ev.target.closest('[data-sr-restore]'))restore();if(ev.target.closest('[data-sr-manage]'))manage()});
-  }
-  function open(){ensureSheet();render();q('#srProSheet')?.classList.add('on');loadProducts().then(render).catch(()=>render())}
-  async function loadProducts(){
-    if(!native()){ready=false;products=[];return products}
-    const p=api();if(!p||!p.getProducts){ready=false;products=[];return products}
-    try{const support=await p.isBillingSupported?.();if(support&&support.isBillingSupported===false){ready=false;products=[];return products}const result=await p.getProducts({productIdentifiers:list(),productType:'subs'});products=result?.products||[];ready=products.length>0;return products}catch(e){console.warn('SleepRise products',e);ready=false;products=[];return products}
-  }
-  async function buyProduct(id){
-    if(busy)return;const p=api();if(!native()||!p?.purchaseProduct){msg(t('notReady'));return}
-    busy=true;render();
-    try{const meta=productFor(id)||{};const plan=meta.planIdentifier||((id===CONFIG.monthly.id)?CONFIG.monthly.plan:CONFIG.yearly.plan);const tr=await p.purchaseProduct({productIdentifier:id,planIdentifier:plan,productType:'subs',quantity:1,autoAcknowledgePurchases:true});if(tr){setPro(true,id);msg(t('success'));q('#srProSheet')?.classList.remove('on')}}catch(e){const text=String(e?.message||e||'');msg(/cancel/i.test(text)?t('cancel'):t('error'));console.warn('SleepRise purchase',e)}finally{busy=false;render()}
-  }
-  async function restore(){
-    const p=api();if(!native()||!p){msg(t('notReady'));return}
-    try{await p.restorePurchases?.();const out=await p.getPurchases?.({productType:'subs'});const found=(out?.purchases||[]).find(x=>list().includes(x.productIdentifier));if(found){setPro(true,found.productIdentifier);msg(t('success'))}else{setPro(false);msg(t('notReady'))}render()}catch(e){console.warn('SleepRise restore',e);msg(t('error'))}
-  }
-  async function manage(){const p=api();if(!native()||!p?.manageSubscriptions){msg(t('notReady'));return}try{await p.manageSubscriptions()}catch(e){console.warn('SleepRise manage',e)}}
-  async function refresh(){ensureSheet();if(native())await restore();render()}
-  window.SleepRiseSubscription={isPro,open,loadProducts,buyProduct,restore,manage,refresh,products:()=>products,config:CONFIG};
-  function start(){ensureSheet();setTimeout(()=>{loadProducts().then(render).catch(()=>render())},900)}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
-})();
-</script>
-<style id="sleeprise-admob-v51-style">
-:root{--sr-ad-safe-space:0px}
-.pages.sr-ad-safe{padding-bottom:calc(var(--sr-ad-safe-space) + 18px)!important}
-.v32-atm-card{position:relative}
-.sr-ad-atm-gate{position:absolute;left:9px;right:9px;bottom:9px;z-index:6;display:flex;align-items:center;justify-content:center;min-height:30px;padding:7px 10px;border:1px solid rgba(255,255,255,.34);border-radius:11px;background:rgba(6,20,43,.82);backdrop-filter:blur(8px);color:#fff;font:800 10px/1.2 Inter,system-ui,sans-serif;letter-spacing:.01em;box-shadow:0 8px 22px rgba(0,0,0,.24);cursor:pointer}
-.sr-ad-atm-gate:focus-visible{outline:2px solid #8af2df;outline-offset:2px}
-.sr-ad-pro-card{margin:12px 0;padding:16px;border-radius:20px;background:linear-gradient(135deg,#0d3150,#146b72 60%,#00b899);color:#fff;box-shadow:0 14px 30px rgba(0,91,103,.18)}
-.sr-ad-pro-card b{display:block;font-size:16px;letter-spacing:-.02em}.sr-ad-pro-card p{margin:7px 0 12px;color:rgba(255,255,255,.82);font-size:11px;line-height:1.45}.sr-ad-pro-card button{border:0;border-radius:12px;padding:10px 13px;background:#fff;color:#0b4f5c;font:800 12px/1 Inter,system-ui,sans-serif;cursor:pointer}.sr-ad-pro-card button:focus-visible{outline:2px solid #fff;outline-offset:2px}.sr44-cinema-overlay .sr44-cinema-bottom{bottom:calc(12px + var(--sr-ad-safe-space))!important}
-@media(prefers-reduced-motion:reduce){.sr-ad-atm-gate,.sr-ad-pro-card{animation:none!important;transition:none!important}}
-</style>
-<script id="sleeprise-admob-v51">
-(function(){
-  'use strict';
-  const CONFIG=Object.freeze({
-    android:{appId:'ca-app-pub-7996356702191225~8756079069',banner:'ca-app-pub-7996356702191225/8863890276',rewarded:'ca-app-pub-7996356702191225/2298481923'},
-    ios:{appId:'ca-app-pub-7996356702191225~9135353011',banner:'ca-app-pub-7996356702191225/3360282152',rewarded:'ca-app-pub-7996356702191225/9302873978'},
-    rewardHours:24
-  });
-  const TEXT={
-    tr:{watch:'Özelliği açmak için bu reklamı izlemek ister misin?',watchThree:'Uyku analizini açmak için 3 kısa reklam izlenecek. Her reklamdan sonra devam edip etmemeyi seçebilirsin.',watchShort:'Reklamı izle · Aç',adUnavailable:'Reklam şu anda hazır değil. Lütfen biraz sonra tekrar dene.',adCancelled:'Reklam izlenmedi; özellik açılmadı.',bannerNote:'SleepRise’i destekleyen küçük bir reklam',proTitle:'SleepRise Pro',proBody:'Tüm reklamları kaldır, ödüllü beklemeleri atla ve sakin deneyimini koru.',proCta:'Pro’yu keşfet',proPending:'Pro aboneliği mağaza ürünleri tanımlandıktan sonra burada açılacak.',privacy:'Gizlilik tercihleri'},
-    en:{watch:'Watch this ad to unlock the feature?',watchThree:'Three short ads are required to unlock sleep analysis. You can stop after each ad.',watchShort:'Watch ad · Unlock',adUnavailable:'The ad is not ready yet. Please try again shortly.',adCancelled:'The ad was not watched; the feature stayed locked.',bannerNote:'A small ad supporting SleepRise',proTitle:'SleepRise Pro',proBody:'Remove every ad, skip rewarded waits, and keep your calm experience.',proCta:'Explore Pro',proPending:'Pro becomes available here after store products are configured.',privacy:'Privacy choices'},
-    es:{watch:'¿Ver este anuncio para desbloquear la función?',watchThree:'Se necesitan tres anuncios cortos para desbloquear el análisis del sueño. Puedes detenerte después de cada anuncio.',watchShort:'Ver anuncio · Abrir',adUnavailable:'El anuncio aún no está disponible. Inténtalo de nuevo pronto.',adCancelled:'No se vio el anuncio; la función permanece bloqueada.',bannerNote:'Un pequeño anuncio que apoya SleepRise',proTitle:'SleepRise Pro',proBody:'Elimina todos los anuncios y conserva una experiencia tranquila.',proCta:'Descubrir Pro',proPending:'Pro estará disponible aquí cuando se configuren los productos de la tienda.',privacy:'Preferencias de privacidad'},
-    de:{watch:'Werbung ansehen, um die Funktion freizuschalten?',watchThree:'Zum Freischalten der Schlafanalyse werden drei kurze Anzeigen benötigt. Nach jeder Anzeige kannst du aufhören.',watchShort:'Werbung ansehen · Öffnen',adUnavailable:'Die Anzeige ist noch nicht bereit. Bitte versuche es gleich noch einmal.',adCancelled:'Die Anzeige wurde nicht angesehen; die Funktion bleibt gesperrt.',bannerNote:'Eine kleine Anzeige zur Unterstützung von SleepRise',proTitle:'SleepRise Pro',proBody:'Alle Anzeigen entfernen und eine ruhige Nutzung behalten.',proCta:'Pro entdecken',proPending:'Pro wird hier verfügbar, sobald die Store-Produkte eingerichtet sind.',privacy:'Datenschutzeinstellungen'},
-    fr:{watch:'Regarder cette annonce pour débloquer la fonction ?',watchThree:'Trois courtes annonces sont nécessaires pour débloquer l’analyse du sommeil. Vous pouvez arrêter après chaque annonce.',watchShort:'Voir l’annonce · Ouvrir',adUnavailable:'L’annonce n’est pas encore prête. Réessayez dans un instant.',adCancelled:'L’annonce n’a pas été regardée ; la fonction reste verrouillée.',bannerNote:'Une petite annonce qui soutient SleepRise',proTitle:'SleepRise Pro',proBody:'Supprimez toutes les annonces et gardez une expérience apaisante.',proCta:'Découvrir Pro',proPending:'Pro sera disponible ici lorsque les produits de la boutique seront configurés.',privacy:'Préférences de confidentialité'},
-    pt:{watch:'Assistir a este anúncio para desbloquear o recurso?',watchThree:'Três anúncios curtos são necessários para desbloquear a análise do sono. Você pode parar após cada anúncio.',watchShort:'Assistir anúncio · Abrir',adUnavailable:'O anúncio ainda não está pronto. Tente novamente em instantes.',adCancelled:'O anúncio não foi assistido; o recurso continua bloqueado.',bannerNote:'Um pequeno anúncio que apoia o SleepRise',proTitle:'SleepRise Pro',proBody:'Remova todos os anúncios e mantenha uma experiência tranquila.',proCta:'Conhecer o Pro',proPending:'O Pro ficará disponível aqui após a configuração dos produtos da loja.',privacy:'Preferências de privacidade'},
-    ar:{watch:'هل تريد مشاهدة هذا الإعلان لفتح الميزة؟',watchThree:'يلزم مشاهدة ثلاثة إعلانات قصيرة لفتح تحليل النوم. يمكنك التوقف بعد كل إعلان.',watchShort:'شاهد الإعلان · فتح',adUnavailable:'الإعلان غير جاهز الآن. حاول مرة أخرى بعد قليل.',adCancelled:'لم تتم مشاهدة الإعلان؛ بقيت الميزة مقفلة.',bannerNote:'إعلان صغير لدعم SleepRise',proTitle:'SleepRise Pro',proBody:'أزل جميع الإعلانات وحافظ على تجربة هادئة.',proCta:'اكتشف Pro',proPending:'سيصبح Pro متاحاً هنا بعد إعداد منتجات المتجر.',privacy:'خيارات الخصوصية'},
-    zh:{watch:'观看此广告以解锁功能吗？',watchThree:'观看三个短广告即可解锁睡眠分析。每个广告结束后都可以停止。',watchShort:'观看广告 · 解锁',adUnavailable:'广告暂时未准备好，请稍后再试。',adCancelled:'未观看广告，功能仍保持锁定。',bannerNote:'支持 SleepRise 的小广告',proTitle:'SleepRise Pro',proBody:'移除所有广告，跳过奖励等待，保持安静的体验。',proCta:'了解 Pro',proPending:'商店商品配置完成后，Pro 将在此处开放。',privacy:'隐私选项'},
-    ja:{watch:'広告を見て機能を解放しますか？',watchThree:'睡眠分析を解放するには短い広告を3本見る必要があります。各広告の後に停止できます。',watchShort:'広告を見る · 解放',adUnavailable:'広告を準備できませんでした。少し待ってから再試行してください。',adCancelled:'広告を見なかったため、機能はロックされたままです。',bannerNote:'SleepRiseを支える小さな広告',proTitle:'SleepRise Pro',proBody:'すべての広告を削除し、報酬広告の待ち時間をなくします。',proCta:'Proを見る',proPending:'ストアの商品設定が完了すると、ここでProを利用できます。',privacy:'プライバシー設定'}
-  };
-  const q=s=>document.querySelector(s), qa=s=>Array.from(document.querySelectorAll(s));
-  const langCode=()=>{const raw=(document.documentElement.lang||'').slice(0,2).toLowerCase();return TEXT[raw]?raw:(typeof lang!=='undefined'&&TEXT[lang]?lang:'en')};
-  const tx=(key)=>((TEXT[langCode()]||TEXT.en)[key]||TEXT.en[key]||key);
-  const native=()=>!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
-  const admob=()=>window.Capacitor?.Plugins?.AdMob||null;
-  const platform=()=>window.Capacitor?.getPlatform?.()||(/iPad|iPhone|iPod/.test(navigator.userAgent)?'ios':'android');
-  const isDebug=()=>{try{return !!window.SleepRiseBuild?.isDebug?.()}catch(e){return false}};
-  const trialKey='sleeprise_trial_started_at_v63',trialDays=7;
-  const trialStarted=()=>{try{let v=Number(localStorage.getItem(trialKey)||0);if(!v){v=Date.now();localStorage.setItem(trialKey,String(v))}return v}catch(e){return Date.now()}};
-  const trialActive=()=>{const v=trialStarted();return Date.now()<v+trialDays*24*60*60*1000};
-  const trialRemaining=()=>Math.max(0,Math.ceil((trialStarted()+trialDays*24*60*60*1000-Date.now())/86400000));
-  const isPro=()=>{try{return localStorage.getItem('sleeprise_pro_active')==='1'||localStorage.getItem('sleeprise_pro')==='1'||window.SleepRiseSubscription?.isPro?.()===true}catch(e){return false}};
-  const unit=()=>{const p=platform()==='ios'?'ios':'android';return CONFIG[p]};
-  const note=msg=>{try{if(typeof notice==='function')return notice(msg);if(typeof toast==='function')return toast(msg);window.alert(msg)}catch(e){}};
-  const safeSpace=on=>{document.documentElement.style.setProperty('--sr-ad-safe-space',on?'72px':'0px');q('.pages')?.classList.toggle('sr-ad-safe',!!on)};
-  let initialized=false, bannerOn=false, consentInfo=null, busy=false;
-  async function init(){
-    const api=admob();
-    if(!native())return true;
-    if(!api){note(tx('adUnavailable'));return false}
-    if(initialized)return true;
-    try{
-      consentInfo=await api.requestConsentInfo?.({})||{canRequestAds:true};
-      if(consentInfo.status==='REQUIRED'&&consentInfo.isConsentFormAvailable)consentInfo=await api.showConsentForm?.()||consentInfo;
-      if(api.trackingAuthorizationStatus){try{const ti=await api.trackingAuthorizationStatus();if(ti?.status==='notDetermined')await api.requestTrackingAuthorization?.()}catch(e){}}
-      if(consentInfo.canRequestAds===false)return false;
-      await api.initialize?.({maxAdContentRating:'General'});
-      initialized=true;
-      return true;
-    }catch(e){console.warn('SleepRise AdMob init',e);return false}
-  }
-  async function showBanner(){
-    if(isPro()||trialActive())return removeBanner();
-    const api=admob();
-    if(!native()||!api)return false;
-    if(!(await init()))return false;
-    try{await api.showBanner({adId:unit().banner,adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:isDebug()});bannerOn=true;safeSpace(true);return true}catch(e){console.warn('SleepRise banner',e);return false}
-  }
-  async function removeBanner(){
-    const api=admob();
-    if(api&&native()){try{await api.removeBanner?.()}catch(e){}}
-    bannerOn=false;safeSpace(false);
-  }
-  async function showRewarded(){
-    if(!native()||trialActive())return true;
-    const api=admob();
-    if(!api||!(await init()))return false;
-    try{
-      await api.prepareRewardVideoAd({adId:unit().rewarded,isTesting:isDebug(),immersiveMode:true});
-      const reward=await api.showRewardVideoAd();
-      return !!reward&&(Number(reward.amount||0)>0||typeof reward.amount==='undefined');
-    }catch(e){console.warn('SleepRise rewarded',e);note(tx('adUnavailable'));return false}
-  }
-  async function rewardAccess(purpose,count){
-    if(isPro()||trialActive())return true;
-    const key='sleeprise_reward_until_'+purpose;
-    if(purpose==='sleep-analysis'&&Number(localStorage.getItem(key)||0)>Date.now())return true;
-    if(!native())return true;
-    if(busy)return false;
-    busy=true;
-    try{
-      for(let i=0;i<count;i++){
-        const prompt=count>1?tx('watchThree'):tx('watch');
-        if(!window.confirm(prompt)){note(tx('adCancelled'));return false}
-        if(!(await showRewarded()))return false;
-      }
-      if(purpose==='sleep-analysis')localStorage.setItem(key,String(Date.now()+CONFIG.rewardHours*60*60*1000));
-      return true;
-    }finally{busy=false}
-  }
-  async function guard(purpose,count,action){const ok=await rewardAccess(purpose,count);if(!ok)return false;try{await action();return true}catch(e){console.warn('SleepRise gated action',e);return false}}
-  function currentPage(){return q('.pages .page.on')?.id||''}
-  async function syncBanner(){
-    const should=currentPage()==='p-relax'&&!isPro()&&!trialActive();
-    if(should&&!bannerOn)await showBanner();
-    if(!should&&bannerOn)await removeBanner();
-    decorateAtmosphereGates();bindRelaxTimers();injectProCard();
-  }
-  function decorateAtmosphereGates(){
-    const cards=qa('#v32Atmospheres [data-v32-atm]');
-    cards.forEach(card=>{
-      const old=card.querySelector('.sr-ad-atm-gate');
-      if(isPro()||trialActive()){old?.remove();return}
-      if(old)return;
-      const gate=document.createElement('span');gate.className='sr-ad-atm-gate';gate.setAttribute('role','button');gate.setAttribute('tabindex','0');gate.textContent=tx('watchShort');
-      const unlock=ev=>{ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();guard('atmosphere',1,async()=>{gate.remove();card.click()})};
-      gate.addEventListener('click',unlock);gate.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){unlock(ev)}});card.appendChild(gate);
-    });
-  }
-  const relaxTimers=new WeakMap();
-  function bindRelaxTimers(){
-    qa('[data-v42-relax-play],[data-sr44-relax-play]').forEach(btn=>{
-      if(btn.__srAdBound)return;btn.__srAdBound=true;
-      btn.addEventListener('click',()=>{
-        clearTimeout(relaxTimers.get(btn));
-        if(isPro()||trialActive())return;
-        const timer=setTimeout(async()=>{
-          const row=btn.closest('[data-v42-relax-row],[data-sr44-relax-card]');
-          if(!row||!row.classList.contains('is-playing'))return;
-          try{btn.click()}catch(e){}
-          const ok=await rewardAccess('relax-continued',1);
-          if(ok&&!isPro())try{btn.click()}catch(e){}
-        },300000);
-        relaxTimers.set(btn,timer);
-      });
-    });
-  }
-  function injectProCard(){
-    const tools=q('#p-tools');if(!tools||q('#srAdProCard'))return;
-    const card=document.createElement('section');card.id='srAdProCard';card.className='sr-ad-pro-card';
-    card.innerHTML='<b>'+tx('proTitle')+'</b><p>'+tx('proBody')+'</p><button type="button" id="srAdProCta">'+tx('proCta')+'</button>';
-    tools.insertBefore(card,tools.firstChild);
-    card.querySelector('button').addEventListener('click',()=>{if(window.SleepRiseSubscription?.open)window.SleepRiseSubscription.open();else note(tx('proPending'))});
-  }
-  function showPro(reason){try{window.SleepRiseSubscription?.open?.(reason)}catch(e){console.warn('SleepRise Pro',e)}}
-  function showPro(reason){try{window.SleepRiseSubscription?.open?.(reason)}catch(e){console.warn('SleepRise Pro',e)}}
-  function gateClick(e){
-    if(window.SleepRiseReviewMode)return;
-    const target=e.target?.closest?.('#btnSession,#btnOwnVid,#btnAddMixSound,#btnAddTone');
-    if(!target||target.dataset.srAdBypass==='1')return;
-    if(target.id==='btnSession'){
-      let open=false;try{open=!!Sleep.open}catch(err){}
-      if(!open)return;
-      e.preventDefault();e.stopImmediatePropagation();
-      guard('sleep-analysis',3,async()=>{target.dataset.srAdBypass='1';target.click();delete target.dataset.srAdBypass});
-      return;
-    }
-    const inputMap={btnOwnVid:'#atmVidFile',btnAddMixSound:'#mixFile',btnAddTone:'#toneFile'};
-    const input=q(inputMap[target.id]);if(!input)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    if(target.id==='btnOwnVid'){
-      if(isPro()||trialActive()){input.click();return}
-      showPro('video');return;
-    }
-    if(target.id==='btnAddTone'){input.click();return}
-    guard('file-upload',3,async()=>input.click());
-  }
-  document.addEventListener('click',gateClick,true);
-  document.addEventListener('click',e=>{if(e.target?.closest?.('nav.tabs [data-p]'))setTimeout(syncBanner,220)},false);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(syncBanner,180)});
-  const observer=new MutationObserver(()=>{decorateAtmosphereGates();bindRelaxTimers();injectProCard()});
-  function start(){
-    try{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})}catch(e){}
-    setTimeout(()=>{init().catch(()=>{});syncBanner().catch(()=>{})},700);
-    setInterval(()=>{const active=currentPage()==='p-relax'&&!isPro()&&!trialActive();if(active&&!bannerOn)showBanner();if(!active&&bannerOn)removeBanner();decorateAtmosphereGates();bindRelaxTimers();injectProCard()},2500);
-  }
-  window.SleepRiseAds={config:CONFIG,isPro,trialActive,trialRemaining,init,showBanner,removeBanner,showRewarded,rewardAccess,guard,showPro,privacy:async()=>{const api=admob();if(api?.showPrivacyOptionsForm)try{return api.showPrivacyOptionsForm()}catch(e){}}};
-  window.SleepRiseSubscription=window.SleepRiseSubscription||{isPro,open:()=>note(tx('proPending'))};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
-})();
-</script>
+
+
 \n
 \n
 
@@ -1725,7 +1484,7 @@ function playTone(e,t,a){t=!1;if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=(typ
     const studio=p.querySelector('#v32StudioToggle');if(studio){set(studio.querySelector('b'),'studioTitle');set(studio.querySelector('b')?.nextElementSibling,'studioDesc')}
     const empty=p.querySelector('#presetRow .note');if(empty)set(empty,'presetEmpty');set(p.querySelector('#btnSavePreset'),'saveMix');const saved=[...p.querySelectorAll('.eyebrow')].find(e=>/Saved mixes|保存したミックス|KAYITLI|Mixes guardadas|Gespeicherte|MIXES ENREGISTRÉS|MIXAGENS SALVAS|المزائج المحفوظة|已保存/.test(e.textContent));set(saved,'savedMixes');p.querySelectorAll('#sleepTimer button').forEach(b=>{const n=b.textContent.trim().match(/\d+/)?.[0];if(n)b.textContent=n+' '+val('minute')});set(p.querySelector('#v32SoundDeck .v32-sound-deck-title'),'studioTitle');p.querySelectorAll('#v32SoundDeck .v32-mix').forEach(b=>{const m=MIX[code()]?.[b.dataset.v32Mix]||MIX.en[b.dataset.v32Mix];if(m){if(b.querySelector('.v32-mix-copy b'))b.querySelector('.v32-mix-copy b').textContent=m[0];if(b.querySelector('.v32-mix-copy small'))b.querySelector('.v32-mix-copy small').textContent=m[1]}});set(p.querySelector('#brMeta'),'breathMeta');
   }
-  function patchLegacyRelax(){const c=code(),u=SOUND_TEXT[c]||SOUND_TEXT.en,legacy=LEGACY_RELAX[c]||LEGACY_RELAX.en,atm=atmName[c]||atmName.en,cin=CINEMA_UI[c]||CINEMA_UI.en;const atmLabels={tr:{off:'Kapalı',rainglass:'Camda yağmur',forestfog:'Sisli orman',fluid:'Akışkan renkler',lake:'Gece gölü',dawnglow:'Şafak ışığı'},en:{off:'Off',rainglass:'Rain on glass',forestfog:'Misty forest',fluid:'Liquid colour',lake:'Night lake',dawnglow:'Dawn glow'},es:{off:'Desactivado',rainglass:'Lluvia en el cristal',forestfog:'Bosque con niebla',fluid:'Colores líquidos',lake:'Lago nocturno',dawnglow:'Resplandor del amanecer'},de:{off:'Aus',rainglass:'Regen am Fenster',forestfog:'Nebelwald',fluid:'Flüssige Farben',lake:'Nachtsee',dawnglow:'Morgendämmerung'},fr:{off:'Désactivé',rainglass:'Pluie sur vitre',forestfog:'Forêt brumeuse',fluid:'Couleurs liquides',lake:'Lac nocturne',dawnglow:'Lueur de l’aube'},pt:{off:'Desligado',rainglass:'Chuva no vidro',forestfog:'Floresta nebulosa',fluid:'Cores líquidas',lake:'Lago noturno',dawnglow:'Luz do amanhecer'},ar:{off:'متوقف',rainglass:'مطر على الزجاج',forestfog:'غابة ضبابية',fluid:'ألوان سائلة',lake:'بحيرة ليلية',dawnglow:'وهج الفجر'},zh:{off:'关闭',rainglass:'玻璃上的雨',forestfog:'雾林',fluid:'流动色彩',lake:'夜间湖泊',dawnglow:'黎明微光'},ja:{off:'オフ',rainglass:'窓の雨',forestfog:'霧の森',fluid:'液体の色',lake:'夜の湖',dawnglow:'夜明けの光'}}[c]||{};const relaxIds=['rain','forest','waves','wavesGulls','smallWaves','nightBirds','eveningBirds'];const fMap={all:'all','Yağmur':'rain','Orman':'forest','Su ve dalga':'water','Gece':'night'};const vMap={all:'all','Su ve dalga':'water','Orman':'forest','Gece':'night'};const root=document.querySelector('#p-relax');if(root){root.querySelectorAll('button[data-atm]').forEach(b=>{const t=atmLabels[b.dataset.atm];if(t)b.textContent=t});root.querySelectorAll('#v32SoundDeck .v32-mix').forEach(b=>{const k=b.dataset.v32Mix,m=MIX[c]?.[k]||MIX.en[k];if(m){b.querySelector('.v32-mix-copy b')?.replaceChildren(document.createTextNode(m[0]));b.querySelector('.v32-mix-copy small')?.replaceChildren(document.createTextNode(m[1]))}const st=b.querySelector('.v32-mix-state');if(st)st.textContent=b.classList.contains('is-playing')||b.classList.contains('on')||b.getAttribute('aria-pressed')==='true'?u.stop:u.start});const lib=root.querySelector('#sr44RelaxLibrary');if(lib){const head=lib.querySelector('.sr44-section-head');if(head){head.querySelector('span').textContent=legacy.section;head.querySelector('h3').textContent=legacy.heading;head.querySelector('p').textContent=legacy.desc;head.querySelector('[data-sr44-relax-stop]').textContent=legacy.stop}lib.querySelectorAll('[data-sr44-relax-filter]').forEach(b=>{const key=fMap[b.dataset.sr44RelaxFilter]||'all';b.textContent=legacy[key]||b.textContent});lib.querySelectorAll('[data-sr44-relax-card]').forEach(card=>{const i=relaxIds.indexOf(card.dataset.sr44RelaxCard),name=RELAX_NAMES[c]?.[i]||RELAX_NAMES.en[i],desc=RELAX_DESC[c]?.[i]||RELAX_DESC.en[i];if(i>=0){card.querySelector('b').textContent=name;card.querySelector('small').textContent=desc}card.querySelector('[data-sr44-relax-play]').textContent=card.classList.contains('is-playing')?u.stop:u.start});lib.querySelector('[data-sr44-mix="sleep"]')?.replaceChildren(document.createTextNode(legacy.deep));lib.querySelector('[data-sr44-mix="coast"]')?.replaceChildren(document.createTextNode(legacy.coast))}const cineRoot=root.querySelector('#sr44CinemaLibrary');if(cineRoot){const head=cineRoot.querySelector('.sr44-section-head');if(head){head.querySelector('span').textContent=cin.section;head.querySelector('h3').textContent=cin.heading;head.querySelector('p').textContent=cin.desc}cineRoot.querySelectorAll('[data-sr44-video-filter]').forEach(b=>{const key=vMap[b.dataset.sr44VideoFilter]||'all';b.textContent=cin[key]||b.textContent});cineRoot.querySelectorAll('[data-sr44-video-card]').forEach((card,i)=>{const title=atm[i]||atmName.en[i],group=VIDEO_GROUP[c]?.[i]||VIDEO_GROUP.en[i];card.querySelector('b').textContent=title;card.querySelector('small').textContent=group+' · '+cin.silent;card.querySelector('[data-sr44-video-open]').textContent=cin.open});const note=cineRoot.querySelector('.sr44-license-note');if(note)note.textContent=cin.license}}const sounds=document.querySelector('#p-sounds');if(sounds){const rel=sounds.querySelector('[data-v42-panel="audio"] .v42-block:nth-of-type(2)');if(rel){rel.querySelector('[data-v42-stop-relax]')?.replaceChildren(document.createTextNode(u.stop));const groups={all:u.all,rain:u.rain,forest:u.forest,water:u.water,night:u.night};rel.querySelectorAll('[data-v42-relax-filters] button').forEach(b=>b.textContent=groups[b.dataset.f]||b.textContent);rel.querySelectorAll('[data-v42-relax-row]').forEach((row,i)=>{row.querySelector('b').textContent=RELAX_NAMES[c]?.[i]||RELAX_NAMES.en[i];row.querySelector('small').textContent=RELAX_DESC[c]?.[i]||RELAX_DESC.en[i];row.querySelector('[data-v42-relax-play]').textContent=row.classList.contains('is-playing')?u.stop:u.start});rel.querySelector('[data-v42-mix="sleep"]')?.replaceChildren(document.createTextNode(legacy.deep));rel.querySelector('[data-v42-mix="coast"]')?.replaceChildren(document.createTextNode(legacy.coast))}}const overlay=document.querySelector('.sr44-cinema-overlay');if(overlay){const span=overlay.querySelector('.sr44-cinema-top span');if(span){let title=span.textContent.split('·').slice(1).join('·').trim();const i=atmName.tr.indexOf(title);if(i>=0)title=atm[i];span.textContent=cin.section+' · '+title}overlay.querySelector('[data-sr44-cinema-close]')?.replaceChildren(document.createTextNode(cin.close));const bottom=overlay.querySelector('.sr44-cinema-bottom span');if(bottom)bottom.textContent=cin.bottom}}
+  function patchLegacyRelax(){const c=code(),u=SOUND_TEXT[c]||SOUND_TEXT.en,legacy=LEGACY_RELAX[c]||LEGACY_RELAX.en,atm=atmName[c]||atmName.en,cin=CINEMA_UI[c]||CINEMA_UI.en;const atmLabels={tr:{off:'Kapalı',rainglass:'Camda yağmur',forestfog:'Sisli orman',fluid:'Akışkan renkler',lake:'Gece gölü',dawnglow:'Şafak ışığı'},en:{off:'Off',rainglass:'Rain on glass',forestfog:'Misty forest',fluid:'Liquid colour',lake:'Night lake',dawnglow:'Dawn glow'},es:{off:'Desactivado',rainglass:'Lluvia en el cristal',forestfog:'Bosque con niebla',fluid:'Colores líquidos',lake:'Lago nocturno',dawnglow:'Resplandor del amanecer'},de:{off:'Aus',rainglass:'Regen am Fenster',forestfog:'Nebelwald',fluid:'Flüssige Farben',lake:'Nachtsee',dawnglow:'Morgendämmerung'},fr:{off:'Désactivé',rainglass:'Pluie sur vitre',forestfog:'Forêt brumeuse',fluid:'Couleurs liquides',lake:'Lac nocturne',dawnglow:'Lueur de l’aube'},pt:{off:'Desligado',rainglass:'Chuva no vidro',forestfog:'Floresta nebulosa',fluid:'Cores líquidas',lake:'Lago noturno',dawnglow:'Luz do amanhecer'},ar:{off:'متوقف',rainglass:'مطر على الزجاج',forestfog:'غابة ضبابية',fluid:'ألوان سائلة',lake:'بحيرة ليلية',dawnglow:'وهج الفجر'},zh:{off:'关闭',rainglass:'玻璃上的雨',forestfog:'雾林',fluid:'流动色彩',lake:'夜间湖泊',dawnglow:'黎明微光'},ja:{off:'オフ',rainglass:'窓の雨',forestfog:'霧の森',fluid:'液体の色',lake:'夜の湖',dawnglow:'夜明けの光'}}[c]||{};const relaxIds=['rain','forest','waves','wavesGulls','smallWaves','nightBirds','eveningBirds'];const fMap={all:'all','Yağmur':'rain','Orman':'forest','Su ve dalga':'water','Gece':'night'};const vMap={all:'all','Su ve dalga':'water','Orman':'forest','Gece':'night'};const root=document.querySelector('#p-relax');if(root){root.querySelectorAll('button[data-atm]').forEach(b=>{const t=atmLabels[b.dataset.atm];if(t)b.textContent=t});root.querySelectorAll('#v32SoundDeck .v32-mix').forEach(b=>{const k=b.dataset.v32Mix,m=MIX[c]?.[k]||MIX.en[k];if(m){b.querySelector('.v32-mix-copy b')?.replaceChildren(document.createTextNode(m[0]));b.querySelector('.v32-mix-copy small')?.replaceChildren(document.createTextNode(m[1]))}const st=b.querySelector('.v32-mix-state');if(st)st.textContent=b.classList.contains('is-playing')||b.classList.contains('on')||b.getAttribute('aria-pressed')==='true'?u.stop:u.start});const lib=root.querySelector('#sr44RelaxLibrary');if(lib){const head=lib.querySelector('.sr44-section-head');if(head){head.querySelector('span').textContent=legacy.section;head.querySelector('h3').textContent=legacy.heading;head.querySelector('p').textContent=legacy.desc;head.querySelector('[data-sr44-relax-stop]').textContent=legacy.stop}lib.querySelectorAll('[data-sr44-relax-filter]').forEach(b=>{const key=fMap[b.dataset.sr44RelaxFilter]||'all';b.textContent=legacy[key]||b.textContent});lib.querySelectorAll('[data-sr44-relax-card]').forEach(card=>{const i=relaxIds.indexOf(card.dataset.sr44RelaxCard),name=RELAX_NAMES[c]?.[i]||RELAX_NAMES.en[i],desc=RELAX_DESC[c]?.[i]||RELAX_DESC.en[i];if(i>=0){card.querySelector('b').textContent=name;card.querySelector('small').textContent=desc}card.querySelector('[data-sr44-relax-play]').textContent=card.classList.contains('is-playing')?u.stop:u.start});lib.querySelector('[data-sr44-mix="sleep"]')?.replaceChildren(document.createTextNode(legacy.deep));lib.querySelector('[data-sr44-mix="coast"]')?.replaceChildren(document.createTextNode(legacy.coast))}const cineRoot=root.querySelector('#sr44CinemaLibrary');if(cineRoot){const head=cineRoot.querySelector('.sr44-section-head');if(head){head.querySelector('span').textContent=cin.section;head.querySelector('h3').textContent=cin.heading;head.querySelector('p').textContent=cin.desc}cineRoot.querySelectorAll('[data-sr44-video-filter]').forEach(b=>{const key=vMap[b.dataset.sr44VideoFilter]||'all';b.textContent=cin[key]||b.textContent});cineRoot.querySelectorAll('[data-sr44-video-card]').forEach((card,i)=>{const fallbackNames={'turquoise-waves':{tr:'Turkuaz Dalgalar',en:'Turquoise waves',es:'Olas turquesas',de:'Türkisfarbene Wellen',fr:'Vagues turquoise',pt:'Ondas turquesa',ar:'أمواج فيروزية',zh:'碧蓝海浪',ja:'ターコイズの波'},'rocky-coast-waves':{tr:'Kayalık Kıyı',en:'Rocky coast',es:'Costa rocosa',de:'Felsige Küste',fr:'Côte rocheuse',pt:'Costa rochosa',ar:'ساحل صخري',zh:'岩石海岸',ja:'岩の海岸'},'relaxing-creek':{tr:'Sakin Dere',en:'Quiet creek',es:'Arroyo tranquilo',de:'Ruhiger Bach',fr:'Ruisseau paisible',pt:'Córrego tranquilo',ar:'جدول هادئ',zh:'静谧溪流',ja:'静かな小川'},'river-through-forest':{tr:'Ormandan Geçen Dere',en:'River through forest',es:'Río entre el bosque',de:'Fluss durch den Wald',fr:'Rivière en forêt',pt:'Rio pela floresta',ar:'نهر عبر الغابة',zh:'穿过森林的河流',ja:'森を流れる川'},'trees-wind':{tr:'Rüzgârlı Ağaçlar',en:'Wind in the trees',es:'Árboles al viento',de:'Bäume im Wind',fr:'Arbres dans le vent',pt:'Árvores ao vento',ar:'أشجار في مهب الريح',zh:'风中的树木',ja:'風に揺れる木々'},'stars-lake':{tr:'Yıldızlı Göl',en:'Starlit lake',es:'Lago estrellado',de:'See im Sternenlicht',fr:'Lac étoilé',pt:'Lago estrelado',ar:'بحيرة تحت النجوم',zh:'星光湖泊',ja:'星空の湖'},'stars-space':{tr:'Yıldızlı Uzay',en:'Stars in space',es:'Estrellas en el espacio',de:'Sterne im All',fr:'Étoiles dans l’espace',pt:'Estrelas no espaço',ar:'نجوم في الفضاء',zh:'星空',ja:'宇宙の星'}};const fallbackGroups={'turquoise-waves':'water','rocky-coast-waves':'water','relaxing-creek':'water','river-through-forest':'forest','trees-wind':'forest','stars-lake':'night','stars-space':'night'};const id=card.dataset.sr44VideoCard,title=atm[i]||atmName.en[i]||fallbackNames[id]?.[c]||fallbackNames[id]?.en||id,group=VIDEO_GROUP[c]?.[i]||VIDEO_GROUP.en[i]||fallbackGroups[id]||'';card.querySelector('b').textContent=title;card.querySelector('small').textContent=group+' · '+cin.silent;card.querySelector('[data-sr44-video-open]').textContent=cin.open});const note=cineRoot.querySelector('.sr44-license-note');if(note)note.textContent=cin.license}}const sounds=document.querySelector('#p-sounds');if(sounds){const rel=sounds.querySelector('[data-v42-panel="audio"] .v42-block:nth-of-type(2)');if(rel){rel.querySelector('[data-v42-stop-relax]')?.replaceChildren(document.createTextNode(u.stop));const groups={all:u.all,rain:u.rain,forest:u.forest,water:u.water,night:u.night};rel.querySelectorAll('[data-v42-relax-filters] button').forEach(b=>b.textContent=groups[b.dataset.f]||b.textContent);rel.querySelectorAll('[data-v42-relax-row]').forEach((row,i)=>{row.querySelector('b').textContent=RELAX_NAMES[c]?.[i]||RELAX_NAMES.en[i];row.querySelector('small').textContent=RELAX_DESC[c]?.[i]||RELAX_DESC.en[i];row.querySelector('[data-v42-relax-play]').textContent=row.classList.contains('is-playing')?u.stop:u.start});rel.querySelector('[data-v42-mix="sleep"]')?.replaceChildren(document.createTextNode(legacy.deep));rel.querySelector('[data-v42-mix="coast"]')?.replaceChildren(document.createTextNode(legacy.coast))}}const overlay=document.querySelector('.sr44-cinema-overlay');if(overlay){const span=overlay.querySelector('.sr44-cinema-top span');if(span){let title=span.textContent.split('·').slice(1).join('·').trim();const i=atmName.tr.indexOf(title);if(i>=0)title=atm[i];span.textContent=cin.section+' · '+title}overlay.querySelector('[data-sr44-cinema-close]')?.replaceChildren(document.createTextNode(cin.close));const bottom=overlay.querySelector('.sr44-cinema-bottom span');if(bottom)bottom.textContent=cin.bottom}}
   function patchCall(){const s=document.querySelector('#callScreen');if(!s)return;const pl=platform();const page=document.querySelector('#p-call');if(page){set(page.querySelector('.v34-kicker'),callVal('kicker'));set(page.querySelector('.v34-head h2'),callVal('title'));set(page.querySelector('.v34-head p'),callVal('desc'));set(page.querySelector('[data-i18n="callerF"]'),callVal('caller'));set(page.querySelector('[data-i18n="whenF"]'),callVal('when'));set(page.querySelector('[data-i18n="callNow"]'),callVal('now'));set(page.querySelector('[data-i18n="planCall"]'),callVal('schedule'));set(page.querySelector('[data-i18n="cancelCall"]'),callVal('cancel'));set(page.querySelector('[data-i18n="directory"]'),callVal('directory'));set(page.querySelector('[data-i18n="addContact"]'),callVal('add'))};s.dataset.sr55Platform=pl;s.classList.add('sr55-native-call');s.classList.toggle('sr55-ios',pl==='ios');s.classList.toggle('sr55-android',pl==='android'||pl==='web');if(!s.querySelector('.sr55-call-brand')){const top=document.createElement('div');top.className='sr55-call-brand';top.innerHTML='<span class="sr55-call-time"></span><span class="sr55-call-label"></span>';s.prepend(top)}const top=s.querySelector('.sr55-call-brand');if(top){top.querySelector('.sr55-call-time').textContent=new Intl.DateTimeFormat(LOCALE[code()],{hour:'2-digit',minute:'2-digit'}).format(new Date());top.querySelector('.sr55-call-label').textContent=val('callBrand')}
     const name=s.querySelector('#cvName')?.textContent?.trim()||'';const av=s.querySelector('#cvAvatar');if(av&&name){const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();if(!/^[\p{Emoji}\s]+$/u.test(av.textContent.trim())||av.textContent.trim().length>2){}else av.textContent=initials||'SR'}s.querySelector('#cvBg')?.setAttribute('data-a','');
     const connected=s.classList.contains('answered');set(s.querySelector('#cvState'),connected?'callConnected':'callIncoming');set(s.querySelector('#cvIncoming #cvNo')?.parentElement?.querySelector('.cbtn-lbl'),'callDecline');set(s.querySelector('#cvIncoming #cvYes')?.parentElement?.querySelector('.cbtn-lbl'),'callAnswer');set(s.querySelector('#cvOngoing .cbtn-lbl'),'callEnd');document.querySelectorAll('[data-i18n="task_call"]').forEach(e=>set(e,'taskCall'));document.querySelectorAll('[data-i18n="callT"]').forEach(e=>set(e,'callTitle'));document.querySelectorAll('[data-i18n="callNote"]').forEach(e=>set(e,'callNote'));
@@ -2231,99 +1990,7 @@ function playTone(e,t,a){t=!1;if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=(typ
 
 </script>
 <!-- SLEEPRISE_V61_MOTION_END -->
-<!-- SLEEPRISE_V63_MONETIZATION_START -->
-<style id="sleeprise-v63-monetization-style">
-  .sr-v63-trial{margin:10px 0 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(0,169,142,.16),rgba(90,87,255,.13));border:1px solid rgba(0,169,142,.25);color:inherit}
-  .sr-v63-trial b{display:block;font-size:14px;letter-spacing:-.02em}.sr-v63-trial span{display:block;margin-top:4px;font-size:11px;line-height:1.45;opacity:.78}
-  .sr-v63-benefits{display:grid;gap:7px;margin:0 0 14px;padding:0;list-style:none}.sr-v63-benefits li{font-size:11px;line-height:1.35;display:flex;gap:8px;align-items:flex-start}.sr-v63-benefits li::before{content:'✓';font-weight:900;color:#00a98e}
-  .sr-v63-later{width:100%;margin-top:10px;border:1px solid var(--line,#dce5f1);border-radius:12px;padding:11px 12px;background:transparent;color:inherit;font:800 11px/1 Inter,system-ui,sans-serif;cursor:pointer}
-  .sr-v63-lock{display:inline-block;margin-inline-start:6px;padding:2px 5px;border-radius:5px;background:rgba(0,169,142,.15);color:#008c77;font-size:9px;font-weight:900;vertical-align:middle}
-  .sr-v63-ad{display:inline-block;margin-inline-start:6px;padding:2px 5px;border-radius:5px;background:rgba(255,159,28,.15);color:#a96500;font-size:9px;font-weight:900;vertical-align:middle}
-  .sr-v63-hidden-close{display:none!important}
-  .app.nightmode .sr-v63-lock{color:#7ff2d9;background:rgba(127,242,217,.13)}.app.nightmode .sr-v63-ad{color:#ffd18b;background:rgba(255,209,139,.12)}
-</style>
-<script id="sleeprise-v63-monetization">
-(function(){
-  'use strict';
-  if(window.__SleepRiseV63Monetization)return;
-  window.__SleepRiseV63Monetization=true;
-  const DAY=86400000, TRIAL=7*DAY, TRIAL_KEY='sleeprise_trial_started_at_v63';
-  const q=s=>document.querySelector(s), qa=s=>Array.from(document.querySelectorAll(s));
-  const native=()=>!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
-  const started=()=>{try{let v=Number(localStorage.getItem(TRIAL_KEY)||0);if(!v){v=Date.now();localStorage.setItem(TRIAL_KEY,String(v))}return v}catch(e){return Date.now()}};
-  const trialActive=()=>Date.now()<started()+TRIAL;
-  const isPro=()=>{try{return window.SleepRiseSubscription?.isPro?.()===true||localStorage.getItem('sleeprise_pro_active')==='1'}catch(e){return false}};
-  const langCode=()=>{const c=(document.documentElement.lang||'en').slice(0,2);return ['tr','en','es','de','fr','pt','ar','zh','ja'].includes(c)?c:'en'};
-  const COPY={
-    tr:{trial:'İlk hafta SleepRise Pro ücretsiz',trialSub:'7 gün boyunca reklamları, beklemeleri ve Pro özelliklerini deneyebilirsin. Deneme sonunda mağazada seçtiğin planın ücreti otomatik yenilenir.',later:'Daha sonra',pro:'Pro',ad:'2 reklam',video:'Kendi videonu eklemek Pro’ya özel',tone:'Kendi alarm sesini ücretsiz ekle',benefits:['Reklamsız Rahatla ve atmosferler','Matematik, hafıza ve barkod görevleri','Kendi videolarını ekleme','Uyku analizinde sınırsız erişim'] ,locked:'Bu görev Pro ile açılır',ads:'Bu görev için iki kısa reklam gerekir'},
-    en:{trial:'Your first week of SleepRise Pro is free',trialSub:'Try ads-free relaxation, no waiting, and Pro features for 7 days. After the trial, the store plan you choose renews automatically at its listed price.',later:'Later',pro:'Pro',ad:'2 ads',video:'Add your own videos with Pro',tone:'Add your own alarm sound for free',benefits:['Ad-free Relax and atmospheres','Math, memory, and barcode missions','Upload your own videos','Unlimited sleep analysis'],locked:'This task unlocks with Pro',ads:'Two short ads are required for this task'},
-    es:{trial:'Tu primera semana de SleepRise Pro es gratis',trialSub:'Prueba 7 días sin anuncios, sin esperas y con funciones Pro. Después, el plan elegido en la tienda se renueva automáticamente al precio indicado.',later:'Más tarde',pro:'Pro',ad:'2 anuncios',video:'Añade tus propios vídeos con Pro',tone:'Añade tu alarma personalizada gratis',benefits:['Relax y atmósferas sin anuncios','Misiones de matemáticas, memoria y códigos','Sube tus propios vídeos','Análisis del sueño sin límites'],locked:'Esta tarea se desbloquea con Pro',ads:'Se necesitan dos anuncios cortos'},
-    de:{trial:'Deine erste SleepRise-Pro-Woche ist kostenlos',trialSub:'Teste 7 Tage lang Entspannung ohne Werbung, ohne Wartezeiten und mit Pro-Funktionen. Danach verlängert sich der gewählte Store-Tarif automatisch zum angegebenen Preis.',later:'Später',pro:'Pro',ad:'2 Anzeigen',video:'Eigene Videos mit Pro hinzufügen',tone:'Eigenen Alarmton kostenlos hinzufügen',benefits:['Werbefreies Relax und Atmosphären','Mathe-, Gedächtnis- und Barcode-Missionen','Eigene Videos hochladen','Unbegrenzte Schlafanalyse'],locked:'Diese Aufgabe wird mit Pro freigeschaltet',ads:'Für diese Aufgabe sind zwei kurze Anzeigen nötig'},
-    fr:{trial:'Ta première semaine SleepRise Pro est gratuite',trialSub:'Teste pendant 7 jours la relaxation sans publicité, sans attente et les fonctions Pro. Ensuite, le forfait choisi dans la boutique se renouvelle automatiquement au prix indiqué.',later:'Plus tard',pro:'Pro',ad:'2 annonces',video:'Ajoute tes vidéos avec Pro',tone:'Ajoute gratuitement ton propre son d’alarme',benefits:['Relax et atmosphères sans publicité','Missions de maths, mémoire et code-barres','Importe tes propres vidéos','Analyse du sommeil illimitée'],locked:'Cette tâche se débloque avec Pro',ads:'Deux courtes annonces sont nécessaires'},
-    pt:{trial:'A primeira semana do SleepRise Pro é grátis',trialSub:'Teste por 7 dias o Relax sem anúncios, sem espera e com recursos Pro. Depois, o plano escolhido na loja renova automaticamente pelo preço indicado.',later:'Mais tarde',pro:'Pro',ad:'2 anúncios',video:'Adicione seus vídeos com o Pro',tone:'Adicione seu próprio alarme gratuitamente',benefits:['Relax e atmosferas sem anúncios','Missões de matemática, memória e código','Envie seus próprios vídeos','Análise do sono ilimitada'],locked:'Esta tarefa é desbloqueada com o Pro',ads:'São necessários dois anúncios curtos'},
-    ar:{trial:'أسبوعك الأول من SleepRise Pro مجاني',trialSub:'جرّب الاسترخاء بلا إعلانات وميزات Pro لمدة 7 أيام. بعد ذلك يتجدد الاشتراك الذي تختاره من المتجر تلقائياً بالسعر الموضح.',later:'لاحقاً',pro:'Pro',ad:'إعلانان',video:'أضف فيديوهاتك مع Pro',tone:'أضف نغمة من اختيارك مجاناً',benefits:['استرخاء وأجواء بلا إعلانات','مهام الرياضيات والذاكرة والباركود','رفع فيديوهاتك الخاصة','تحليل نوم غير محدود'],locked:'هذه المهمة متاحة مع Pro',ads:'يلزم مشاهدة إعلانين قصيرين'},
-    zh:{trial:'SleepRise Pro 首周免费',trialSub:'7 天内体验无广告放松、免等待和 Pro 功能。试用结束后，商店中选择的方案会按显示价格自动续订。',later:'稍后',pro:'Pro',ad:'2 个广告',video:'使用 Pro 添加自己的视频',tone:'免费添加自己的闹钟声音',benefits:['无广告的放松和氛围','数学、记忆和条码任务','上传自己的视频','无限睡眠分析'],locked:'此任务需要 Pro 解锁',ads:'此任务需要观看两个短广告'},
-    ja:{trial:'最初の1週間はSleepRise Proを無料で体験',trialSub:'7日間、広告なしのリラックス機能、待ち時間なし、Pro機能をお試しください。終了後はストアで選択したプランが表示価格で自動更新されます。',later:'後で',pro:'Pro',ad:'広告2本',video:'Proで自分の動画を追加',tone:'自分のアラーム音を無料で追加',benefits:['広告なしのリラックスと雰囲気','数学・記憶・バーコードミッション','自分の動画をアップロード','睡眠分析を無制限で利用'],locked:'このタスクはProで解放されます',ads:'このタスクには短い広告が2本必要です'}
-  };
-  const c=()=>COPY[langCode()]||COPY.en;
-  function decoratePaywall(){
-    const sheet=q('#srProSheet'),panel=sheet?.querySelector('.sr-pro-panel');if(!sheet||!panel)return;
-    const x=c();
-    const close=sheet.querySelector('[data-sr-pro-close]');if(close){close.classList.add('sr-v63-hidden-close');close.setAttribute('aria-hidden','true');}
-    let trial=panel.querySelector('.sr-v63-trial');if(!trial){trial=document.createElement('div');trial.className='sr-v63-trial';const head=panel.querySelector('.sr-pro-head');head?.after(trial)}
-    trial.innerHTML='<b>'+x.trial+'</b><span>'+x.trialSub+'</span>';
-    let benefits=panel.querySelector('.sr-v63-benefits');if(!benefits){benefits=document.createElement('ul');benefits.className='sr-v63-benefits';const products=panel.querySelector('[data-sr-products]');products?.before(benefits)}
-    benefits.innerHTML=x.benefits.map(v=>'<li>'+v+'</li>').join('');
-    let later=panel.querySelector('[data-sr-later]');if(!later){later=document.createElement('button');later.type='button';later.className='sr-v63-later';later.setAttribute('data-sr-later','1');later.addEventListener('click',()=>sheet.classList.remove('on'));panel.querySelector('.sr-pro-actions')?.after(later)}
-    later.textContent=x.later;
-    sheet.addEventListener('click',ev=>{if(ev.target===sheet){ev.preventDefault();ev.stopImmediatePropagation()}},true);
-  }
-  function openPaywall(){try{window.SleepRiseSubscription?.open?.();setTimeout(decoratePaywall,40);setTimeout(decoratePaywall,900)}catch(e){}}
-  const freeTasks=new Set(['typing','shake']);
-  const proTasks=new Set(['math','memory','barcode']);
-  const adTasks=new Set(['steps','call','random','none']);
-  function taskType(task){if(proTasks.has(task))return 'pro';if(freeTasks.has(task))return 'free';return 'ad'}
-  function bindProfileGate(){
-    const select=q('#srTaskProfile');if(!select||select.__srV63Bound)return;select.__srV63Bound=true;
-    select.addEventListener('change',ev=>{if(trialActive()||isPro())return;ev.preventDefault();ev.stopImmediatePropagation();select.value='gentle';openPaywall()},true);
-  }
-  function decorateTaskButtons(){
-    const x=c();qa('#fTask button').forEach(btn=>{
-      const task=btn.dataset.z;if(!task)return;
-      btn.querySelectorAll('.sr-v63-lock,.sr-v63-ad').forEach(n=>n.remove());
-      const kind=taskType(task);
-      if(kind==='pro'){const b=document.createElement('small');b.className='sr-v63-lock';b.textContent=x.pro;btn.appendChild(b);btn.title=x.locked;}
-      else if(kind==='ad'){const b=document.createElement('small');b.className='sr-v63-ad';b.textContent=x.ad;btn.appendChild(b);btn.title=x.ads;}
-      else btn.title='';
-    });
-  }
-  async function unlockAdTask(task){
-    if(trialActive()||isPro())return true;
-    const api=window.SleepRiseAds;
-    if(!api?.rewardAccess)return false;
-    const first=await api.rewardAccess('task-'+task,1);if(!first)return false;
-    return await api.rewardAccess('task-'+task,1);
-  }
-  document.addEventListener('click',async ev=>{
-    const btn=ev.target?.closest?.('#fTask button');if(!btn)return;
-    const task=btn.dataset.z,kind=taskType(task);
-    if(trialActive()||isPro()||kind==='free')return;
-    ev.preventDefault();ev.stopImmediatePropagation();
-    if(kind==='pro'){openPaywall();return}
-    const ok=await unlockAdTask(task);
-    if(ok&&typeof draft!=='undefined'&&draft){draft.task=task;draft.taskProfile='custom';draft.tasks=[task];if(typeof syncSheet==='function')syncSheet()}
-  },true);
-  // Any old Pro mission saved during the trial safely falls back to a free text task after the trial.
-  try{if(typeof fire==='function'&&!window.__srV63FireGuard){const oldFire=fire;window.__srV63FireGuard=true;fire=function(alarm){try{if(alarm&&!trialActive()&&!isPro()&&proTasks.has(alarm.task)){alarm={...alarm,task:'typing',tasks:['typing'],__srLockedFallback:true}}}catch(e){}return oldFire.apply(this,arguments.length? [alarm]:arguments)}}}catch(e){}
-  function trackUsage(){
-    try{const k='sleeprise_v63_app_opens',n=Number(localStorage.getItem(k)||0)+1;localStorage.setItem(k,String(n))}catch(e){}
-  }
-  function decorate(){decoratePaywall();decorateTaskButtons();bindProfileGate()}
-  trackUsage();decorate();setTimeout(decorate,350);setTimeout(decorate,1200);/* SleepRise stability: monetization decoration is event-driven. */
-  window.SleepRiseMonetization={trialActive,trialDays:7,taskType,freeTasks,proTasks,adTasks,openPaywall};
-})();
-</script>
-<!-- SLEEPRISE_V63_MONETIZATION_END -->
+
 <!-- SLEEPRISE_V64_REVIEW_START -->
 <script id="sleeprise-v64-review">
 (function(){
@@ -2527,19 +2194,13 @@ function playTone(e,t,a){t=!1;if(stopTone(),SLEEPRISE_MP3_TONES[e]){const n=(typ
   };
   const TASKS=['none','typing','steps','shake','math','memory','barcode','call','random','pushups','situps','squats','pullups','burpees'];
   const ICON={none:'○',typing:'⌨',steps:'♟',shake:'↯',math:'×',memory:'▦',barcode:'▥',call:'☎',random:'◇',pushups:'⇣',situps:'◒',squats:'⌄',pullups:'↑',burpees:'✦',object:'⌕'};
-  const PRO=new Set(['math','memory','barcode','pushups','situps','squats','pullups','burpees']);
+  const PRO=new Set();
   const FITNESS=new Set(['pushups','situps','squats','pullups','burpees']);
   const clean=e=>String(e||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const lang=()=>{const x=(document.documentElement.lang||'en').slice(0,2);return C.includes(x)?x:'en'};
   const tx=()=>TX[lang()]||TX.en;
   const fmt=(s,v)=>String(s).replace(/\{[nc]\}/g,String(v));
-  const isPro=()=>{try{return !!(window.SleepRiseMonetization?.isPro?.()||window.SleepRiseSubscription?.isPro?.()||localStorage.getItem('sf_pro')==='1')}catch(e){return false}};
-  const trial=()=>{try{return !!window.SleepRiseMonetization?.trialActive?.()}catch(e){return false}};
-  const maybeUnlock=task=>{
-    if(!PRO.has(task)||isPro()||trial())return true;
-    try{if(typeof window.SleepRiseMonetization?.openPaywall==='function'){window.SleepRiseMonetization.openPaywall();return false}}catch(e){}
-    return true;
-  };
+  const maybeUnlock=()=>true;
   const currentTasks=()=>{
     try{if(typeof draft!=='undefined'&&draft){const a=Array.isArray(draft.tasks)?draft.tasks.filter(x=>TASKS.includes(x)):[];if(a.length)return a;return [TASKS.includes(draft.task)?draft.task:'none']}}
     catch(e){}
@@ -3110,7 +2771,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   function patchOnboarding(){const o=$('#v42Onboarding');if(!o)return false;o.querySelectorAll('[data-v42-female-note]').forEach(x=>x.remove());const spans=o.querySelectorAll('.v42-onboard-features span');spans.forEach(x=>{if((x.textContent||'').includes('ilaç')||(x.textContent||'').includes('nöbet'))x.textContent='Uyku planı, alarm sesleri, radyo ile uyanma ve rahatlama modları.'});return true}
   function createRelaxLibrary(){const page=$('#p-relax');if(!page||$('#sr44RelaxLibrary'))return;$('#sleepriseRelaxLibrary')?.remove();const section=document.createElement('section');section.id='sr44RelaxLibrary';section.className='sr44-relax-library';section.innerHTML='<div class="sr44-section-head"><div><span>RAHATLAMA SESLERİ</span><h3>Sesleri klasörüne göre seç</h3><p>Ses ve görüntüyü ayrı ayrı kontrol et.</p></div><button type="button" data-sr44-relax-stop>DURDUR</button></div><div class="sr44-category-tabs" data-sr44-relax-tabs><button class="on" data-sr44-relax-filter="all">Tümü</button><button data-sr44-relax-filter="Yağmur">Yağmur</button><button data-sr44-relax-filter="Orman">Orman</button><button data-sr44-relax-filter="Su ve dalga">Su ve dalga</button><button data-sr44-relax-filter="Gece">Gece</button></div><div class="sr44-relax-list">'+RELAX.map(a=>'<article class="sr44-relax-card" data-sr44-relax-card="'+a.id+'" data-sr44-relax-group="'+a.group+'"><span class="sr44-relax-icon">'+(a.group==='Su ve dalga'?'≈':a.group==='Gece'?'◌':a.group==='Yağmur'?'≋':'♧')+'</span><div><b>'+a.title+'</b><small>'+a.desc+'</small></div><button type="button" data-sr44-relax-play="'+a.id+'">BAŞLAT</button><input type="range" min="0" max="1" step=".01" value=".32" data-sr44-relax-volume="'+a.id+'"></article>').join('')+'</div><div class="sr44-mix"><button type="button" data-sr44-mix="sleep">Uyku miksini başlat</button><button type="button" data-sr44-mix="coast">Kıyı miksini başlat</button></div>';
-    const anchor=$('#v32SoundDeck')||page.firstElementChild;anchor?.after(section);if(!anchor)page.appendChild(section);wireRelax(section);createCinemaLibrary(page);
+    const anchor=$('#v32SoundDeck')||page.firstElementChild;anchor?.after(section);if(!anchor)page.appendChild(section);wireRelax(section);createCinemaLibrary(page);setTimeout(()=>{try{window.SleepRiseV69LocalePolish?.apply?.()}catch(e){}},0);
   }
   function wireRelax(section){section.querySelectorAll('[data-sr44-relax-filter]').forEach(b=>b.addEventListener('click',()=>{section.querySelectorAll('[data-sr44-relax-filter]').forEach(x=>x.classList.remove('on'));b.classList.add('on');const f=b.dataset.sr44RelaxFilter;section.querySelectorAll('[data-sr44-relax-card]').forEach(c=>c.hidden=f!=='all'&&c.dataset.sr44RelaxGroup!==f)}));section.querySelectorAll('[data-sr44-relax-play]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.sr44RelaxPlay,a=audioPlayers.get('relax:'+id);if(a&&!a.paused){stopAudio(a);b.textContent='BAŞLAT';b.closest('[data-sr44-relax-card]').classList.remove('is-playing')}else{playRelax(id,section.querySelector('[data-sr44-relax-volume="'+id+'"]').value);b.textContent='DURDUR';b.closest('[data-sr44-relax-card]').classList.add('is-playing')}}));section.querySelectorAll('[data-sr44-relax-volume]').forEach(i=>i.addEventListener('input',()=>playRelax(i.dataset.sr44RelaxVolume,i.value)));section.querySelector('[data-sr44-relax-stop]').addEventListener('click',stopRelax);section.querySelector('[data-sr44-mix="sleep"]').addEventListener('click',()=>{playRelax('rain',.2);playRelax('forest',.16);playRelax('nightBirds',.1);notice('Uyku miksin başladı')});section.querySelector('[data-sr44-mix="coast"]').addEventListener('click',()=>{playRelax('waves',.2);playRelax('wavesGulls',.12);notice('Kıyı miksin başladı')})}
   function createCinemaLibrary(page){if($('#sr44CinemaLibrary'))return;const s=document.createElement('section');s.id='sr44CinemaLibrary';s.className='sr44-cinema-library';s.innerHTML='<div class="sr44-section-head"><div><span>SİNEMA MODU</span><h3>Arka planda rahatlatıcı videolar</h3><p>Bir sahne seç; ekran sadeleşsin ve video sessizce loop oynasın.</p></div></div><div class="sr44-category-tabs" data-sr44-video-tabs><button class="on" data-sr44-video-filter="all">Tümü</button><button data-sr44-video-filter="Su ve dalga">Su</button><button data-sr44-video-filter="Orman">Orman</button><button data-sr44-video-filter="Gece">Gece</button></div><div class="sr44-video-grid">'+VIDEOS.map(v=>'<article class="sr44-video-card" data-sr44-video-card="'+v.id+'" data-sr44-video-group="'+v.group+'"><video muted loop playsinline preload="metadata" src="'+v.file+'"></video><div><b>'+v.title+'</b><small>'+v.group+' · sessiz arka plan</small></div><button type="button" data-sr44-video-open="'+v.id+'">SİNEMADA AÇ</button></article>').join('')+'</div><small class="sr44-license-note">Klipler Mixkit Stock Video Free License altında seçildi; kaynak sayfaları proje içindeki lisans notunda kayıtlıdır.</small>';s.querySelectorAll('[data-sr44-video-filter]').forEach(b=>b.addEventListener('click',()=>{s.querySelectorAll('[data-sr44-video-filter]').forEach(x=>x.classList.remove('on'));b.classList.add('on');const f=b.dataset.sr44VideoFilter;s.querySelectorAll('[data-sr44-video-card]').forEach(c=>c.hidden=f!=='all'&&c.dataset.sr44VideoGroup!==f)}));s.querySelectorAll('[data-sr44-video-open]').forEach(b=>b.addEventListener('click',()=>openCinema(VIDEOS.find(v=>v.id===b.dataset.sr44VideoOpen))));page.appendChild(s)}
@@ -3725,7 +3386,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .sr68-status-title{display:block;color:#006f62;font:800 11px/1.2 Inter,-apple-system,system-ui,sans-serif}
 .sr68-status-copy{display:block;margin-top:4px;color:#5a6880;font:600 10px/1.35 Inter,-apple-system,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sr68-master-stop{min-height:38px;padding:9px 11px;border:1px solid rgba(193,63,53,.24);border-radius:11px;background:rgba(255,95,82,.10);color:#b33e35;font:800 10px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 150ms var(--sr68-ease)}
-.sr68-master-stop:active,.sr68-toggle:active,.sr68-pro button:active{transform:scale(.97)}
+.sr68-master-stop:active,.sr68-toggle:active{transform:scale(.97)}
 .sr68-section{margin:0 0 12px;padding:13px;border:1px solid rgba(43,107,255,.12);border-radius:18px;background:rgba(255,255,255,.72)}
 .sr68-section:last-of-type{margin-bottom:0}
 .sr68-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:10px}
@@ -3755,10 +3416,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .sr68-preference input:checked{background:#00a98c}
 .sr68-preference input:checked:after{transform:translateX(17px)}
 .sr68-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(43,107,255,.07);color:#5a6880;font:600 9px/1.4 Inter,-apple-system,system-ui,sans-serif}
-.sr68-pro{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:14px;border-radius:17px;background:linear-gradient(135deg,#102c52,#126b73 62%,#00a98c);color:#fff;box-shadow:0 12px 26px rgba(0,106,115,.18)}
-.sr68-pro b{display:block;font:800 14px/1.15 Inter,-apple-system,system-ui,sans-serif}
-.sr68-pro p{margin:5px 0 0;color:rgba(255,255,255,.78);font:500 9px/1.4 Inter,-apple-system,system-ui,sans-serif}
-.sr68-pro button{flex:0 0 auto;min-height:36px;padding:9px 10px;border:1px solid rgba(255,255,255,.36);border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font:800 9px/1 Inter,-apple-system,system-ui,sans-serif;cursor:pointer;transition:transform 150ms var(--sr68-ease),background 180ms var(--sr68-ease)}
 .sr68-details{margin-top:10px;border-top:1px solid rgba(43,107,255,.10);padding-top:10px}
 .sr68-details summary{cursor:pointer;color:#2450aa;font:800 10px/1.3 Inter,-apple-system,system-ui,sans-serif}
 .sr68-details[open] summary{margin-bottom:10px}
@@ -3767,8 +3424,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .app.nightmode .sr68-head p,.app.nightmode .sr68-section-head small,.app.nightmode .sr68-sound-desc,.app.nightmode .sr68-preference small,.app.nightmode .sr68-note{color:#bfc5dd}
 .app.nightmode .sr68-section,.app.nightmode .sr68-sound-row{background:rgba(31,38,78,.82);border-color:rgba(255,255,255,.12)}
 .app.nightmode .sr68-toggle,.app.nightmode .sr68-tools-row button{background:rgba(255,255,255,.08);color:#dffdfa;border-color:rgba(134,230,222,.25)}
-@media(max-width:420px){.sr68-head{display:block}.sr68-head-badge{display:inline-block;margin-top:10px}.sr68-status{grid-template-columns:1fr}.sr68-master-stop{width:100%}.sr68-pro{align-items:flex-start;flex-direction:column}.sr68-pro button{width:100%}}
-@media(prefers-reduced-motion:reduce){.sr68-status,.sr68-sound-row,.sr68-sound-dot,.sr68-toggle,.sr68-preference input,.sr68-preference input:after,.sr68-master-stop,.sr68-tools-row button,.sr68-pro button{transition:none!important}}
+@media(max-width:420px){.sr68-head{display:block}.sr68-head-badge{display:inline-block;margin-top:10px}.sr68-status{grid-template-columns:1fr}.sr68-master-stop{width:100%}}
+@media(prefers-reduced-motion:reduce){.sr68-status,.sr68-sound-row,.sr68-sound-dot,.sr68-toggle,.sr68-preference input,.sr68-preference input:after,.sr68-master-stop,.sr68-tools-row button{transition:none!important}}
 </style>
 <script id="sleeprise-v68-sound-center">
 (function(){
@@ -3812,9 +3469,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function startFile(item){if(active.has(item.id)){stopOne(item.id);return}if(item.mode!=='alarm'&&soundCount()>=3){notify('Aynı anda en fazla 3 rahatlama sesi açılabilir.');return}try{const a=ensureAudio(item);a.volume=volumeFor(item.id);a.currentTime=0;const p=a.play();active.set(item.id,{kind:'file',audio:a,label:item.title,timer:item.mode==='alarm'?setTimeout(()=>stopOne(item.id),6500):null});buzz();renderStatus();if(p?.catch)p.catch(()=>{stopOne(item.id);notify('Ses için ekrana dokunarak tekrar deneyin.')})}catch(e){console.warn('SleepRise file sound',e);notify('Ses başlatılamadı.')}}
   function start(item){item.mode==='generated'?startGenerated(item):startFile(item)}
   function row(item){const title=item.mode==='generated'?legacyLabel(item):item.title;return '<article class="sr68-sound-row" data-sr68-id="'+esc(item.id)+'" data-sr68-mode="'+esc(item.mode)+'"><span class="sr68-sound-dot" aria-hidden="true"></span><div><b class="sr68-sound-name">'+esc(title)+'</b><small class="sr68-sound-desc">'+esc(item.desc||'')+'</small></div><button type="button" class="sr68-toggle" data-sr68-toggle="'+esc(item.id)+'" aria-pressed="false">'+(item.mode==='alarm'?'DİNLE':'AÇ')+'</button>'+(item.mode==='alarm'?'':'<input class="sr68-volume" type="range" min="0" max="1" step=".01" value="'+volumeFor(item.id)+'" data-sr68-volume="'+esc(item.id)+'" aria-label="'+esc(title)+' ses seviyesi">')+'</article>'}
-  function build(){const tools=q('#p-tools');if(!tools)return;let card=q('#sr66SoundSettings');if(!card){card=document.createElement('section');card.id='sr66SoundSettings';tools.insertBefore(card,tools.firstElementChild)}if(card.dataset.sr68Ready==='1'){renderStatus();return}card.dataset.sr68Ready='1';card.classList.add('sr68-center');card.innerHTML='<div class="sr68-head"><div><b>Sesler ve kişisel ayarlar</b><p>Rahatlama, bebek ve alarm seslerini tek merkezden yönet.</p></div><span class="sr68-head-badge">V39 DENEYİMİ</span></div><div class="sr68-status" id="sr68Status"><div><b class="sr68-status-title" id="sr68StatusTitle">Ses merkezi hazır</b><span class="sr68-status-copy" id="sr68StatusCopy">Henüz ses çalmıyor. Sesler yalnız Aç düğmesine dokunduğunda başlar.</span></div><button type="button" class="sr68-master-stop" id="sr68StopAll">TÜMÜNÜ DURDUR</button></div><section class="sr68-section"><div class="sr68-section-head"><div><b>Rahatlama sesleri</b><small>Eski sürümdeki yerleşik sesler ve gerçek kayıtlar.</small></div></div><div class="sr68-sound-list">'+[...generated,...real].map(row).join('')+'</div><div class="sr68-tools-row"><button type="button" data-sr68-mix="sleep">UYKU MİKSİ: YAĞMUR + ORMAN + GECE</button><button type="button" data-sr68-mix="coast">KIYI MİKSİ: DALGA + KUŞLAR</button></div></section><section class="sr68-section"><div class="sr68-section-head"><div><b>Bebek sesleri</b><small>V39’daki sakinleştirici bebek sesleri.</small></div></div><div class="sr68-sound-list">'+baby.map(row).join('')+'</div></section><details class="sr68-details"><summary>Alarm seslerini merkezi olarak dinle</summary><div class="sr68-sound-list">'+alarms().map(x=>row({id:x.id,file:x.file,title:x.title,desc:x.desc||'Alarm önizlemesi',mode:'alarm'})).join('')+'</div></details><section class="sr68-section"><div class="sr68-section-head"><div><b>Kişisel ayarlar</b><small>Ses davranışını kendi kullanımına göre belirle.</small></div></div><div class="sr68-preferences"><label class="sr68-preference"><span><b>Yumuşak ses geçişi</b><small>Gerçek kayıtlar açılırken sert başlamaz.</small></span><input type="checkbox" data-sr68-pref="ramp" '+(state.ramp?'checked':'')+'></label><label class="sr68-preference"><span><b>Titreşimli düğme geri bildirimi</b><small>Bir sesi açıp kapattığında kısa geri bildirim verir.</small></span><input type="checkbox" data-sr68-pref="haptics" '+(state.haptics?'checked':'')+'></label></div><div class="sr68-note">Güvenli davranış: Uygulama açılırken hiçbir ses otomatik başlamaz. Ses yalnızca ilgili satırdaki <b>AÇ</b> veya <b>DİNLE</b> düğmesine dokununca başlar; her satırda görünür DURDUR düğmesi bulunur.</div></section><div class="sr68-pro"><div><b>SleepRise Pro</b><p>Reklamları kaldır, beklemeleri azalt ve sakin deneyimi koru.</p></div><button type="button" data-sr68-pro>PRO SEÇENEKLERİ</button></div>';
+  function build(){const tools=q('#p-tools');if(!tools)return;let card=q('#sr66SoundSettings');if(!card){card=document.createElement('section');card.id='sr66SoundSettings';tools.insertBefore(card,tools.firstElementChild)}if(card.dataset.sr68Ready==='1'){renderStatus();return}card.dataset.sr68Ready='1';card.classList.add('sr68-center');card.innerHTML='<div class="sr68-head"><div><b>Sesler ve kişisel ayarlar</b><p>Rahatlama, bebek ve alarm seslerini tek merkezden yönet.</p></div><span class="sr68-head-badge">V39 DENEYİMİ</span></div><div class="sr68-status" id="sr68Status"><div><b class="sr68-status-title" id="sr68StatusTitle">Ses merkezi hazır</b><span class="sr68-status-copy" id="sr68StatusCopy">Henüz ses çalmıyor. Sesler yalnız Aç düğmesine dokunduğunda başlar.</span></div><button type="button" class="sr68-master-stop" id="sr68StopAll">TÜMÜNÜ DURDUR</button></div><section class="sr68-section"><div class="sr68-section-head"><div><b>Rahatlama sesleri</b><small>Eski sürümdeki yerleşik sesler ve gerçek kayıtlar.</small></div></div><div class="sr68-sound-list">'+[...generated,...real].map(row).join('')+'</div><div class="sr68-tools-row"><button type="button" data-sr68-mix="sleep">UYKU MİKSİ: YAĞMUR + ORMAN + GECE</button><button type="button" data-sr68-mix="coast">KIYI MİKSİ: DALGA + KUŞLAR</button></div></section><section class="sr68-section"><div class="sr68-section-head"><div><b>Bebek sesleri</b><small>V39’daki sakinleştirici bebek sesleri.</small></div></div><div class="sr68-sound-list">'+baby.map(row).join('')+'</div></section><details class="sr68-details"><summary>Alarm seslerini merkezi olarak dinle</summary><div class="sr68-sound-list">'+alarms().map(x=>row({id:x.id,file:x.file,title:x.title,desc:x.desc||'Alarm önizlemesi',mode:'alarm'})).join('')+'</div></details><section class="sr68-section"><div class="sr68-section-head"><div><b>Kişisel ayarlar</b><small>Ses davranışını kendi kullanımına göre belirle.</small></div></div><div class="sr68-preferences"><label class="sr68-preference"><span><b>Yumuşak ses geçişi</b><small>Gerçek kayıtlar açılırken sert başlamaz.</small></span><input type="checkbox" data-sr68-pref="ramp" '+(state.ramp?'checked':'')+'></label><label class="sr68-preference"><span><b>Titreşimli düğme geri bildirimi</b><small>Bir sesi açıp kapattığında kısa geri bildirim verir.</small></span><input type="checkbox" data-sr68-pref="haptics" '+(state.haptics?'checked':'')+'></label></div><div class="sr68-note">Güvenli davranış: Uygulama açılırken hiçbir ses otomatik başlamaz. Ses yalnızca ilgili satırdaki <b>AÇ</b> veya <b>DİNLE</b> düğmesine dokununca başlar; her satırda görünür DURDUR düğmesi bulunur.</div></section>';
     q('#sr68StopAll')?.addEventListener('click',()=>{buzz();stopAll()});
-    card.addEventListener('click',e=>{const b=e.target.closest('[data-sr68-toggle]');if(b){e.preventDefault();e.stopPropagation();const id=b.dataset.sr68Toggle;const item=[...allRelax,...alarms().map(x=>({...x,mode:'alarm'}))].find(x=>x.id===id);if(item)start(item);return}const mix=e.target.closest('[data-sr68-mix]');if(mix){e.preventDefault();e.stopPropagation();const ids=mix.dataset.sr68Mix==='coast'?['sea-waves','sea-waves-seagulls']:['rain','forest','birds-at-night'];ids.forEach(id=>{const item=[...allRelax].find(x=>x.id===id);if(item&&!active.has(id))start(item)});return}const pro=e.target.closest('[data-sr68-pro]');if(pro){e.preventDefault();try{window.SleepRiseSubscription?.open?.()}catch(err){notify('Pro seçenekleri henüz hazır değil.')}return}});
+    card.addEventListener('click',e=>{const b=e.target.closest('[data-sr68-toggle]');if(b){e.preventDefault();e.stopPropagation();const id=b.dataset.sr68Toggle;const item=[...allRelax,...alarms().map(x=>({...x,mode:'alarm'}))].find(x=>x.id===id);if(item)start(item);return}const mix=e.target.closest('[data-sr68-mix]');if(mix){e.preventDefault();e.stopPropagation();const ids=mix.dataset.sr68Mix==='coast'?['sea-waves','sea-waves-seagulls']:['rain','forest','birds-at-night'];ids.forEach(id=>{const item=[...allRelax].find(x=>x.id===id);if(item&&!active.has(id))start(item)});return}});
     card.addEventListener('input',e=>{const input=e.target.closest('[data-sr68-volume]');if(input){e.stopPropagation();setVolume(input.dataset.sr68Volume,input.value)}});
     card.addEventListener('change',e=>{const p=e.target.closest('[data-sr68-pref]');if(!p)return;if(p.dataset.sr68Pref==='ramp')state.ramp=p.checked;if(p.dataset.sr68Pref==='haptics')state.haptics=p.checked;save();buzz()});
     renderStatus();
@@ -3897,7 +3554,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const first=c.querySelector('.sr68-tools-row');if(first){setKey(first.querySelector('[data-sr68-mix="sleep"]'),'mixDeep');setKey(first.querySelector('[data-sr68-mix="coast"]'),'mixCoast')}
     setKey(c.querySelector('.sr68-details summary'),'alarmSection');
     const prefs=c.querySelectorAll('.sr68-preference');[['softRamp','softRampDesc'],['haptics','hapticsDesc']].forEach((x,i)=>{const r=prefs[i];if(r){setKey(r.querySelector('b'),x[0]);setKey(r.querySelector('small'),x[1])}});
-    setKey(c.querySelector('.sr68-note'),'safeNote');setKey(c.querySelector('.sr68-pro p'),'proText');setKey(c.querySelector('.sr68-pro button'),'pro');
+    setKey(c.querySelector('.sr68-note'),'safeNote');
     qa('#sr66SoundSettings [data-sr68-id]').forEach(row=>{const id=row.dataset.sr68Id;const name=N[code()]?.[id]||N.en[id]||id;set(row.querySelector('.sr68-sound-name'),name);set(row.querySelector('.sr68-sound-desc'),row.dataset.sr68Mode==='alarm'?(window.SleepRiseV50ToneName?.(id)||txt('alarmSection')):txt('relaxSection'));const b=row.querySelector('[data-sr68-toggle]');if(b)b.textContent=row.classList.contains('is-playing')?txt('stop'):(row.dataset.sr68Mode==='alarm'?txt('listen'):txt('open'))});
   }
   function patchOnboarding(){const o=q('#onb');if(!o)return;setKey(o.querySelector('.v35-onb-note'),'onbNote');setKey(o.querySelector('#onbTitle'),'onbTitle');setKey(o.querySelector('#onbSub'),'onbSub');setKey(o.querySelector('.v33-onb-dursun .hello'),'onbHello');setKey(o.querySelector('.v33-onb-dursun .caption'),'onbCaption');qa('#onb button').forEach(b=>{const v=(b.textContent||'').trim();if(/^(Skip|Atla|Saltar|Überspringen|Ignorer|Pular|تخط|跳过|スキップ)$/i.test(v))set(b,code()==='tr'?'Atla':code()==='en'?'Skip':code()==='es'?'Omitir':code()==='de'?'Überspringen':code()==='fr'?'Ignorer':code()==='pt'?'Pular':code()==='ar'?'تخطى':code()==='zh'?'跳过':'スキップ');if(/^(Continue|Devam|Continuar|Weiter|Continuer|続ける|继续)$/i.test(v))set(b,txt('start'))});}
@@ -4016,57 +3673,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<!-- SLEEPRISE_REVIEW_MODE_V74_START -->
-<script id="sleeprise-review-mode-v74">
-/* SleepRise review build: monetization is intentionally disabled until a later update. */
-(function(){
-  'use strict';
-  if(window.__SleepRiseReviewModeV74)return;
-  window.__SleepRiseReviewModeV74=true;
-  window.SleepRiseReviewMode=true;
-  const removeReviewNodes=()=>{
-    try{
-      document.documentElement.classList.add('sleeprise-review-build');
-      document.documentElement.style.setProperty('--sr-ad-safe-space','0px');
-      document.querySelector('.pages')?.classList.remove('sr-ad-safe');
-      document.querySelectorAll('#srAdProCard,.sr-ad-pro-card,.sr-ad-atm-gate,#srProSheet,.sr-pro-sheet,[data-sr-paywall],[data-sleeprise-paywall]').forEach(el=>{
-        if(el.id==='srProSheet'||el.classList.contains('sr-pro-sheet'))el.classList.remove('on');
-        el.hidden=true;
-        el.setAttribute('aria-hidden','true');
-      });
-    }catch(e){}
-  };
-  const alwaysAvailable={
-    isPro:()=>true,
-    trialActive:()=>true,
-    trialRemaining:()=>0,
-    init:()=>Promise.resolve(false),
-    showBanner:()=>Promise.resolve(false),
-    removeBanner:()=>Promise.resolve(true),
-    showRewarded:()=>Promise.resolve(true),
-    rewardAccess:()=>Promise.resolve(true),
-    guard:async(_purpose,_count,action)=>{try{if(typeof action==='function')await action();return true}catch(e){return false}},
-    showPro:()=>false,
-    privacy:()=>Promise.resolve(false)
-  };
-  window.SleepRiseAds=Object.assign(window.SleepRiseAds||{},alwaysAvailable);
-  window.SleepRiseMonetization=Object.assign(window.SleepRiseMonetization||{},alwaysAvailable,{openPaywall:()=>false});
-  const sub=window.SleepRiseSubscription||{};
-  window.SleepRiseSubscription=Object.assign(sub,{isPro:()=>true,open:()=>false,buyProduct:()=>Promise.resolve(false),loadProducts:()=>Promise.resolve([]),restore:()=>Promise.resolve(false),manage:()=>Promise.resolve(false),refresh:()=>Promise.resolve(false)});
-  const reviewStyle=document.createElement('style');reviewStyle.id='sleeprise-review-mode-v74-style';reviewStyle.textContent='html.sleeprise-review-build #srProSheet,html.sleeprise-review-build .sr-pro-sheet,html.sleeprise-review-build #srAdProCard,html.sleeprise-review-build .sr-ad-pro-card,html.sleeprise-review-build .sr-ad-atm-gate{display:none!important;visibility:hidden!important;pointer-events:none!important}';document.head.appendChild(reviewStyle);
-  removeReviewNodes();
-  const observer=new MutationObserver(()=>{
-    if(!observer.__scheduled){observer.__scheduled=true;requestAnimationFrame(()=>{observer.__scheduled=false;removeReviewNodes()})}
-  });
-  try{observer.observe(document.body,{subtree:true,childList:true})}catch(e){}
-  document.addEventListener('click',e=>{
-    const target=e.target?.closest?.('#srAdProCard,.sr-ad-pro-card,.sr-ad-atm-gate,#srProSheet,.sr-pro-sheet,[data-sr-paywall],[data-sleeprise-paywall]');
-    if(target){e.preventDefault();e.stopImmediatePropagation()}
-  },true);
-  window.SleepRiseReviewBuild={enabled:true,monetizationDisabled:true,adsDisabled:true,subscriptionsDisabled:true,restore:removeReviewNodes};
-})();
-</script>
-<!-- SLEEPRISE_REVIEW_MODE_V74_END -->
+
 
 <!-- SLEEPRISE_V81_NATIVE_ALARM_STOP_START -->
 <script id="sleeprise-v81-native-alarm-stop">

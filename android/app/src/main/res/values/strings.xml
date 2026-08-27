@@ -4,5 +4,4 @@
     <string name="title_activity_main">Sleepify</string>
     <string name="package_name">com.sleepify.app</string>
     <string name="custom_url_scheme">com.sleepify.app</string>
-    <string name="admob_app_id">ca-app-pub-7996356702191225~8756079069</string>
 </resources>
