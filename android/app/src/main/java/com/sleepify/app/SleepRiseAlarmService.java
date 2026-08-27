@@ -85,15 +85,35 @@ public class SleepRiseAlarmService extends Service {
                     .putString("locale", locale == null ? "en" : locale)
                     .putString("radioUrl", radioUrl == null ? "" : radioUrl)
                     .apply();
-            startAlarmPlayback(id, sound, alarmId, locale, radioUrl);
+            try {
+                startAlarmPlayback(id, sound, alarmId, locale, radioUrl);
+            } catch (Exception startupFailure) {
+                // If Android/OEM rejects foreground promotion after accepting
+                // startForegroundService(), do not leave the user with silence.
+                android.util.Log.e("SleepRiseAlarm", "Alarm service startup failed", startupFailure);
+                SleepRiseAlarmReceiver.emergencyFallback(
+                        getApplicationContext(), id, sound, alarmId, locale);
+                stopSelf();
+            }
         } else if (intent == null) {
             SharedPreferences state = getSharedPreferences(STATE_PREFS, MODE_PRIVATE);
             if (state.getBoolean("running", false)) {
-                startAlarmPlayback(state.getInt("notificationId", -1),
-                        state.getString("sound", "phone_alarm"),
-                        state.getString("alarmId", ""),
-                        state.getString("locale", "en"),
-                        state.getString("radioUrl", ""));
+                try {
+                    startAlarmPlayback(state.getInt("notificationId", -1),
+                            state.getString("sound", "phone_alarm"),
+                            state.getString("alarmId", ""),
+                            state.getString("locale", "en"),
+                            state.getString("radioUrl", ""));
+                } catch (Exception startupFailure) {
+                    android.util.Log.e("SleepRiseAlarm", "Sticky alarm restart failed", startupFailure);
+                    SleepRiseAlarmReceiver.emergencyFallback(
+                            getApplicationContext(),
+                            state.getInt("notificationId", -1),
+                            state.getString("sound", "phone_alarm"),
+                            state.getString("alarmId", ""),
+                            state.getString("locale", "en"));
+                    stopSelf();
+                }
             }
         }
         return START_STICKY;
@@ -208,13 +228,16 @@ public class SleepRiseAlarmService extends Service {
         if (resource == 0) return false;
         MediaPlayer next = null;
         try {
-            next = MediaPlayer.create(context, resource);
-            if (next == null) return false;
-            next.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
-            next.setAudioAttributes(new AudioAttributes.Builder()
+            AudioAttributes attributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_ALARM)
-                    .build());
+                    .build();
+            // Use the AudioAttributes-aware factory so USAGE_ALARM is applied
+            // before MediaPlayer preparation. Calling setAudioAttributes after
+            // create(context, resource) is too late to guarantee alarm routing.
+            next = MediaPlayer.create(context, resource, attributes, 0);
+            if (next == null) return false;
+            next.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
             next.setLooping(true);
             next.setVolume(1f, 1f);
             final MediaPlayer failedPlayer = next;

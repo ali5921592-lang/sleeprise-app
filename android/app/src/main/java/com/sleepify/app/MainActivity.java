@@ -205,8 +205,8 @@ public class MainActivity extends BridgeActivity {
 
     private final class SleepRiseAlarmBridge {
         @JavascriptInterface
-        public void scheduleAlarm(int id, long atMillis, String sound, String alarmId, String locale, String radioUrl) {
-            SleepRiseAlarmReceiver.schedule(MainActivity.this, id, atMillis, sound, alarmId, locale, radioUrl);
+        public boolean scheduleAlarm(int id, long atMillis, String sound, String alarmId, String locale, String radioUrl) {
+            return SleepRiseAlarmReceiver.schedule(MainActivity.this, id, atMillis, sound, alarmId, locale, radioUrl);
         }
 
         @JavascriptInterface

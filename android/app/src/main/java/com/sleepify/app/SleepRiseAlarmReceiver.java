@@ -37,11 +37,13 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
     private static final String ACTIVE_ID = "active_id";
     private static final String CHANNEL_ID = "sleeprise_native_alarm_v90";
     private static final int NOTIFICATION_BASE = 720000;
+    private static final long DELIVERY_WAKELOCK_TIMEOUT_MS = 15_000L;
 
     private static MediaPlayer activePlayer;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
     private static PowerManager.WakeLock wakeLock;
+    private static PowerManager.WakeLock deliveryWakeLock;
     private static int activeNotificationId = -1;
 
     @Override
@@ -59,22 +61,27 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         String alarmId = intent.getStringExtra("alarmId");
         String locale = intent.getStringExtra("locale");
         String radioUrl = intent.getStringExtra("radioUrl");
+        Context app = context.getApplicationContext();
+        PowerManager.WakeLock handoff = acquireDeliveryWakeLock(app);
+        boolean serviceStartAccepted = false;
         try {
-            SleepRiseAlarmService.start(context.getApplicationContext(), id, sound, alarmId, locale, radioUrl);
+            SleepRiseAlarmService.start(app, id, sound, alarmId, locale, radioUrl);
+            serviceStartAccepted = true;
         } catch (Exception error) {
             // Fallback for devices that reject a foreground-service start.
-            if (!playAlarmSound(context.getApplicationContext(), sound) && !"phone_alarm".equals(sound)) {
-                playAlarmSound(context.getApplicationContext(), "phone_alarm");
-            }
-            showAlarmNotification(context.getApplicationContext(), id, alarmId, locale);
+            emergencyFallback(app, id, sound, alarmId, locale);
+        } finally {
+            // On success the short lock times out automatically after the
+            // receiver-to-service handoff. On failure release it immediately.
+            if (!serviceStartAccepted) releaseDeliveryWakeLock(handoff);
         }
     }
 
-    public static void schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale) {
-        schedule(context, id, atMillis, sound, alarmId, locale, "");
+    public static boolean schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale) {
+        return schedule(context, id, atMillis, sound, alarmId, locale, "");
     }
 
-    public static void schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale, String radioUrl) {
+    public static boolean schedule(Context context, int id, long atMillis, String sound, String alarmId, String locale, String radioUrl) {
         Context app = context.getApplicationContext();
         Intent intent = new Intent(app, SleepRiseAlarmReceiver.class)
                 .setAction(ACTION_FIRE)
@@ -85,24 +92,8 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 .putExtra("radioUrl", radioUrl == null ? "" : radioUrl);
         PendingIntent pending = pendingIntent(app, id, intent);
         AlarmManager alarmManager = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager == null) return;
+        if (alarmManager == null) return false;
         long trigger = Math.max(atMillis, System.currentTimeMillis() + 1000L);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-            try {
-                // AlarmClock is the OS-sanctioned exact path for alarm-clock apps and is
-                // treated as a user-visible wake-up alarm during Doze/standby.
-                PendingIntent show = showIntent(app, id, alarmId, locale);
-                AlarmManager.AlarmClockInfo alarmClock = new AlarmManager.AlarmClockInfo(trigger, show);
-                alarmManager.setAlarmClock(alarmClock, pending);
-            } catch (SecurityException denied) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, pending);
-        }
-
         SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         Set<String> ids = new HashSet<>(prefs.getStringSet(IDS, new HashSet<>()));
         ids.add(String.valueOf(id));
@@ -114,6 +105,43 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
                 .putString("locale_" + id, normalizeLocale(locale))
                 .putString("radio_" + id, radioUrl == null ? "" : radioUrl)
                 .apply();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            // A regular alarm-clock release must not silently downgrade to an
+            // inexact alarm when the user has not granted Alarms & reminders.
+            // The web layer surfaces this state and opens the special-access page.
+            return false;
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
+                try {
+                    // AlarmClock is the OS-sanctioned exact path for alarm-clock apps and is
+                    // treated as a user-visible wake-up alarm during Doze/standby.
+                    PendingIntent show = showIntent(app, id, alarmId, locale);
+                    AlarmManager.AlarmClockInfo alarmClock = new AlarmManager.AlarmClockInfo(trigger, show);
+                    alarmManager.setAlarmClock(alarmClock, pending);
+                } catch (SecurityException alarmClockDenied) {
+                    // Some OEMs can reject setAlarmClock after the permission check
+                    // (or the user can revoke access between the check and call).
+                    // Try the other exact API, then keep a non-silent inexact fallback.
+                    try {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
+                    } catch (SecurityException exactDenied) {
+                        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
+                    }
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // This path is intentionally a fallback: Android may defer it in Doze.
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending);
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, pending);
+            }
+        } catch (Exception schedulingFailure) {
+            android.util.Log.e("SleepRiseAlarm", "Alarm registration failed for " + id, schedulingFailure);
+            return false;
+        }
+
+        SleepRiseDirectBootReceiver.save(app, id, trigger, sound, alarmId, normalizeLocale(locale));
+        return true;
     }
 
     public static void cancelAll(Context context) {
@@ -135,6 +163,47 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         // Rescheduling must not silence an alarm that is currently ringing.
         // The explicit stopAlarmSound bridge is the only path allowed to stop it.
         prefs.edit().clear().apply();
+        SleepRiseDirectBootReceiver.clear(app);
+    }
+
+    /** Cancel only the normal AlarmManager entry for one alarm id. */
+    static void cancelScheduledEntry(Context context, int id) {
+        if (id < 0) return;
+        Context app = context.getApplicationContext();
+        AlarmManager manager = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        if (manager == null) return;
+        Intent intent = new Intent(app, SleepRiseAlarmReceiver.class).setAction(ACTION_FIRE);
+        PendingIntent pending = pendingIntent(app, id, intent);
+        try { manager.cancel(pending); } catch (Exception ignored) { }
+        try { pending.cancel(); } catch (Exception ignored) { }
+    }
+
+    private static PowerManager.WakeLock acquireDeliveryWakeLock(Context context) {
+        synchronized (SleepRiseAlarmReceiver.class) {
+            try {
+                PowerManager manager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                if (manager == null) return null;
+                if (deliveryWakeLock != null && deliveryWakeLock.isHeld()) {
+                    try { deliveryWakeLock.release(); } catch (Exception ignored) { }
+                }
+                deliveryWakeLock = manager.newWakeLock(
+                        PowerManager.PARTIAL_WAKE_LOCK,
+                        "SleepRise:AlarmDelivery");
+                deliveryWakeLock.setReferenceCounted(false);
+                deliveryWakeLock.acquire(DELIVERY_WAKELOCK_TIMEOUT_MS);
+                return deliveryWakeLock;
+            } catch (Exception ignored) {
+                deliveryWakeLock = null;
+                return null;
+            }
+        }
+    }
+
+    private static void releaseDeliveryWakeLock(PowerManager.WakeLock lock) {
+        synchronized (SleepRiseAlarmReceiver.class) {
+            try { if (lock != null && lock.isHeld()) lock.release(); } catch (Exception ignored) { }
+            if (deliveryWakeLock == lock) deliveryWakeLock = null;
+        }
     }
 
     private static void acquireWakeLock(Context context) {
@@ -206,6 +275,15 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         }
     }
 
+    /** Emergency path used when the foreground service cannot be promoted. */
+    static void emergencyFallback(Context context, int id, String sound, String alarmId, String locale) {
+        String requested = sound == null ? "phone_alarm" : sound;
+        if (!playAlarmSound(context, requested) && !"phone_alarm".equals(requested)) {
+            playAlarmSound(context, "phone_alarm");
+        }
+        showAlarmNotification(context, id, alarmId, locale);
+    }
+
     private static boolean playAlarmSound(Context context, String sound) {
         synchronized (SleepRiseAlarmReceiver.class) {
             stopCurrent(context);
@@ -221,14 +299,17 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
             if (resource == 0) resource = context.getResources().getIdentifier("alarm_default", "raw", context.getPackageName());
             if (resource == 0) return false;
             try {
-                MediaPlayer player = MediaPlayer.create(context, resource);
-                if (player == null) return false;
                 AudioAttributes attributes = new AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .setUsage(AudioAttributes.USAGE_ALARM)
                         .build();
+                // The AudioAttributes overload creates an already-prepared player;
+                // unlike create(context, resource) followed by setAudioAttributes,
+                // the alarm usage is applied before preparation and therefore routes
+                // through the device alarm stream as intended.
+                MediaPlayer player = MediaPlayer.create(context, resource, attributes, 0);
+                if (player == null) return false;
                 player.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
-                player.setAudioAttributes(attributes);
                 player.setLooping(true);
                 player.setVolume(1.0f, 1.0f);
                 final String requestedSound = safe;
@@ -255,7 +336,7 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private static void showAlarmNotification(Context context, int id, String alarmId, String locale) {
+    static void showAlarmNotification(Context context, int id, String alarmId, String locale) {
         ensureChannel(context);
         int notificationId = NOTIFICATION_BASE + Math.max(0, id);
         activeNotificationId = notificationId;
@@ -319,7 +400,12 @@ public class SleepRiseAlarmReceiver extends BroadcastReceiver {
     }
 
     public static void rescheduleSaved(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        Context app = context.getApplicationContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager manager = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+            if (manager == null || !manager.canScheduleExactAlarms()) return;
+        }
+        SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         Set<String> saved = prefs.getStringSet(IDS, new HashSet<>());
         for (String value : new ArrayList<>(saved)) {
             try {

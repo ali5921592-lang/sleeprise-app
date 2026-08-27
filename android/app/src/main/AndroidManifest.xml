@@ -27,12 +27,31 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".SleepRiseDirectBootReceiver"
+            android:directBootAware="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="com.sleepify.app.SLEEP_RISE_DIRECT_BOOT_FIRE" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".SleepRiseAlarmService"
             android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <service
+            android:name=".SleepRiseDirectBootService"
+            android:enabled="true"
+            android:directBootAware="true"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
