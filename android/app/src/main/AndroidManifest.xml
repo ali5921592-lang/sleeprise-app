@@ -24,7 +24,7 @@
 
         <receiver
             android:name=".SleepRiseBootReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -35,7 +35,7 @@
         <receiver
             android:name=".SleepRiseDirectBootReceiver"
             android:directBootAware="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="com.sleepify.app.SLEEP_RISE_DIRECT_BOOT_FIRE" />
